@@ -141,6 +141,7 @@ class 道具(ModeComp, BaseMode):
             "转盘",
             "牛奶",
             "止疼药",
+            "烟花",
         ]
         ban = []
         limit = 16
@@ -294,6 +295,7 @@ class 赌徒(ModeComp, BaseMode):
             "口红",
             "牛奶",
             "金币",
+            "烟花",
         ]
         ban = []
         limit = 12

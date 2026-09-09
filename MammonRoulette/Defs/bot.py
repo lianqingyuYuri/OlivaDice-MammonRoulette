@@ -21,8 +21,6 @@ from .. import config
 from ..Core.comp import BotComp, PropComp, EffectComp, ModeComp
 from ..Core.work import RegGameWork
 
-from AmorLib import Registerable
-
 
 # region DQN 网络
 class DQN(nn.Module):
