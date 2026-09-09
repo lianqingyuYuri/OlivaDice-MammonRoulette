@@ -21,6 +21,9 @@ class BaseMode:
     points = 0
     reply: list = []
 
+    class GameWork:
+        pass
+
     class seats:
         default: int = 2
         max: int = 8
@@ -28,6 +31,7 @@ class BaseMode:
 
     class props:
         pool: list = []
+        allow: list = []
         ban: list = []
         limit: int = 0
 
@@ -92,9 +96,8 @@ class 经典(ModeComp, BaseMode):
     )
     points = 50
 
-    class props:
+    class props(BaseMode.props):
         pool = ["手铐", "锯子", "花生", "巧克力", "香烟", "红牛", "邀请函", "放大镜"]
-        ban = []
         limit = 6
 
     @classmethod
@@ -126,7 +129,7 @@ class 道具(ModeComp, BaseMode):
     )
     points = 40
 
-    class props:
+    class props(BaseMode.props):
         pool = [
             "手铐",
             "锯子",
@@ -143,7 +146,6 @@ class 道具(ModeComp, BaseMode):
             "止疼药",
             "烟花",
         ]
-        ban = []
         limit = 16
 
     @classmethod
@@ -163,7 +165,7 @@ class 金币(ModeComp, BaseMode):
     brief = (
         "〈赏金〉60"
         "\n〈血量〉每名玩家5hp."
-        "\n〈道具池(上限12)〉{金币}"
+        "\n〈道具池(上限12)〉\\{金币\\}"
         "\n〔机制〕"
         "\n1. 回合开始时获得 1 枚金币;"
         "\n2. 玩家血量首次低至 2 时, 获得 1 枚金币."
@@ -174,9 +176,8 @@ class 金币(ModeComp, BaseMode):
         ("strMrModeGold_2", "金币模式 机制2的回复词", "金光乍現！一枚含金量0%的金幣?落入{tGamblerName}手中."),
     ]
 
-    class props:
+    class props(BaseMode.props):
         pool = ["金币"]
-        ban = []
         limit = 12
 
     @classmethod
@@ -223,7 +224,7 @@ class 勇者(ModeComp, BaseMode):
     points = 40
     reply = [("strMrModeHero_1", "勇者模式 机制3的回复词", "伴隨七彩光芒，魔彈發射.")]
 
-    class props:
+    class props(BaseMode.props):
         pool = [
             "手铐",
             "锯子",
@@ -239,7 +240,6 @@ class 勇者(ModeComp, BaseMode):
             "牛奶",
             "金币",
         ]
-        ban = []
         limit = 12
 
     @classmethod
@@ -285,7 +285,7 @@ class 赌徒(ModeComp, BaseMode):
         ("strMrModeGambler_2", "赌徒模式 机制4的回复词", "伴隨七彩光芒，魔彈發射."),
     ]
 
-    class props:
+    class props(BaseMode.props):
         pool = [
             "手铐",
             "锯子",
@@ -343,3 +343,59 @@ class 赌徒(ModeComp, BaseMode):
             tmp["dmg"] += 1
             msg_reply = msg_manager.msg_format("strMrModeGambler_2")
             RegGameWork.reply_info(msg_manager, msg_reply)
+
+
+# class 大富翁(ModeComp, BaseMode):
+#     name = "大富翁"
+#     brief = ""
+#     points = 0
+#     reply: list = []
+
+#     class props(BaseMode.props):
+#         pool: list = ["金币"]
+#         allow: list = ["和你爆了"]
+#         ban: list = ["手铐", "口红", "止疼药"]
+#         limit: int = 0
+
+#     @classmethod
+#     def join(cls, msg_manager, user_id):
+#         game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
+#         players[user_id]["hp"] = 2
+
+#     # 受伤
+#     @classmethod
+#     def damage(cls, msg_manager):
+#         game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
+#         target, murderer = tmp["target"], tmp["murderer"]
+#         if tmp["dmg"] <= 0:
+#             if players[target]["hp"] > 2:
+#                 tmp["dmg"] = 0
+#             return
+#         elif target != murderer:
+#             RegGameWork.draw_prop(msg_manager, target, 1)
+#             if players[target]["props"].count("金币") > 5:
+#                 order[:] = [target]
+
+#                 RegGameWork.is_over(msg_manager)
+
+#     # 死亡
+#     @classmethod
+#     def dead(cls, msg_manager):
+#         game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
+#         target, murderer = tmp["target"], tmp["murderer"]
+#         if players[target]["surrender"]:
+#             tmp["check_over"] = True
+#             return
+#         tmp["check_over"] = False
+#         target, murderer = tmp["target"], tmp["murderer"]
+#         pl_target, pl_murderer = players[target], players[murderer]
+#         if target == murderer:
+#             pass
+#         else:
+#             pass
+#         order.append(target)
+#         pl_target["hp"] = 2
+#         pl_target["actions"] = 0
+#         pl_target["kills"] = 0
+#         pl_target["suicide"] = False
+#         pl_murderer["kills"] = 0

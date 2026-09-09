@@ -9,6 +9,7 @@ game = {
         "points": int,  # 积分
         "props": {
             "pool": [],  # 道具池
+            "allow": [],  # 道具白名单
             "ban": [],  # 道具黑名单
             "limit": int,  # 持有道具上限
         },

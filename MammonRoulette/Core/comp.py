@@ -40,6 +40,7 @@ class ModeComp(Registerable):
                 },
                 "props": {
                     "pool": mode_cls.props.pool,
+                    "allow": mode_cls.props.allow,
                     "ban": mode_cls.props.ban,
                     "limit": mode_cls.props.limit,
                 },

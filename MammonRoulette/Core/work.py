@@ -202,10 +202,13 @@ class RegGameWork:
     @staticmethod
     def get_prop(game, user_id, prop):  # 获取道具
         mode_props = game["mode"]["props"]
+        mode_limit = mode_props["limit"]
         pl_props = game["data"]["players"][user_id]["props"]
-        if len(pl_props) >= mode_props["limit"]:
+        if mode_limit > 0 and len(pl_props) >= mode_limit:
             return None
         elif prop in mode_props["ban"]:
+            prop = random.choice(mode_props["pool"])
+        elif prop not in mode_props["allow"] and not MR.Core.comp.PropComp.get(prop).allow_flag:
             prop = random.choice(mode_props["pool"])
         pl_props.append(prop)
         return prop
@@ -249,6 +252,10 @@ class RegGameWork:
     def join(cls, msg_manager, user_id, bot_model=None):
         """添加一名玩家."""
         game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
+        mode_cls = MR.Core.comp.ModeComp.get(game["mode"]["name"])
+        mode_cls_join = getattr(mode_cls.GameWork, "join", None)
+        if mode_cls_join:
+            return mode_cls_join(msg_manager, user_id, bot_model)
         if bot_model is None:
             with DataBase(config.DB_PATH) as db:
                 name = db.select("gambler", "name", "user_id = ?", user_id)[0][0]
@@ -274,6 +281,10 @@ class RegGameWork:
     def start(cls, msg_manager):
         """对局开始"""
         game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
+        mode_cls = MR.Core.comp.ModeComp.get(game["mode"]["name"])
+        mode_cls_start = getattr(mode_cls.GameWork, "start", None)
+        if mode_cls_start:
+            return mode_cls_start(msg_manager)
         game["start"] = True
         game["expireTime"] = 0
         cls.bullet(msg_manager)
@@ -299,6 +310,10 @@ class RegGameWork:
     @classmethod
     def bullet(cls, msg_manager):  # 刷新子弹
         game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
+        mode_cls = MR.Core.comp.ModeComp.get(game["mode"]["name"])
+        mode_cls_bullet = getattr(mode_cls.GameWork, "bullet", None)
+        if mode_cls_bullet:
+            return mode_cls_bullet(msg_manager)
         if game["over"]:
             return
         if data["ammo_live"] < 1:
@@ -313,6 +328,10 @@ class RegGameWork:
     @classmethod
     def reload(cls, msg_manager):  # 装弹
         game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
+        mode_cls = MR.Core.comp.ModeComp.get(game["mode"]["name"])
+        mode_cls_reload = getattr(mode_cls.GameWork, "reload", None)
+        if mode_cls_reload:
+            return mode_cls_reload(msg_manager)
         cls.handle_event(msg_manager, "reload")
         ammo_live, ammo_blank = random.randint(1, 4), random.randint(1, 4)
         data["ammo_live"], data["ammo_blank"] = ammo_live, ammo_blank
@@ -322,6 +341,10 @@ class RegGameWork:
     @classmethod
     def shoot(cls, msg_manager, target):  # 开枪
         game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
+        mode_cls = MR.Core.comp.ModeComp.get(game["mode"]["name"])
+        mode_cls_shoot = getattr(mode_cls.GameWork, "shoot", None)
+        if mode_cls_shoot:
+            return mode_cls_shoot(msg_manager, target)
         dmg_type = ""
         is_attack_me = target == shooter
         murderer = shooter
@@ -390,6 +413,10 @@ class RegGameWork:
     @classmethod
     def damage(cls, msg_manager, target, dmg, murderer):  # 受伤
         game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
+        mode_cls = MR.Core.comp.ModeComp.get(game["mode"]["name"])
+        mode_cls_damage = getattr(mode_cls.GameWork, "damage", None)
+        if mode_cls_damage:
+            return mode_cls_damage(msg_manager, target, murderer)
         if game["over"]:
             return
         dmg_type = tmp.get("dmg_type", "")
@@ -421,17 +448,15 @@ class RegGameWork:
     @classmethod
     def dead(cls, msg_manager, target, murderer):  # 死亡
         game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
+        mode_cls = MR.Core.comp.ModeComp.get(game["mode"]["name"])
+        mode_cls_dead = getattr(mode_cls.GameWork, "dead", None)
+        if mode_cls_dead:
+            return mode_cls_dead(msg_manager, target, murderer)
         if game["over"]:
             return
-        check_over = tmp.get("check_over", True)
-        cls.handle_event(msg_manager, "dead", target=target, murderer=murderer, check_over=check_over)
-        target, murderer, check_over = tmp["target"], tmp["murderer"], tmp["check_over"]
         if not murderer:
             murderer = shooter
-        pl_target, pl_murderer = (
-            players[target],
-            players[murderer],
-        )
+        pl_target, pl_murderer = players[target], players[murderer]
         name = pl_target["name"]
         if players[target]["surrender"]:
             RegGameWork.reply_info(msg_manager, msg_manager.msg_format("strMrGamblerSurrender", {"tGamblerName": name}))
@@ -455,6 +480,9 @@ class RegGameWork:
             cls.switch(msg_manager)
             tmp["consume_action"] = 0
         order.remove(target)
+        check_over = tmp.get("check_over", True)
+        cls.handle_event(msg_manager, "dead", target=target, murderer=murderer, check_over=check_over)
+        check_over = tmp["check_over"]
         if check_over:
             cls.is_over(msg_manager)
         return
@@ -462,6 +490,10 @@ class RegGameWork:
     @classmethod
     def is_over(cls, msg_manager):  # 游戏是否结束
         game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
+        mode_cls = MR.Core.comp.ModeComp.get(game["mode"]["name"])
+        mode_cls_is_over = getattr(mode_cls.GameWork, "is_over", None)
+        if mode_cls_is_over:
+            return mode_cls_is_over(msg_manager)
         if game["over"]:
             return True
         tmp["check_over"] = True
@@ -484,6 +516,10 @@ class RegGameWork:
     @classmethod
     def end_round(cls, msg_manager):  # 回合结束
         game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
+        mode_cls = MR.Core.comp.ModeComp.get(game["mode"]["name"])
+        mode_cls_end_round = getattr(mode_cls.GameWork, "end_round", None)
+        if mode_cls_end_round:
+            return mode_cls_end_round(msg_manager)
         if game["over"]:
             return
         cls.handle_event(msg_manager, "end_round")
@@ -500,6 +536,10 @@ class RegGameWork:
     @classmethod
     def switch(cls, msg_manager):  # 换人
         game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
+        mode_cls = MR.Core.comp.ModeComp.get(game["mode"]["name"])
+        mode_cls_switch = getattr(mode_cls.GameWork, "switch", None)
+        if mode_cls_switch:
+            return mode_cls_switch(msg_manager)
         while True:
             shooter = order[(order.index(shooter) + 1) % len(order)]
             pl_shooter = players[shooter]

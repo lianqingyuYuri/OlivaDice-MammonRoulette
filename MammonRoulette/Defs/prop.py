@@ -18,8 +18,9 @@ from ..Core.work import RegGameWork
 
 
 class BaseProp:
-    name = ""
-    brief = ""
+    name: str = ""
+    brief: str = ""
+    allow_flag: bool = True
     reply: list = []
 
     @classmethod
@@ -43,6 +44,7 @@ class BaseProp:
         pass
 
 
+# region 道具
 class 手铐(PropComp, BaseProp):
     name = "手铐"
     brief = "不能将枪手选为目标. 束缚目标行动 1 回合, 且在目标恢复行动前无法将其再次选为手铐目标."
@@ -525,23 +527,22 @@ class 金币(PropComp, BaseProp):
                 plugin_event.reply(msg_reply)
                 return
             # 检查是否持有金币
-            if cls.name not in players[user_id]["props"]:
+            if not RegGameWork.remove_prop(game, user_id, cls.name):
                 msg_reply = msg_manager.msg_format("strMrGamblerNoProp", {"tPropName": cls.name})
                 plugin_event.reply(msg_reply)
                 return
-            # cls.purchase(msg_manager, user_id, groups[0])
-            prop = groups[0]
             # 检查道具是否被禁售
-            if prop in game["mode"]["props"]["ban"]:
+            prop = groups[0]
+            actual_prop = RegGameWork.get_prop(game, user_id, prop)
+            if prop != actual_prop:
+                RegGameWork.remove_prop(game, user_id, actual_prop)
+                RegGameWork.get_prop(game, user_id, cls.name)
                 RegGameWork.reply_info(msg_manager, msg_manager.msg_format("strMrPropGold_3", {"tPropName": prop}))
                 msg_reply = RegGameWork.format_reply(msg_manager)
                 plugin_event.reply(msg_reply)
                 return
-            # 兑换道具
-            pl_user = players[user_id]
-            props = pl_user["props"]
-            props[props.index(cls.name)] = prop
-            name = pl_user["name"]
+            # reply
+            name = RegGameWork.get_name(game, user_id)
             t_value = {
                 "tGamblerName": name,
                 "tPropName": prop,
@@ -651,3 +652,11 @@ class 烟花(PropComp, BaseProp):
                     RegGameWork.damage(msg_manager, pl, 1, shooter)
                     tmp[f"{pl}_hp_now"] = tmp["hp_now"]
         return
+
+
+# endregion
+# class 和你爆了(PropComp, BaseProp):
+#     name = "和你爆了"
+#     brief = ""
+#     allow_flag = False
+#     reply = []
