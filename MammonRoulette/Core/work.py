@@ -66,7 +66,7 @@ class RegGameWork:
         if not reply["only"]:
             info, note = reply["info"], reply["note"]
             t_value = {}
-            t_value.update({"tInfo": "\n".join([item["data"] for item in info])})
+            t_value.update({"tInfo": "\n".join([item["data"] for item in info if item["data"]])})
             if note["ammo"]:
                 # 子弹
                 t_value.update({"tNowBulletType": msg_manager.msg_format("strMrAmmoLive" if bullet else "strMrAmmoBlank")})
