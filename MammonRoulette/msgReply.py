@@ -271,10 +271,11 @@ def match_game(plugin_event, Proc, msg_manager, groups):
     if len(order) >= seats:
         RegGameWork.start(msg_manager)
         situation(plugin_event, Proc, msg_manager, None)
+        msg_reply = RegGameWork.format_reply(msg_manager)
     else:
         msg_reply = msg_manager.msg_format("strMrGamePrep", {"tGameMode": mode_name, "tSeatsHas": len(order), "tSeatsMax": seats})
-        plugin_event.reply(msg_reply)
-        return
+    plugin_event.reply(msg_reply)
+    return
     # endregion
 
 

@@ -29,7 +29,7 @@ class BaseProp:
 
     @classmethod
     def apply(cls, msg_manager, target) -> bool | None:
-        raise NotImplementedError
+        pass
 
     @classmethod
     def callback(cls, msg_manager, moment, prop_data=None) -> bool | None:

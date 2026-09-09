@@ -163,7 +163,7 @@ class RegGameWork:
         search = prop_id if prop_id else prop_name
         search_key = "id" if prop_id else "name"
         prop_event = msg_manager.val["game"]["data"]["prop_event"]
-        for prop_data in prop_event:
+        for prop_data in reversed(prop_event):
             if prop_data[search_key] == search:
                 MR.Core.comp.PropComp.uninstall(msg_manager, prop_data["name"], prop_data)
                 prop_event.remove(prop_data)

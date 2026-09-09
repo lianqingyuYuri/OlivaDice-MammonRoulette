@@ -58,7 +58,8 @@ class 神经麻痹(EffectComp, BaseEffect):
     brief = "回合结束时失去所有[神经麻痹], 并失去等值的HP."
     reply = [
         ("strMrEffectPain_1", "神经麻痹效果 层数增加", "{tGamblerName}沒感到疼痛[神经麻痹 {stacks_before}->{stacks_now}]."),
-        ("strMrEffectPain_2", "神经麻痹效果 结算", "{tGamblerName}的神經在悲鳴[hp {hp_before}->{hp_now}]……"),
+        ("strMrEffectPain_2", "神经麻痹效果 结算1", "{tGamblerName}的神經在悲鳴[hp {hp_before}->{hp_now}]……"),
+        ("strMrEffectPain_3", "神经麻痹效果 结算2", "{tGamblerName}的藥效衰減, 不再止疼."),
     ]
 
     @classmethod
@@ -74,7 +75,7 @@ class 神经麻痹(EffectComp, BaseEffect):
         effect_data = players[target]["effect_event"][cls.name]
         if stacks > 0:
             effect_data["stacks"] += stacks
-            effect_data["data"].append({"dmg": stacks, "murderer": target})
+            effect_data["data"].append({"dmg": stacks, "murderer": tmp["murderer"]})
         return True
 
     @classmethod
@@ -105,13 +106,12 @@ class 神经麻痹(EffectComp, BaseEffect):
             for data in effect_data["data"]:
                 RegGameWork.damage(msg_manager, target, data["dmg"], data["murderer"])
             if not RegGameWork.is_over(msg_manager):
-                msg_reply = msg_manager.msg_format(
-                    "strMrEffectPain_2",
-                    {
-                        "tGamblerName": RegGameWork.get_name(game, target),
-                        "hp_before": hp_before,
-                        "hp_now": tmp["hp_now"],
-                    },
-                )
+                if effect_data["stacks"] > 0:
+                    msg_reply = msg_manager.msg_format(
+                        "strMrEffectPain_2",
+                        {"tGamblerName": RegGameWork.get_name(game, target), "hp_before": hp_before, "hp_now": tmp["hp_now"]},
+                    )
+                else:
+                    msg_reply = msg_manager.msg_format("strMrEffectPain_3", {"tGamblerName": RegGameWork.get_name(game, target)})
                 RegGameWork.reply_info(msg_manager, msg_reply)
             return True
