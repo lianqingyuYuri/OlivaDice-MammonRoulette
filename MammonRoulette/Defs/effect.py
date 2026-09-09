@@ -57,8 +57,8 @@ class 神经麻痹(EffectComp, BaseEffect):
     name = "神经麻痹"
     brief = "回合结束时失去所有[神经麻痹], 并失去等值的HP."
     reply = [
-        ("strMrEffectPain_1", "神经麻痹效果 层数增加", "{tGamblerName}沒感受到疼痛[{stacks_before}->{stacks_now}]."),
-        ("strMrEffectPain_2", "神经麻痹效果 结算", "{tGamblerName}的神經在悲鳴……[hp {hp_before}->{hp_now}]."),
+        ("strMrEffectPain_1", "神经麻痹效果 层数增加", "{tGamblerName}沒感到疼痛[神经麻痹 {stacks_before}->{stacks_now}]."),
+        ("strMrEffectPain_2", "神经麻痹效果 结算", "{tGamblerName}的神經在悲鳴[hp {hp_before}->{hp_now}]……"),
     ]
 
     @classmethod
