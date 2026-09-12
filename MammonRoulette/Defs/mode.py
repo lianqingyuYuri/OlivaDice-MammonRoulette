@@ -94,7 +94,7 @@ class 经典(ModeComp, BaseMode):
     points = 50
 
     class props(BaseMode.props):
-        pool = ("手镯", "锯子", "花生", "巧克力", "香烟", "红牛", "邀请函", "放大镜")
+        pool = ("手铐", "锯子", "花生", "巧克力", "香烟", "红牛", "邀请函", "放大镜")
         limit = 6
 
     @classmethod
@@ -128,7 +128,7 @@ class 道具(ModeComp, BaseMode):
 
     class props(BaseMode.props):
         pool = (
-            "手镯",
+            "手铐",
             "锯子",
             "邀请函",
             "花生",
@@ -223,7 +223,7 @@ class 勇者(ModeComp, BaseMode):
 
     class props(BaseMode.props):
         pool = (
-            "手镯",
+            "手铐",
             "锯子",
             "邀请函",
             "花生",
@@ -284,7 +284,7 @@ class 赌徒(ModeComp, BaseMode):
 
     class props(BaseMode.props):
         pool = (
-            "手镯",
+            "手铐",
             "锯子",
             "邀请函",
             "红牛",

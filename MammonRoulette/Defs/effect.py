@@ -109,11 +109,7 @@ class 神经麻痹(EffectComp, BaseEffect):
                 if effect_data["stacks"] > 0:
                     msg_reply = msg_manager.msg_format(
                         "strMrEffectPain_2",
-                        {
-                            "tGamblerName": RegGameWork.get_name(game, target),
-                            "hp_before": hp_before,
-                            "hp_now": players[target]["hp"],
-                        },
+                        {"tGamblerName": RegGameWork.get_name(game, target), "hp_before": hp_before, "hp_now": tmp["hp_now"]},
                     )
                 else:
                     msg_reply = msg_manager.msg_format("strMrEffectPain_3", {"tGamblerName": RegGameWork.get_name(game, target)})
