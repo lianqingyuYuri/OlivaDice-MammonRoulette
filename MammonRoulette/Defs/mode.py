@@ -21,9 +21,6 @@ class BaseMode:
     points = 0
     reply: tuple = ()
 
-    class GameWork:
-        pass
-
     class seats:
         default: int = 2
         max: int = 8
