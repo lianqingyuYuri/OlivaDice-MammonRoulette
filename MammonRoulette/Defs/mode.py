@@ -19,7 +19,7 @@ class BaseMode:
     name = ""
     brief = ""
     points = 0
-    reply: list = []
+    reply: tuple = ()
 
     class GameWork:
         pass
@@ -30,9 +30,9 @@ class BaseMode:
         min: int = 2
 
     class props:
-        pool: list = []
-        allow: list = []
-        ban: list = []
+        pool: tuple = ()
+        allow: tuple = ()
+        ban: tuple = ()
         limit: int = 0
 
     class modify:
@@ -97,7 +97,7 @@ class 经典(ModeComp, BaseMode):
     points = 50
 
     class props(BaseMode.props):
-        pool = ["手铐", "锯子", "花生", "巧克力", "香烟", "红牛", "邀请函", "放大镜"]
+        pool = ("手镯", "锯子", "花生", "巧克力", "香烟", "红牛", "邀请函", "放大镜")
         limit = 6
 
     @classmethod
@@ -130,8 +130,8 @@ class 道具(ModeComp, BaseMode):
     points = 40
 
     class props(BaseMode.props):
-        pool = [
-            "手铐",
+        pool = (
+            "手镯",
             "锯子",
             "邀请函",
             "花生",
@@ -145,7 +145,7 @@ class 道具(ModeComp, BaseMode):
             "牛奶",
             "止疼药",
             "烟花",
-        ]
+        )
         limit = 16
 
     @classmethod
@@ -171,13 +171,13 @@ class 金币(ModeComp, BaseMode):
         "\n2. 玩家血量首次低至 2 时, 获得 1 枚金币."
     )
     points = 60
-    reply = [
+    reply = (
         ("strMrModeGold_1", "金币模式 机制2的回复词", "金光乍現！一枚金幣落入{tGamblerName}手中."),
         ("strMrModeGold_2", "金币模式 机制2的回复词", "金光乍現！一枚含金量0%的金幣?落入{tGamblerName}手中."),
-    ]
+    )
 
     class props(BaseMode.props):
-        pool = ["金币"]
+        pool = ("金币",)
         limit = 12
 
     @classmethod
@@ -222,11 +222,11 @@ class 勇者(ModeComp, BaseMode):
         "\n3. 实弹有1/3的概率使伤害+1."
     )
     points = 40
-    reply = [("strMrModeHero_1", "勇者模式 机制3的回复词", "伴隨七彩光芒，魔彈發射.")]
+    reply = (("strMrModeHero_1", "勇者模式 机制3的回复词", "伴隨七彩光芒，魔彈發射."),)
 
     class props(BaseMode.props):
-        pool = [
-            "手铐",
+        pool = (
+            "手镯",
             "锯子",
             "邀请函",
             "花生",
@@ -239,7 +239,7 @@ class 勇者(ModeComp, BaseMode):
             "转盘",
             "牛奶",
             "金币",
-        ]
+        )
         limit = 12
 
     @classmethod
@@ -280,14 +280,14 @@ class 赌徒(ModeComp, BaseMode):
         "\n5. 不会正常显示弹药数量."
     )
     points = 40
-    reply = [
+    reply = (
         ("strMrModeGambler_1", "赌徒模式 机制3的回复词", "子彈擊穿突然出現的{poker}."),
         ("strMrModeGambler_2", "赌徒模式 机制4的回复词", "伴隨七彩光芒，魔彈發射."),
-    ]
+    )
 
     class props(BaseMode.props):
-        pool = [
-            "手铐",
+        pool = (
+            "手镯",
             "锯子",
             "邀请函",
             "红牛",
@@ -296,8 +296,7 @@ class 赌徒(ModeComp, BaseMode):
             "牛奶",
             "金币",
             "烟花",
-        ]
-        ban = []
+        )
         limit = 12
 
     class modify(BaseMode.modify):
