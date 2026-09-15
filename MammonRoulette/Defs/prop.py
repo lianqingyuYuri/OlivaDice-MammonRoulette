@@ -67,7 +67,7 @@ class 锯子(PropComp, BaseProp):
             msg_reply = msg_manager.msg_format("strMrPropSaw_1")
             RegGameWork.reply_info(msg_manager, msg_reply)
             prop_data = {"name": cls.name}
-            RegGameWork.create_prop_event(msg_manager, prop_data)
+            RegGameWork.create_props_event(msg_manager, prop_data)
             return True
         msg_reply = msg_manager.msg_format("strMrPropSaw_2")
         RegGameWork.reply_info(msg_manager, msg_reply)
@@ -240,7 +240,7 @@ class 放大镜(PropComp, BaseProp):
             RegGameWork.reply_info(msg_manager, msg_reply)
             prop_data = {"name": cls.name}
             cls.persist(msg_manager, prop_data)
-            RegGameWork.create_prop_event(msg_manager, prop_data)
+            RegGameWork.create_props_event(msg_manager, prop_data)
             return True
         msg_reply = msg_manager.msg_format("strMrPropMagnifier_2")
         RegGameWork.reply_info(msg_manager, msg_reply)
@@ -341,7 +341,7 @@ class 扑克(PropComp, BaseProp):
         RegGameWork.reply_info(msg_manager, msg_reply)
         prop_data = {"name": cls.name}
         if not RegGameWork.get_prop_data(msg_manager, prop_name=cls.name):
-            RegGameWork.create_prop_event(msg_manager, prop_data)
+            RegGameWork.create_props_event(msg_manager, prop_data)
         data["bullet"] = not bullet
         if bullet:
             data["ammo_blank"] += 1
@@ -406,7 +406,7 @@ class 转盘(PropComp, BaseProp):
         for clear_prop in cls.clear_prop:
             prop_data = RegGameWork.get_prop_data(msg_manager, prop_name=clear_prop)
             if prop_data:
-                RegGameWork.remove_prop_event(msg_manager, prop_data[0]["id"])
+                RegGameWork.remove_props_event(msg_manager, prop_data[0]["id"])
         reply["note"]["ammo"] = True
         return True
 
@@ -547,7 +547,7 @@ class 止疼药(PropComp, BaseProp):
     @classmethod
     def apply(cls, msg_manager, target):
         game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
-        if "神经麻痹" in players[target]["effect_event"]:
+        if "神经麻痹" in players[target]["effects_event"]:
             msg_reply = msg_manager.msg_format("strMrPropPain_3", {"tGamblerName": RegGameWork.get_name(game, target)})
             RegGameWork.reply_info(msg_manager, msg_reply)
             return False
@@ -579,7 +579,7 @@ class 烟花(PropComp, BaseProp):
         msg_reply = msg_manager.msg_format("strMrPropFirework_1", {"tGamblerName": RegGameWork.get_name(game, target)})
         RegGameWork.reply_info(msg_manager, msg_reply)
         prop_data = {"name": cls.name, "data": {"reactivation": 0, "draws": 1}}
-        RegGameWork.create_prop_event(msg_manager, prop_data)
+        RegGameWork.create_props_event(msg_manager, prop_data)
         tmp["check_over"] = False
         order_before = order.copy()
         for pl in order_before:
@@ -591,7 +591,7 @@ class 烟花(PropComp, BaseProp):
                 RegGameWork.damage(msg_manager, pl, 1, shooter)
                 tmp[f"{pl}_hp_now"] = tmp["hp_now"]
         cls.explosion(msg_manager, order_before)
-        RegGameWork.remove_prop_event(msg_manager, prop_name=cls.name)
+        RegGameWork.remove_props_event(msg_manager, prop_name=cls.name)
         situation = [
             f"{RegGameWork.get_name(game, pl)}[hp {tmp[f'{pl}_hp_before']}->{tmp[f'{pl}_hp_now']}]."
             for pl in order_before

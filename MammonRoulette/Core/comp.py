@@ -145,7 +145,7 @@ class BotComp(Registerable):
                 "hp": players[uid]["hp"],
                 "props": players[uid]["props"],
                 "actions": players[uid]["actions"],
-                "effect_event": players[uid]["effect_event"],
+                "effects_event": players[uid]["effects_event"],
             }
             for uid in order
         }
@@ -159,7 +159,7 @@ class BotComp(Registerable):
             "players": t_players,
             "ammo": t_ammo,
             "bullet": bullet,
-            "prop_event": data["prop_event"],
+            "props_event": data["props_event"],
         }
 
     @classmethod

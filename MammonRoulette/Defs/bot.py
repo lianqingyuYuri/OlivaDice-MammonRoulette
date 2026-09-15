@@ -170,7 +170,7 @@ class Stephen(BotComp, BaseBot):
 
         effect_vec = np.zeros(len(self.ALL_EFFECTS), dtype=np.float32)
         for i, effect_name in enumerate(self.ALL_EFFECTS):
-            effect_data = player["effect_event"].get(effect_name)
+            effect_data = player["effects_event"].get(effect_name)
             if effect_data and isinstance(effect_data, dict):
                 effect_vec[i] = effect_data.get("stacks", 0) / self.MAX_EFFECT_STACKS
 
@@ -198,7 +198,7 @@ class Stephen(BotComp, BaseBot):
 
                 p_effect_vec = np.zeros(len(self.ALL_EFFECTS), dtype=np.float32)
                 for j, effect_name in enumerate(self.ALL_EFFECTS):
-                    effect_data = p["effect_event"].get(effect_name)
+                    effect_data = p["effects_event"].get(effect_name)
                     if effect_data and isinstance(effect_data, dict):
                         p_effect_vec[j] = effect_data.get("stacks", 0) / self.MAX_EFFECT_STACKS
 

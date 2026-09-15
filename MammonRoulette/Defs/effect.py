@@ -21,7 +21,7 @@ class 束缚(EffectComp, BaseEffect):
     def apply(cls, msg_manager, target, stacks):
         game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
         effect_data = {"stacks": 1}
-        RegGameWork.create_effect_event(msg_manager, target, cls.name, effect_data)
+        RegGameWork.create_effects_event(msg_manager, target, cls.name, effect_data)
         return True
 
     @classmethod
@@ -44,14 +44,14 @@ class 神经麻痹(EffectComp, BaseEffect):
     @classmethod
     def apply(cls, msg_manager, target, stacks):
         game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
-        if cls.name not in players[target]["effect_event"]:
+        if cls.name not in players[target]["effects_event"]:
             expired = False if target == shooter else True
-            players[target]["effect_event"][cls.name] = {
+            players[target]["effects_event"][cls.name] = {
                 "stacks": 0,
                 "data": [],
                 "expired": expired,
             }
-        effect_data = players[target]["effect_event"][cls.name]
+        effect_data = players[target]["effects_event"][cls.name]
         if stacks > 0:
             effect_data["stacks"] += stacks
             effect_data["data"].append({"dmg": stacks, "murderer": tmp["murderer"]})
@@ -75,7 +75,7 @@ class 神经麻痹(EffectComp, BaseEffect):
             RegGameWork.reply_info(msg_manager, msg_reply)
             return False
         elif moment == "end_round" and target == shooter:
-            effect_data = players[target]["effect_event"][cls.name]
+            effect_data = players[target]["effects_event"][cls.name]
             if not effect_data["expired"]:
                 effect_data["expired"] = True
                 return False

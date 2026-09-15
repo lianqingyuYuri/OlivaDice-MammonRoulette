@@ -30,7 +30,7 @@ game = {
                 "suicide": bool,  # 自杀
                 "surrender": bool,  # 投降
                 "points_mult": int,  # 积分倍率
-                "effect_event": {},  # 效果事件
+                "effects_event": {},  # 效果事件
                 "bot_model": None,  # AI模型
             },
         },
@@ -40,7 +40,7 @@ game = {
             "bullet_show": bool,  # 显示子弹
             "bot_flag": bool,  # AI旗帜
         },
-        "prop_event": [],  # 道具事件
+        "props_event": [],  # 道具事件
     },
     "reply": {
         "info": [],  # 常规信息
@@ -54,16 +54,16 @@ game = {
 }
 
 moment = [
+    "reload",
     "shoot",
     "damage",
     "dead",
     "end_round",
     "switch",
-    "reload",
 ]
 # 特殊事件
-remove_prop_event = "remove"
-remove_effect_event = "remove"
+remove_props_event = "remove"
+remove_effects_event = "remove"
 
 prop_data = {
     "id": str,  # 道具id

@@ -238,7 +238,7 @@ def match_game(plugin_event, Proc, msg_manager, groups):
                         "bullet_show": bool(mode_cfg["modify"]["bullet_show"]),
                         "bot_flag": False,
                     },
-                    "prop_event": [],
+                    "props_event": [],
                 },
                 "reply": {
                     "info": [],
@@ -437,7 +437,7 @@ def situation(plugin_event, Proc, msg_manager, groups):
                 )
             )
         effects = []
-        for effect, effect_data in pl["effect_event"].items():
+        for effect, effect_data in pl["effects_event"].items():
             stacks = effect_data["stacks"]
             effects.append(
                 msg_manager.msg_format(
@@ -450,7 +450,7 @@ def situation(plugin_event, Proc, msg_manager, groups):
             "tGamblerName": pl["name"],
             "tGamblerHp": pl["hp"],
             "tGamblerProps": (link.join(props) if pl["props"] else msg_manager.msg_format("strMrPropNoneNode")),
-            "tGamblerEffect": (link.join(effects) if pl["effect_event"] else msg_manager.msg_format("strMrEffectNoneNode")),
+            "tGamblerEffect": (link.join(effects) if pl["effects_event"] else msg_manager.msg_format("strMrEffectNoneNode")),
             "tGamblerActions": pl["actions"],
             "tGamblerKills": pl["kills"],
         }
