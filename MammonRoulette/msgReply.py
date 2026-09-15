@@ -157,7 +157,6 @@ commands_helpdoc.append("(模式名)[匹配,对局] //以默认人数匹配对�
 @commands.route("ob", f"^({'|'.join(ModeComp.list())})(?:匹配|对局)(?:(\\d+)p)?$")
 def match_game(plugin_event, Proc, msg_manager, groups):
     user_id, game = msg_manager.user_id, msg_manager.val["game"]
-    game_work = GameWork.from_manager(msg_manager)
     # region 自动注册
     with DataBase(config.DB_PATH) as db:
         gambler_info = db.select("gambler", "user_id", "user_id = ?", user_id)
@@ -190,8 +189,11 @@ def match_game(plugin_event, Proc, msg_manager, groups):
     # endregion
     game_start = game.get("start", False)
     # region 清除过期对局
-    expireTime = int(time.time())
-    if expireTime > game.get("expireTime", 0) and not game_start:
+    expireTime = int(time.time()) // 60
+    if expireTime > game.get("expireTime", 0):
+        if game_start:
+            msg_reply = msg_manager.msg_format("strMrGameExpired", {"tGameMode": game["mode"]["name"]})
+            plugin_event.reply(msg_reply)
         game.clear()
     # endregion
     # region 构建对局
@@ -201,7 +203,7 @@ def match_game(plugin_event, Proc, msg_manager, groups):
             {
                 "start": False,
                 "over": False,
-                "expireTime": expireTime + 600,
+                "expireTime": expireTime + 10,
                 "seats": seats,
                 "mode": {
                     "name": mode_name,
@@ -251,6 +253,7 @@ def match_game(plugin_event, Proc, msg_manager, groups):
     data = game["data"]
     order = data["order"]
     # region 添加玩家
+    game_work = GameWork.from_manager(msg_manager)
     if user_id not in order:
         game_work.join(user_id)
     # endregion

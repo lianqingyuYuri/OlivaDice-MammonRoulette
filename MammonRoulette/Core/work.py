@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import MammonRoulette as MR
 
+import time
 import random
 from dataclasses import dataclass
 
@@ -333,7 +334,7 @@ class GameWork:
 
     def start(self):
         self.game["start"] = True
-        self.game["expireTime"] = 0
+        self.game["expireTime"] = int(time.time()) // 60 + 120
         self.chamber_round()
         random.shuffle(self.order)
         self.shooter = self.order[0]
