@@ -10,7 +10,7 @@
 
 from ..Core.base import BaseEffect
 from ..Core.comp import EffectComp
-from ..Core.work import RegGameWork
+from ..Core.work import GameWork
 
 
 class 束缚(EffectComp, BaseEffect):
@@ -19,15 +19,15 @@ class 束缚(EffectComp, BaseEffect):
 
     @classmethod
     def apply(cls, msg_manager, target, stacks):
-        game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
+        game_work = GameWork.from_manager(msg_manager)
         effect_data = {"stacks": 1}
-        RegGameWork.create_effects_event(msg_manager, target, cls.name, effect_data)
+        game_work.create_effects_event(target, cls.name, effect_data)
         return True
 
     @classmethod
     def callback(cls, msg_manager, moment, target, effect_data):
-        game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
-        if moment != "switch" or target != shooter:
+        game_work = GameWork.from_manager(msg_manager)
+        if moment != "switch" or target != game_work.shooter:
             return False
         return True
 
@@ -43,9 +43,10 @@ class 神经麻痹(EffectComp, BaseEffect):
 
     @classmethod
     def apply(cls, msg_manager, target, stacks):
-        game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
+        game_work = GameWork.from_manager(msg_manager)
+        players = game_work.players
         if cls.name not in players[target]["effects_event"]:
-            expired = False if target == shooter else True
+            expired = False if target == game_work.shooter else True
             players[target]["effects_event"][cls.name] = {
                 "stacks": 0,
                 "data": [],
@@ -54,12 +55,14 @@ class 神经麻痹(EffectComp, BaseEffect):
         effect_data = players[target]["effects_event"][cls.name]
         if stacks > 0:
             effect_data["stacks"] += stacks
-            effect_data["data"].append({"dmg": stacks, "murderer": tmp["murderer"]})
+            effect_data["data"].append({"dmg": stacks, "murderer": game_work.tmp["murderer"]})
         return True
 
     @classmethod
     def callback(cls, msg_manager, moment, target, effect_data):
-        game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
+        game_work = GameWork.from_manager(msg_manager)
+        players = game_work.players
+        tmp = game_work.tmp
         if moment == "damage" and target == tmp["target"] and tmp["dmg_type"] == "":
             stacks_before = effect_data["stacks"]
             dmg, tmp["dmg"] = tmp["dmg"], 0
@@ -67,14 +70,14 @@ class 神经麻痹(EffectComp, BaseEffect):
             msg_reply = msg_manager.msg_format(
                 "strMrEffectPain_1",
                 {
-                    "tGamblerName": RegGameWork.get_name(game, target),
+                    "tGamblerName": game_work.get_name(target),
                     "stacks_before": stacks_before,
                     "stacks_now": stacks_before + dmg,
                 },
             )
-            RegGameWork.reply_info(msg_manager, msg_reply)
+            game_work.upsert_info(msg_reply)
             return False
-        elif moment == "end_round" and target == shooter:
+        elif moment == "end_round" and target == game_work.shooter:
             effect_data = players[target]["effects_event"][cls.name]
             if not effect_data["expired"]:
                 effect_data["expired"] = True
@@ -83,14 +86,14 @@ class 神经麻痹(EffectComp, BaseEffect):
             tmp["check_over"] = False
             hp_before = players[target]["hp"]
             for data in effect_data["data"]:
-                RegGameWork.damage(msg_manager, target, data["dmg"], data["murderer"])
-            if not RegGameWork.is_over(msg_manager):
+                game_work.damage(target, data["dmg"], data["murderer"])
+            if not game_work.try_over():
                 if effect_data["stacks"] > 0:
                     msg_reply = msg_manager.msg_format(
                         "strMrEffectPain_2",
-                        {"tGamblerName": RegGameWork.get_name(game, target), "hp_before": hp_before, "hp_now": tmp["hp_now"]},
+                        {"tGamblerName": game_work.get_name(target), "hp_before": hp_before, "hp_now": tmp["hp_now"]},
                     )
                 else:
-                    msg_reply = msg_manager.msg_format("strMrEffectPain_3", {"tGamblerName": RegGameWork.get_name(game, target)})
-                RegGameWork.reply_info(msg_manager, msg_reply)
+                    msg_reply = msg_manager.msg_format("strMrEffectPain_3", {"tGamblerName": game_work.get_name(target)})
+                game_work.upsert_info(msg_reply)
             return True
