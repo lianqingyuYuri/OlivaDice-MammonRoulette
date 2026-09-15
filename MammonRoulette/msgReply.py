@@ -18,7 +18,7 @@ from . import config
 from .main import commands, COMMON_CMD
 from .msgCustom import dictHelpDoc, dictDefsMode
 from .Core.comp import ModeComp, PropComp, BotComp
-from .Core.work import RegGameWork
+from .Core.work import GameWork
 
 commands_helpdoc = []
 
@@ -27,19 +27,6 @@ poker = {
     "suits": ("方片♦️", "梅花♣️", "红桃♥️", "黑桃♠️"),
     "ranks": ("A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"),
 }
-
-
-def get_target(game, target):
-    data = game["data"]
-    order = data["order"]
-    if not target:
-        target = order[(order.index(data["shooter"]) + 1) % len(order)]
-    elif target not in order:
-        target = int(target)
-        if target > len(order) or target < 1:
-            return
-        target = order[target - 1]
-    return target
 
 
 # region 资料
@@ -170,6 +157,7 @@ commands_helpdoc.append("(模式名)[匹配,对局] //以默认人数匹配对�
 @commands.route("ob", f"^({'|'.join(ModeComp.list())})(?:匹配|对局)(?:(\\d+)p)?$")
 def match_game(plugin_event, Proc, msg_manager, groups):
     user_id, game = msg_manager.user_id, msg_manager.val["game"]
+    game_work = GameWork.from_manager(msg_manager)
     # region 自动注册
     with DataBase(config.DB_PATH) as db:
         gambler_info = db.select("gambler", "user_id", "user_id = ?", user_id)
@@ -236,7 +224,7 @@ def match_game(plugin_event, Proc, msg_manager, groups):
                         "dmg": mode_cfg["modify"]["dmg"],
                         "ammo_show": bool(mode_cfg["modify"]["ammo_show"]),
                         "bullet_show": bool(mode_cfg["modify"]["bullet_show"]),
-                        "bot_flag": False,
+                        "flag_bot": False,
                     },
                     "props_event": [],
                 },
@@ -264,14 +252,14 @@ def match_game(plugin_event, Proc, msg_manager, groups):
     order = data["order"]
     # region 添加玩家
     if user_id not in order:
-        RegGameWork.join(msg_manager, user_id)
+        game_work.join(user_id)
     # endregion
     # region 检查人数
     seats = game["seats"]
     if len(order) >= seats:
-        RegGameWork.start(msg_manager)
+        game_work.start()
         situation(plugin_event, Proc, msg_manager, None)
-        msg_reply = RegGameWork.format_reply(msg_manager)
+        msg_reply = game_work.format_reply()
     else:
         msg_reply = msg_manager.msg_format("strMrGamePrep", {"tGameMode": mode_name, "tSeatsHas": len(order), "tSeatsMax": seats})
     plugin_event.reply(msg_reply)
@@ -287,24 +275,24 @@ def join_bot(plugin_event, Proc, msg_manager, groups):
     game = msg_manager.val["game"]
     if not game or game["start"]:
         return
-    game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
+    game_work = GameWork.from_manager(msg_manager)
     seats = game["seats"]
     mode_name = game["mode"]["name"]
     bot_name = groups[0]
     # region 添加AI
     while True:
         bot_id = f"bot_{random.randint(0, 999999)}"
-        if bot_id not in players:
+        if bot_id not in game_work.players:
             break
-    RegGameWork.join(msg_manager, bot_id, bot_model=bot_name)
+    game_work.join(bot_id, bot_model=bot_name)
     # endregion
     # region 检查人数
-    if len(order) >= seats:
-        RegGameWork.start(msg_manager)
+    if len(game_work.order) >= seats:
+        game_work.start()
         situation(plugin_event, Proc, msg_manager, None)
     else:
         msg_reply = msg_manager.msg_format(
-            "strMrAiJoin", {"tAIName": bot_name, "tGameMode": mode_name, "tSeatsHas": len(order), "tSeatsMax": seats}
+            "strMrAiJoin", {"tAIName": bot_name, "tGameMode": mode_name, "tSeatsHas": len(game_work.order), "tSeatsMax": seats}
         )
         plugin_event.reply(msg_reply)
         return
@@ -351,17 +339,17 @@ commands_helpdoc.append("[吞,开]枪(目标) //对目标射击, 可用qq号或�
 @commands.route("play", "^(吞|开|開)[槍|枪] *(\\d*)$")
 def shoot(plugin_event, Proc, msg_manager, groups):
     user_id = msg_manager.user_id
-    game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
-    if user_id != shooter:
-        msg_reply = msg_manager.msg_format("strMrGamblerTurn", {"tGamblerName": RegGameWork.get_name(game, shooter)})
+    game_work = GameWork.from_manager(msg_manager)
+    if user_id != game_work.shooter:
+        msg_reply = msg_manager.msg_format("strMrGamblerTurn", {"tGamblerName": game_work.get_name(game_work.shooter)})
         plugin_event.reply(msg_reply)
         return
     if groups[0] == "吞":
         target = user_id
-    elif not (target := get_target(game, groups[1])):
+    elif not (target := game_work.get_target(groups[1])):
         return
-    RegGameWork.shoot(msg_manager, target)
-    msg_reply = RegGameWork.format_reply(msg_manager)
+    game_work.shoot(target)
+    msg_reply = game_work.format_reply()
     plugin_event.reply(msg_reply)
     return
 
@@ -372,26 +360,26 @@ commands_helpdoc.append("[使用,留空](道具名)(目标) //对目标使用道
 @commands.route("play", f"^(?:使用|) *({'|'.join(PropComp.list())}) *(\\d*)$")
 def use_prop(plugin_event, Proc, msg_manager, groups):
     user_id, game = msg_manager.user_id, msg_manager.val["game"]
-    game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
+    game_work = GameWork.from_manager(msg_manager)
     # 检查是否是玩家回合
-    if user_id != shooter:
-        msg_reply = msg_manager.msg_format("strMrGamblerTurn", {"tGamblerName": RegGameWork.get_name(game, shooter)})
+    if user_id != game_work.shooter:
+        msg_reply = msg_manager.msg_format("strMrGamblerTurn", {"tGamblerName": game_work.get_name()})
         plugin_event.reply(msg_reply)
         return
     prop, target = groups[0], groups[1]
     # 检查是否持有道具
-    if prop not in players[user_id]["props"]:
+    if prop not in game_work.players[user_id]["props"]:
         msg_reply = msg_manager.msg_format("strMrGamblerNoProp", {"tPropName": prop})
         plugin_event.reply(msg_reply)
         return
     # 确认目标
     if not target:
         target = user_id
-    elif not (target := get_target(game, target)):
+    elif not (target := game_work.get_target(target)):
         return
     # 使用道具
     PropComp.use(msg_manager, prop, user_id, target)
-    msg_reply = RegGameWork.format_reply(msg_manager)
+    msg_reply = game_work.format_reply()
     plugin_event.reply(msg_reply)
     return
 
@@ -402,14 +390,13 @@ commands_helpdoc.append("投降 //以自杀的形式结束.")
 @commands.route("play", "^投降$")
 def surrender(plugin_event, Proc, msg_manager, groups):
     user_id = msg_manager.user_id
-    game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
-    players[user_id]["surrender"] = True
-    RegGameWork.dead(msg_manager, user_id, user_id)
-    if not game.get("over"):
-        shooter = data["shooter"]
-        modify["bot_flag"] = RegGameWork.is_bot(game, shooter)
-        BotComp.action(msg_manager)
-    msg_reply = RegGameWork.format_reply(msg_manager)
+    game_work = GameWork.from_manager(msg_manager)
+    game_work.players[user_id]["surrender"] = True
+    game_work.dead(user_id, user_id)
+    if not game_work.flag_over:
+        if not game_work.flag_bot:
+            BotComp.action(msg_manager)
+    msg_reply = game_work.format_reply()
     plugin_event.reply(msg_reply)
     return
 
@@ -422,13 +409,13 @@ def situation(plugin_event, Proc, msg_manager, groups):
     game = msg_manager.val["game"]
     if not game.get("start"):
         return
-    game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
+    game_work = GameWork.from_manager(msg_manager)
     t_value = {}
     link = msg_manager.msg_format("strMrLink")
     # 赌徒
     pl_data_list = []
-    for idx, user_id in enumerate(order):
-        pl = players[user_id]
+    for idx, user_id in enumerate(game_work.order):
+        pl = game_work.players[user_id]
         props = []
         for prop, count in Counter(pl["props"]).items():
             props.append(
@@ -460,35 +447,44 @@ def situation(plugin_event, Proc, msg_manager, groups):
     t_value.update(
         {
             "tShooter": msg_manager.msg_format(
-                "strMrGameShooter", {"tGamblerIdx": order.index(shooter) + 1, "tGamblerName": players[shooter]["name"]}
+                "strMrGameShooter",
+                {
+                    "tGamblerIdx": game_work.order.index(game_work.shooter) + 1,
+                    "tGamblerName": game_work.players[game_work.shooter]["name"],
+                },
             )
         }
     )
     # 子弹
-    t_value.update({"tNowBulletType": msg_manager.msg_format("strMrAmmoLive" if bullet else "strMrAmmoBlank")})
+    t_value.update({"tNowBulletType": msg_manager.msg_format("strMrAmmoLive" if game_work.bullet else "strMrAmmoBlank")})
     t_value.update(
         {
             "tGameNowBullet": (
                 msg_manager.msg_format("strMrGameNowBulletShow", t_value)
-                if modify["bullet_show"]
+                if game_work.bullet_show
                 else msg_manager.msg_format("strMrGameNowBulletHide", t_value)
             )
         }
     )
     # 弹药
-    ammo_live, ammo_blank = data["ammo_live"], data["ammo_blank"]
-    t_value.update({"tAmmoLiveCount": ammo_live, "tAmmoBlankCount": ammo_blank, "tAmmoCount": ammo_live + ammo_blank})
+    t_value.update(
+        {
+            "tAmmoLiveCount": game_work.ammo_live,
+            "tAmmoBlankCount": game_work.ammo_blank,
+            "tAmmoCount": game_work.ammo_live + game_work.ammo_blank,
+        }
+    )
     t_value.update(
         {
             "tGameAmmo": (
                 msg_manager.msg_format("strMrGameAmmoShow", t_value)
-                if modify["ammo_show"]
+                if game_work.ammo_show
                 else msg_manager.msg_format("strMrGameAmmoHide", t_value)
             )
         }
     )
     # 死亡
-    dead_list = [players[uid]["name"] for uid in players if uid not in order]
+    dead_list = [game_work.players[uid]["name"] for uid in game_work.players if uid not in game_work.order]
     t_value.update({"tDeadList": f"{link.join(dead_list)}"})
     t_value.update(
         {
