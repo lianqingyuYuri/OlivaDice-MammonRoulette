@@ -13,7 +13,7 @@ import random
 from ..msgCustom import dictDefsMode, dictDefsNote
 from ..Core.base import BaseMode
 from ..Core.comp import ModeComp
-from ..Core.work import RegGameWork
+from ..Core.work import GameWork
 
 
 class 经典(ModeComp, BaseMode):
@@ -35,10 +35,10 @@ class 经典(ModeComp, BaseMode):
 
     @classmethod
     def start(cls, msg_manager):
-        game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
-        for pl in order[1:]:
-            RegGameWork.draw_prop(msg_manager, pl, 1)
-        RegGameWork.draw_prop(msg_manager, shooter, 2)
+        game_work = GameWork.from_manager(msg_manager)
+        for pl in game_work.order[1:]:
+            game_work.draw_prop(pl, 1)
+        game_work.draw_prop(game_work.shooter, 2)
 
     @classmethod
     def join(cls, msg_manager, user_id):
@@ -47,7 +47,8 @@ class 经典(ModeComp, BaseMode):
     # 换人
     @classmethod
     def switch(cls, msg_manager):
-        RegGameWork.draw_prop(msg_manager, msg_manager.val["game"]["data"]["shooter"], 2)
+        game_work = GameWork.from_manager(msg_manager)
+        game_work.draw_prop(game_work.shooter, 2)
 
 
 class 道具(ModeComp, BaseMode):
@@ -83,14 +84,15 @@ class 道具(ModeComp, BaseMode):
 
     @classmethod
     def join(cls, msg_manager, user_id):
-        game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
-        players[user_id]["hp"] = 5 if len(order) < 4 else 6
+        game_work = GameWork.from_manager(msg_manager)
+        game_work.players[user_id]["hp"] = 5 if len(game_work.order) < 4 else 6
 
     # 装弹
     @classmethod
     def reload(cls, msg_manager):
-        for pl in msg_manager.val["game"]["data"]["order"]:
-            RegGameWork.draw_prop(msg_manager, pl, 4)
+        game_work = GameWork.from_manager(msg_manager)
+        for pl in game_work.order:
+            game_work.draw_prop(pl, 4)
 
 
 class 金币(ModeComp, BaseMode):
@@ -115,7 +117,8 @@ class 金币(ModeComp, BaseMode):
 
     @classmethod
     def start(cls, msg_manager):
-        RegGameWork.draw_prop(msg_manager, msg_manager.val["game"]["data"]["shooter"], 1)
+        game_work = GameWork.from_manager(msg_manager)
+        game_work.draw_prop(game_work.shooter, 1)
 
     @classmethod
     def join(cls, msg_manager, user_id):
@@ -124,21 +127,23 @@ class 金币(ModeComp, BaseMode):
     # 换人
     @classmethod
     def switch(cls, msg_manager):
-        RegGameWork.draw_prop(msg_manager, msg_manager.val["game"]["data"]["shooter"], 1)
+        game_work = GameWork.from_manager(msg_manager)
+        game_work.draw_prop(game_work.shooter, 1)
 
     # 受伤
     @classmethod
     def damage(cls, msg_manager):
-        game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
+        game_work = GameWork.from_manager(msg_manager)
+        modify, tmp = game_work.modify, game_work.tmp
         target, dmg = tmp["target"], tmp["dmg"]
         comp = modify.setdefault("金币", [])
-        if target not in comp and players[target]["hp"] - dmg <= 2:
-            t_value = {"tGamblerName": RegGameWork.get_name(game, target)}
-            if RegGameWork.get_prop(game, target, "金币"):
+        if target not in comp and game_work.players[target]["hp"] - dmg <= 2:
+            t_value = {"tGamblerName": game_work.get_name(target)}
+            if game_work.get_prop(target, "金币"):
                 msg_reply = msg_manager.msg_format("strMrModeGold_1", t_value)
             else:
                 msg_reply = msg_manager.msg_format("strMrModeGold_2", t_value)
-            RegGameWork.reply_info(msg_manager, msg_reply)
+            game_work.upsert_info(msg_reply)
             comp.append(target)
 
 
@@ -177,9 +182,9 @@ class 勇者(ModeComp, BaseMode):
 
     @classmethod
     def start(cls, msg_manager):
-        game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
-        for pl in order:
-            RegGameWork.draw_prop(msg_manager, pl, 2 if pl != shooter else 1)
+        game_work = GameWork.from_manager(msg_manager)
+        for pl in game_work.order:
+            game_work.draw_prop(pl, 2 if pl != game_work.shooter else 1)
 
     @classmethod
     def join(cls, msg_manager, user_id):
@@ -188,14 +193,15 @@ class 勇者(ModeComp, BaseMode):
     # 开枪
     @classmethod
     def shoot(cls, msg_manager):
-        game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
-        if bullet and random.randint(1, 3) == 1:
+        game_work = GameWork.from_manager(msg_manager)
+        tmp = game_work.tmp
+        if random.randint(1, 3) == 1:
             tmp["dmg"] += 1
             msg_reply = msg_manager.msg_format("strMrModeHero_1")
-            RegGameWork.reply_info(msg_manager, msg_reply)
+            game_work.upsert_info(msg_reply)
         target, is_attack_me = tmp["target"], tmp["is_attack_me"]
-        if is_attack_me and not bullet:
-            RegGameWork.draw_prop(msg_manager, target, 2)
+        if is_attack_me and not game_work.bullet:
+            game_work.draw_prop(target, 2)
 
 
 class 赌徒(ModeComp, BaseMode):
@@ -246,9 +252,9 @@ class 赌徒(ModeComp, BaseMode):
 
     @classmethod
     def start(cls, msg_manager):
-        game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
-        for pl in order:
-            RegGameWork.draw_prop(msg_manager, pl, 2)
+        game_work = GameWork.from_manager(msg_manager)
+        for pl in game_work.order:
+            game_work.draw_prop(pl, 2)
 
     @classmethod
     def join(cls, msg_manager, user_id):
@@ -257,24 +263,25 @@ class 赌徒(ModeComp, BaseMode):
     # 开枪
     @classmethod
     def shoot(cls, msg_manager):
-        game, data, reply, tmp, modify, players, order, shooter, bullet = RegGameWork.get_index(msg_manager)
+        game_work = GameWork.from_manager(msg_manager)
+        data, tmp = game_work.data, game_work.tmp
         target, is_attack_me = tmp["target"], tmp["is_attack_me"]
-        if is_attack_me and not bullet:
-            RegGameWork.draw_prop(msg_manager, target, 3)
+        if is_attack_me and not game_work.bullet:
+            game_work.draw_prop(target, 3)
         if random.randint(1, 3) == 1:
-            data["bullet"] = not bullet
-            if bullet:
+            if game_work.bullet:
                 data["ammo_blank"] += 1
                 data["ammo_live"] -= 1
             else:
                 data["ammo_blank"] -= 1
                 data["ammo_live"] += 1
+            game_work.bullet = not game_work.bullet
             msg_reply = msg_manager.msg_format("strMrModeGambler_1", {"poker": cls.poker()})
-            RegGameWork.reply_info(msg_manager, msg_reply)
+            game_work.upsert_info(msg_reply)
         if data["bullet"] and random.randint(1, 3) == 1:
             tmp["dmg"] += 1
             msg_reply = msg_manager.msg_format("strMrModeGambler_2")
-            RegGameWork.reply_info(msg_manager, msg_reply)
+            game_work.upsert_info(msg_reply)
 
 
 # class 大富翁(ModeComp, BaseMode):

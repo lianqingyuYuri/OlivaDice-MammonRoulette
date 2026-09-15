@@ -19,7 +19,7 @@ import torch.nn.functional as F
 
 from .. import config
 from ..Core.comp import BotComp, PropComp, EffectComp, ModeComp
-from ..Core.work import RegGameWork
+from ..Core.work import GameWork
 
 
 # region DQN 网络

@@ -113,7 +113,7 @@ class GameWork:
             user_id = self.shooter
         return self.players[user_id]["name"]
 
-    def get_target(self, target):
+    def get_target(self, target=None):
         if not target:
             target = self.order[(self.order.index(self.shooter) + 1) % len(self.order)]
         elif target not in self.order:
