@@ -262,5 +262,13 @@ class BotComp(Registerable):
     #         except Exception:
     #             pass
     @classmethod
+    def load_all(cls):
+        pass
+
+    @classmethod
+    def save_all(cls):
+        pass
+
+    @classmethod
     def action(cls, msg_manager):
         pass
