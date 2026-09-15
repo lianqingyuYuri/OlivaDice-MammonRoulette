@@ -121,6 +121,7 @@ class Event(object):
                     2,
                     "[unity] - [恶魔轮盘] - [config] - 重加载.",
                 )
+            # GUI
             elif plugin_event.data.event == "MammonRoulette_Menu_manage":  # type: ignore
                 if MammonRoulette.config.has_NativeGUI and platform.system() == "Windows":
                     MammonRoulette.GUI.ConfigUI(
