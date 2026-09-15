@@ -1,7 +1,7 @@
 class BaseMode:
-    name = ""
-    brief = ""
-    points = 0
+    name: str = ""
+    brief: str = ""
+    points: int = 0
     reply: tuple = ()
 
     class seats:
@@ -95,8 +95,8 @@ class BaseProp:
 
 
 class BaseEffect:
-    name = ""
-    brief = ""
+    name: str = ""
+    brief: str = ""
     reply: list = []
 
     @classmethod
