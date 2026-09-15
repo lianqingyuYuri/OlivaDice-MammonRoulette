@@ -8,30 +8,9 @@
 @Desc      :    None
 """
 
+from ..Core.base import BaseEffect
 from ..Core.comp import EffectComp
 from ..Core.work import RegGameWork
-
-
-class BaseEffect:
-    name = ""
-    brief = ""
-    reply: list = []
-
-    @classmethod
-    def init(cls):
-        pass
-
-    @classmethod
-    def apply(cls, msg_manager, target, stacks) -> bool | None:
-        raise NotImplementedError
-
-    @classmethod
-    def callback(cls, msg_manager, moment, target, effect_data) -> bool | None:
-        pass
-
-    @classmethod
-    def unapply(cls, msg_manager) -> bool | None:
-        pass
 
 
 class 束缚(EffectComp, BaseEffect):

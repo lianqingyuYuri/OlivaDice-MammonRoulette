@@ -13,35 +13,9 @@ import string
 
 from ..main import commands
 from ..msgCustom import dictHelpDoc, dictDefsMode
+from ..Core.base import BaseProp
 from ..Core.comp import ModeComp, PropComp, EffectComp
 from ..Core.work import RegGameWork
-
-
-class BaseProp:
-    name: str = ""
-    brief: str = ""
-    allow_flag: bool = True
-    reply: list = []
-
-    @classmethod
-    def init(cls):
-        pass
-
-    @classmethod
-    def apply(cls, msg_manager, target) -> bool | None:
-        pass
-
-    @classmethod
-    def callback(cls, msg_manager, moment, prop_data=None) -> bool | None:
-        pass
-
-    @classmethod
-    def unapply(cls, msg_manager, prop_data=None) -> bool | None:
-        pass
-
-    @classmethod
-    def persist(cls, msg_manager, prop_data=None) -> bool | None:
-        pass
 
 
 # region 道具
