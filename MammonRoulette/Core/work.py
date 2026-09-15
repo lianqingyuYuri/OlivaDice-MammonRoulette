@@ -8,6 +8,8 @@
 @Desc      :    None
 """
 
+from __future__ import annotations
+
 import MammonRoulette as MR
 
 import random
