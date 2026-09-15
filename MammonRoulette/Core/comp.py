@@ -27,7 +27,7 @@ class ModeComp(Registerable):
 
     @classmethod
     def init_after(cls):
-        mode_helpDoc = {}
+        t_helpDoc = {}
         for mode_name, mode_cls in cls._register.items():
             mode_cls.init()
             dictDefsMode["default"][mode_name] = {
@@ -50,12 +50,12 @@ class ModeComp(Registerable):
                     "bullet_show": mode_cls.modify.bullet_show,
                 },
             }
-            mode_helpDoc[f"恶赌模式 {mode_name}"] = mode_cls.brief
+            t_helpDoc[f"恶赌模式 {mode_name}"] = mode_cls.brief
             for reply in mode_cls.reply:
                 reply_field, reply_note, reply_msg = reply
                 dictStrCustom[reply_field] = reply_msg
                 dictStrCustomNote[reply_field] = reply_note
-        dictHelpDoc.update(mode_helpDoc)
+        dictHelpDoc.update(t_helpDoc)
         return
 
     @classmethod
@@ -68,18 +68,18 @@ class PropComp(Registerable):
 
     @classmethod
     def init_after(cls):
-        prop_helpDoc = {}
+        t_helpDoc = {}
         for prop_name, prop_cls in cls._register.items():
             prop_cls.init()
             dictDefsProp["default"][prop_name] = {
                 "brief": prop_cls.brief,
             }
-            prop_helpDoc[f"恶赌道具 {prop_name}"] = prop_cls.brief
+            t_helpDoc[f"恶赌道具 {prop_name}"] = prop_cls.brief
             for reply in prop_cls.reply:
                 reply_field, reply_note, reply_msg = reply
                 dictStrCustom[reply_field] = reply_msg
                 dictStrCustomNote[reply_field] = reply_note
-        dictHelpDoc.update(prop_helpDoc)
+        dictHelpDoc.update(t_helpDoc)
         return
 
     @classmethod
@@ -105,18 +105,18 @@ class EffectComp(Registerable):
 
     @classmethod
     def init_after(cls):
-        effect_helpDoc = {}
+        t_helpDoc = {}
         for effect_name, effect_cls in cls._register.items():
             effect_cls.init()
             dictDefsEffect["default"][effect_name] = {
                 "brief": effect_cls.brief,
             }
-            effect_helpDoc[f"恶赌效果 {effect_name}"] = effect_cls.brief
+            t_helpDoc[f"恶赌效果 {effect_name}"] = effect_cls.brief
             for reply in effect_cls.reply:
                 reply_field, reply_note, reply_msg = reply
                 dictStrCustom[reply_field] = reply_msg
                 dictStrCustomNote[reply_field] = reply_note
-        dictHelpDoc.update(effect_helpDoc)
+        dictHelpDoc.update(t_helpDoc)
         return
 
     @classmethod
