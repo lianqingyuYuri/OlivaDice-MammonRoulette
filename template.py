@@ -38,7 +38,7 @@ game = {
             "dmg": int,  # 伤害
             "ammo_show": bool,  # 显示弹药
             "bullet_show": bool,  # 显示子弹
-            "bot_flag": bool,  # AI旗帜
+            "flag_bot": bool,  # AI旗帜
         },
         "props_event": [],  # 道具事件
     },
