@@ -284,33 +284,106 @@ class 赌徒(ModeComp, BaseMode):
             game_work.upsert_info(msg_reply)
 
 
-# class 大富翁(ModeComp, BaseMode):
-#     name = "大富翁"
-#     brief = ""
-#     points = 40
-#     reply = ()
+class 大富翁(ModeComp, BaseMode):
+    name = "大富翁"
+    brief = (
+        "〈赏金〉20"
+        "\n〈血量〉每名玩家2hp."
+        "\n〈道具池〉(无上限)\\{金币\\}"
+        "\n〔机制〕"
+        "\n1. 游戏开始时, 所有玩家抽取 2 个道具;"
+        "\n2. 玩家不会死亡, hp归零时复活, 并失去半数金币;"
+        "\n3. 玩家复活时摇动老虎机, 有1/6概率获得奖励(1 枚金币), 若未获得奖励, 则本次奖励叠加到下次奖励中;"
+        "\n4. 每对其他玩家造成 1 点伤害, 获得 1 枚金币;"
+        "\n5. 击杀其他玩家时, 获得对方半数金币;"
+        "\n6. 率先持有6枚金币的玩家获胜."
+    )
+    points = 20
+    reply = (
+        ("strMrModeMonopoly_1", "大富翁模式 机制3的回复词", "老虎机拉杆落下, [{jackpot}], {tGamblerName}赢得{gold}枚金币."),
+        ("strMrModeMonopoly_2", "大富翁模式 机制3的回复词", "老虎机拉杆落下, [{jackpot}]."),
+    )
 
-#     class seats(BaseMode.seats):
-#         default = 2
-#         max = 12
-#         min = 2
+    class seats(BaseMode.seats):
+        default = 2
+        max = 12
+        min = 2
 
-#     class props(BaseMode.props):
-#         pool = ("金币",)
-#         allow = ("和你爆了",)
-#         limit = 0
+    class props(BaseMode.props):
+        pool = ("锯子", "邀请函", "花生", "巧克力", "香烟", "放大镜", "扑克", "转盘", "牛奶")
+        # allow = ("和你爆了",)
+        ban = ("手链", "口红", "止疼药", "红牛")
+        limit = 0
 
-#     @classmethod
-#     def join(cls, msg_manager, user_id):
-#         game_work = GameWork.from_manager(msg_manager)
-#         game_work.players[user_id]["hp"] = 2
+    @classmethod
+    def start(cls, msg_manager):
+        game_work = GameWork.from_manager(msg_manager)
+        game_work.modify["order_copy"] = game_work.order.copy()
+        game_work.modify["gold"] = 0
+        for pl in game_work.order:
+            game_work.draw_prop(pl, 2)
 
-#     def try_over(self):
-#         pass
+    @classmethod
+    def join(cls, msg_manager, user_id):
+        game_work = GameWork.from_manager(msg_manager)
+        game_work.players[user_id]["hp"] = 2
 
-#     @classmethod
-#     def damage(cls, msg_manager):
-#         game_work = GameWork.from_manager(msg_manager)
+    @classmethod
+    def try_over(cls, msg_manager):
+        game_work = GameWork.from_manager(msg_manager)
+        wins = []
+        for pl in game_work.order:
+            gold_count = game_work.players[pl]["props"].count("金币")
+            game_work.players[pl]["points_mult"] = int(gold_count / 3)
+            if gold_count >= 6:
+                wins.append(pl)
+        if wins:
+            game_work.order = [pl for pl in game_work.order if pl in wins]
+            return True
+        return False
 
-#     def dead(self):
-#         pass
+    @classmethod
+    def damage(cls, msg_manager):
+        game_work = GameWork.from_manager(msg_manager)
+        if not game_work.tmp["is_attack_me"]:
+            for _ in range(game_work.tmp["dmg"]):
+                game_work.get_prop(game_work.tmp["murderer"], "金币")
+            game_work.try_over()
+
+    @classmethod
+    def dead(cls, msg_manager):
+        game_work = GameWork.from_manager(msg_manager)
+        target = game_work.tmp["target"]
+        murderer = game_work.tmp["murderer"]
+        if game_work.players[target]["surrender"]:
+            game_work.modify["order_copy"].remove(target)
+        else:
+            game_work.order = game_work.modify["order_copy"].copy()
+            game_work.players[target]["hp"] = 2
+            # 摇动老虎机
+            if random.randint(1, 6) == 1:
+                gold = game_work.modify["gold"]
+                for _ in range(gold):
+                    game_work.get_prop(target, "金币")
+                game_work.modify["gold"] = 0
+                jackpot = str(random.randint(0, 9)) * 3
+                msg_reply = msg_manager.msg_format(
+                    "strMrModeMonopoly_1", {"jackpot": jackpot, "tGamblerName": target, "gold": gold}
+                )
+            else:
+                game_work.modify["gold"] += 1
+                choices = [f"{i:03d}" for i in range(1000) if i % 111 != 0]
+                jackpot = random.choice(choices)
+                msg_reply = msg_manager.msg_format("strMrModeMonopoly_2", {"jackpot": jackpot})
+            game_work.upsert_info(msg_reply)
+            # 失去一半金币
+            gold_count = game_work.players[target]["props"].count("金币")
+            gold_count_half = (gold_count + 1) // 2
+            for _ in range(gold_count_half):
+                game_work.remove_prop(target, "金币")
+            # 获得对方一半金币
+            if not game_work.tmp["is_attack_me"]:
+                game_work.players[murderer]["kills"] = 0
+                for _ in range(gold_count_half):
+                    game_work.get_prop(murderer, "金币")
+            game_work.try_over()
