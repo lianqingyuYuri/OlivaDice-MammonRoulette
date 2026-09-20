@@ -85,10 +85,6 @@ class GameWork:
     def flag_over(self):
         return self.game["over"]
 
-    @flag_over.setter
-    def flag_over(self, value):
-        self.game["over"] = value
-
     @classmethod
     def from_manager(cls, msg_manager):
         game = msg_manager.val["game"]
@@ -532,7 +528,7 @@ class GameWork:
         return False
 
     def over(self):
-        self.flag_over = True
+        self.game["over"] = True
         with DataBase(config.DB_PATH) as db:
             for pl in self.players.keys():
                 if self.players[pl]["bot_model"] is None:
