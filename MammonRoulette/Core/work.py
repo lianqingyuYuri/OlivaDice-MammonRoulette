@@ -194,6 +194,7 @@ class GameWork:
         else:
             msg_reply = self.reply["only"]
         self.reply.update({"info": [], "note": {"ammo": self.ammo_show or self.bullet_show, "round": False}, "only": ""})
+        self.tmp.clear()
         return msg_reply
 
     # endregion
