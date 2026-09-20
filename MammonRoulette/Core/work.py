@@ -526,12 +526,12 @@ class GameWork:
         flag_over = self.mode.try_over(self.msg_manager)
         if len(self.order) == 1:
             self.upsert_info(self.msg_manager.msg_format("strMrGameEnd", {"tWinnerName": self.get_name(self.order[0])}))
-            self.over()
-            return True
+            flag_over = True
         elif len(self.order) < 1:
             self.upsert_info(self.msg_manager.msg_format("strMrGameTied"))
+            flag_over = True
+        if flag_over:
             self.over()
-            return True
         return flag_over
 
     def over(self):
