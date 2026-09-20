@@ -185,7 +185,6 @@ dictHelpDoc = {
 dictConsoleSwitch = {
     "MrMainEnabled": 1,
     "MrPokeEnabled": 1,
-    "MrDebugEnabled": -1,
 }
 dictConsoleSwitchNote = {
     "MrMainEnabled": "[恶魔轮盘]全局开关, 默认开启\n0 关闭\n1 开启",
