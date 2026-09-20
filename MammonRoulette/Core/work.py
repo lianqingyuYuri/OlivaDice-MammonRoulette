@@ -450,7 +450,9 @@ class GameWork:
         self.tmp["hp_before"] = pl_target["hp"]
         pl_target["hp"] -= dmg
         self.tmp["hp_now"] = pl_target["hp"]
+        self.tmp["is_killed"] = False
         if pl_target["hp"] <= 0 and target in self.order and check_dead:
+            self.tmp["is_killed"] = True
             self.dead(target, murderer)
         return
 
