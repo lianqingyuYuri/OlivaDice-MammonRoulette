@@ -38,7 +38,7 @@ default_debug_flag = False
 DEBUG_FLAG = 0
 
 default_bot_model_dir = "plugin/data/MammonRoulette/data/bot_model/"
-AI_MODEL_DIR = ""
+BOT_MODEL_DIR = ""
 
 
 def releaseDir(dir_path):
@@ -47,24 +47,24 @@ def releaseDir(dir_path):
 
 
 def initConfig(Proc):
-    global DB_PATH, TMP_GAME_PATH, DEBUG_FLAG, AI_MODEL_DIR
+    global DB_PATH, TMP_GAME_PATH, DEBUG_FLAG, BOT_MODEL_DIR
     with IniConfig(configPath) as cfg:
         DB_PATH = cfg.get("path", "db_path", default_db_path)
         TMP_GAME_PATH = cfg.get("path", "tmp_game_path", default_tmp_game_path)
         DEBUG_FLAG = cfg.getboolean("flags", "debug_flag", default_debug_flag)
-        AI_MODEL_DIR = cfg.get("dir", "bot_model_dir", default_bot_model_dir)
-    releaseDir(AI_MODEL_DIR)
+        BOT_MODEL_DIR = cfg.get("dir", "bot_model_dir", default_bot_model_dir)
+    releaseDir(BOT_MODEL_DIR)
     for hash_this in Proc.Proc_data["bot_info_dict"]:
         releaseDir(dataDirRoot + "/" + hash_this)
 
 
 def readConfig(Proc):
-    global DB_PATH, TMP_GAME_PATH, DEBUG_FLAG, AI_MODEL_DIR
+    global DB_PATH, TMP_GAME_PATH, DEBUG_FLAG, BOT_MODEL_DIR
     with IniConfig(configPath) as cfg:
         DB_PATH = cfg.get("path", "db_path", default_db_path)
         TMP_GAME_PATH = cfg.get("path", "tmp_game_path", default_tmp_game_path)
         DEBUG_FLAG = cfg.getboolean("flags", "debug_flag", default_debug_flag)
-        AI_MODEL_DIR = cfg.get("dir", "bot_model_dir", default_bot_model_dir)
+        BOT_MODEL_DIR = cfg.get("dir", "bot_model_dir", default_bot_model_dir)
     for hash_this in Proc.Proc_data["bot_info_dict"]:
         custom_path = dataDirRoot + "/" + hash_this
         releaseDir(custom_path)
@@ -96,7 +96,7 @@ def saveConfig(Proc):
         cfg.set("path", "db_path", DB_PATH)
         cfg.set("path", "tmp_game_path", TMP_GAME_PATH)
         cfg.set("flags", "debug_flag", DEBUG_FLAG)
-        cfg.set("dir", "bot_model_dir", AI_MODEL_DIR)
+        cfg.set("dir", "bot_model_dir", BOT_MODEL_DIR)
         cfg.save()
     for hash_this in Proc.Proc_data["bot_info_dict"]:
         custom_path = dataDirRoot + "/" + hash_this

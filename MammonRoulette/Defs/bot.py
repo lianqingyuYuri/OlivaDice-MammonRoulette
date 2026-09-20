@@ -369,7 +369,7 @@ class Stephen(BotComp, BaseBot):
     # region 持久化
     def save(self) -> None:
         """将模型参数、优化器状态、经验回放保存到磁盘。"""
-        path = os.path.join(config.AI_MODEL_DIR, f"{self.name}.pth")
+        path = os.path.join(config.BOT_MODEL_DIR, f"{self.name}.pth")
         torch.save(
             {
                 "policy_net": self.policy_net.state_dict(),
@@ -384,7 +384,7 @@ class Stephen(BotComp, BaseBot):
 
     def load(self) -> None:
         """从磁盘恢复模型参数、优化器状态、经验回放。"""
-        path = os.path.join(config.AI_MODEL_DIR, f"{self.name}.pth")
+        path = os.path.join(config.BOT_MODEL_DIR, f"{self.name}.pth")
         if not os.path.exists(path):
             return
         checkpoint = torch.load(path, map_location=self.device)
