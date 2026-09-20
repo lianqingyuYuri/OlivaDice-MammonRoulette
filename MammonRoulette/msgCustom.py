@@ -192,9 +192,9 @@ dictConsoleSwitchNote = {
 }
 # endregion
 # region MammonRoulette
-dictDefsMode = {"default": {}}
-dictDefsProp = {"default": {}}
-dictDefsEffect = {"default": {}}
+dictModeCustom = {"default": {}}
+dictPropCustom = {"default": {}}
+dictEffectCustom = {"default": {}}
 dictDefsNote = {
     "strModeBrief": "模式简介",
     "strModePoints": "赏金",
@@ -203,6 +203,7 @@ dictDefsNote = {
     "strModeSeatsMin": "最小玩家数",
     "strModePropsPool": "道具池",
     "strModePropsLimit": "道具上限",
+    "strModePropsAllow": "许可列表",
     "strModePropsBan": "禁用列表",
     "strModeModifyDmg": "伤害修改",
     "strModeModifyAmmoShow": "弹药显示",

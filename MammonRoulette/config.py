@@ -21,7 +21,7 @@ import os
 
 from AmorLib import IniConfig
 
-from .msgCustom import dictDefsMode, dictDefsProp, dictDefsEffect
+from .msgCustom import dictModeCustom, dictPropCustom, dictEffectCustom
 
 name = "恶魔轮盘"
 
@@ -68,25 +68,25 @@ def readConfig(Proc):
     for hash_this in Proc.Proc_data["bot_info_dict"]:
         custom_path = dataDirRoot + "/" + hash_this
         releaseDir(custom_path)
-        dictDefsMode[hash_this] = copy.deepcopy(dictDefsMode["default"])
-        dictDefsProp[hash_this] = copy.deepcopy(dictDefsProp["default"])
-        dictDefsEffect[hash_this] = copy.deepcopy(dictDefsEffect["default"])
+        dictModeCustom[hash_this] = copy.deepcopy(dictModeCustom["default"])
+        dictPropCustom[hash_this] = copy.deepcopy(dictPropCustom["default"])
+        dictEffectCustom[hash_this] = copy.deepcopy(dictEffectCustom["default"])
         try:
             with open(custom_path + "/customMode.json", "r", encoding="utf-8") as f:
                 customDefs = json.load(f)
-                dictDefsMode[hash_this].update(customDefs)
+                dictModeCustom[hash_this].update(customDefs)
         except:
             pass
         try:
             with open(custom_path + "/customProp.json", "r", encoding="utf-8") as f:
                 customDefs = json.load(f)
-                dictDefsProp[hash_this].update(customDefs)
+                dictPropCustom[hash_this].update(customDefs)
         except:
             pass
         try:
             with open(custom_path + "/customEffect.json", "r", encoding="utf-8") as f:
                 customDefs = json.load(f)
-                dictDefsEffect[hash_this].update(customDefs)
+                dictEffectCustom[hash_this].update(customDefs)
         except:
             pass
 
@@ -102,8 +102,8 @@ def saveConfig(Proc):
         custom_path = dataDirRoot + "/" + hash_this
         releaseDir(custom_path)
         with open(custom_path + "/customMode.json", "w", encoding="utf-8") as f:
-            json.dump(dictDefsMode[hash_this], f, ensure_ascii=False, indent=4)
+            json.dump(dictModeCustom[hash_this], f, ensure_ascii=False, indent=4)
         with open(custom_path + "/customProp.json", "w", encoding="utf-8") as f:
-            json.dump(dictDefsProp[hash_this], f, ensure_ascii=False, indent=4)
+            json.dump(dictPropCustom[hash_this], f, ensure_ascii=False, indent=4)
         with open(custom_path + "/customEffect.json", "w", encoding="utf-8") as f:
-            json.dump(dictDefsEffect[hash_this], f, ensure_ascii=False, indent=4)
+            json.dump(dictEffectCustom[hash_this], f, ensure_ascii=False, indent=4)

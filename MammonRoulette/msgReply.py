@@ -16,7 +16,7 @@ from AmorLib import DataBase
 
 from . import config
 from .main import commands, COMMON_CMD
-from .msgCustom import dictHelpDoc, dictDefsMode
+from .msgCustom import dictHelpDoc, dictModeCustom
 from .Core.comp import ModeComp, PropComp, BotComp
 from .Core.work import GameWork
 
@@ -167,7 +167,7 @@ def match_game(plugin_event, Proc, msg_manager, groups):
     # region 读取模式数据
     mode_name, seats = groups[0], groups[1]
     bot_hash = msg_manager.bot_hash
-    mode_cfg = dictDefsMode[bot_hash][mode_name]
+    mode_cfg = dictModeCustom[bot_hash][mode_name]
     seats_min, seats_max, seats_def = (
         mode_cfg["seats"]["min"],
         mode_cfg["seats"]["max"],

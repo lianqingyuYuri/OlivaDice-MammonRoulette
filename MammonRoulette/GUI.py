@@ -29,9 +29,9 @@ from PIL import Image, ImageTk
 from . import config
 from .msgCustom import (
     dictHelpDoc,
-    dictDefsMode,
-    dictDefsProp,
-    dictDefsEffect,
+    dictModeCustom,
+    dictPropCustom,
+    dictEffectCustom,
     dictDefsNote,
 )
 
@@ -312,7 +312,7 @@ class ConfigUI(object):
         for item in self.UIObject["tree_mode"].get_children():
             self.UIObject["tree_mode"].delete(item)
 
-        source_data = dictDefsMode["default"] if is_global_mode else dictDefsMode.get(self.UIData["hash_now"], {})
+        source_data = dictModeCustom["default"] if is_global_mode else dictModeCustom.get(self.UIData["hash_now"], {})
         for mode_name, mode_data in source_data.items():
             brief = mode_data.get("brief", "").replace("\n", " ").strip()
             points = mode_data.get("points", 0)
@@ -564,7 +564,7 @@ class ConfigUI(object):
             return
         item = self.UIObject["tree_mode"].item(selection[0])
         mode_name = item["values"][0]
-        source_data = dictDefsMode["default"] if self.UIData["hash_now"] == "unity" else dictDefsMode[self.UIData["hash_now"]]
+        source_data = dictModeCustom["default"] if self.UIData["hash_now"] == "unity" else dictModeCustom[self.UIData["hash_now"]]
         mode_data = source_data.get(mode_name)
         if not mode_data:
             return
@@ -640,8 +640,8 @@ class ConfigUI(object):
             return
 
         current_hash = self.UIData["hash_now"]
-        default_modes = copy.deepcopy(dictDefsMode["default"])
-        dictDefsMode[current_hash] = default_modes
+        default_modes = copy.deepcopy(dictModeCustom["default"])
+        dictModeCustom[current_hash] = default_modes
         # 更新帮助文档
         for mode_name, mode_data in default_modes.items():
             self.update_mode_helpdoc(mode_name, mode_data)
@@ -674,10 +674,10 @@ class ConfigUI(object):
                 return
             current_hash = self.UIData["hash_now"]
             # 备份当前数据（用于失败回滚）
-            backup = copy.deepcopy(dictDefsMode.get(current_hash, {}))
+            backup = copy.deepcopy(dictModeCustom.get(current_hash, {}))
             try:
                 # 更新全局
-                dictDefsMode[current_hash] = import_data
+                dictModeCustom[current_hash] = import_data
                 # 更新帮助文档
                 for mode_name, mode_data in import_data.items():
                     self.update_mode_helpdoc(mode_name, mode_data)
@@ -689,7 +689,7 @@ class ConfigUI(object):
                 messagebox.showinfo("完成", "模式配置导入成功", parent=self.UIObject["root"])
             except Exception as e:
                 # 回滚
-                dictDefsMode[current_hash] = backup
+                dictModeCustom[current_hash] = backup
                 for mode_name, mode_data in backup.items():
                     self.update_mode_helpdoc(mode_name, mode_data)
                 raise
@@ -709,7 +709,7 @@ class ConfigUI(object):
             return
         try:
             current_hash = self.UIData["hash_now"]
-            export_data = dictDefsMode.get(current_hash, {})
+            export_data = dictModeCustom.get(current_hash, {})
             with open(file_path, "w", encoding="utf-8") as f:
                 json.dump(export_data, f, ensure_ascii=False, indent=4)
             messagebox.showinfo("完成", "模式配置导出成功", parent=self.UIObject["root"])
@@ -726,16 +726,16 @@ class ConfigUI(object):
             return
         current_hash = self.UIData["hash_now"]
         file_path = config.dataDirRoot + "/" + current_hash + "/customMode.json"
-        backup = copy.deepcopy(dictDefsMode.get(current_hash, {}))
+        backup = copy.deepcopy(dictModeCustom.get(current_hash, {}))
         try:
             if os.path.exists(file_path):
                 with open(file_path, "r", encoding="utf-8") as f:
                     loaded = json.load(f)
                 if not isinstance(loaded, dict):
                     raise ValueError("自定义模式配置文件格式不正确")
-                dictDefsMode[current_hash] = loaded
+                dictModeCustom[current_hash] = loaded
             else:
-                dictDefsMode[current_hash] = copy.deepcopy(dictDefsMode["default"])
+                dictModeCustom[current_hash] = copy.deepcopy(dictModeCustom["default"])
             # 更新帮助文档
             for mode_name, mode_data in loaded.items():
                 self.update_mode_helpdoc(mode_name, mode_data)
@@ -743,7 +743,7 @@ class ConfigUI(object):
             messagebox.showinfo("完成", "模式配置刷新成功", parent=self.UIObject["root"])
         except Exception as e:
             # 回滚
-            dictDefsMode[current_hash] = backup
+            dictModeCustom[current_hash] = backup
             for mode_name, mode_data in backup.items():
                 self.update_mode_helpdoc(mode_name, mode_data)
             messagebox.showerror("错误", f"刷新失败: {str(e)}\n配置未更改", parent=self.UIObject["root"])
@@ -765,11 +765,11 @@ class ConfigUI(object):
             parent=root,
         ):
             return
-        dictDefsMode[current_hash][mode_name] = copy.deepcopy(dictDefsMode["default"][mode_name])
-        self.update_mode_helpdoc(mode_name, dictDefsMode[current_hash][mode_name])
+        dictModeCustom[current_hash][mode_name] = copy.deepcopy(dictModeCustom["default"][mode_name])
+        self.update_mode_helpdoc(mode_name, dictModeCustom[current_hash][mode_name])
         file_path = config.dataDirRoot + "/" + current_hash + "/customMode.json"
         with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(dictDefsMode[current_hash], f, ensure_ascii=False, indent=4)
+            json.dump(dictModeCustom[current_hash], f, ensure_ascii=False, indent=4)
         self.init_data_total()
 
     def reset_mode_detail_config(self):
@@ -799,8 +799,8 @@ class ConfigUI(object):
         ):
             return
 
-        default_modes = copy.deepcopy(dictDefsMode["default"][mode_name])
-        current_data = dictDefsMode[current_hash][mode_name]
+        default_modes = copy.deepcopy(dictModeCustom["default"][mode_name])
+        current_data = dictModeCustom[current_hash][mode_name]
         # 根据字段类型更新数据
         if field_key in ("brief", "points"):
             current_data[field_key] = default_modes[field_key]
@@ -832,7 +832,7 @@ class ConfigUI(object):
         # 保存并刷新
         file_path = config.dataDirRoot + "/" + current_hash + "/customMode.json"
         with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(dictDefsMode[current_hash], f, ensure_ascii=False, indent=4)
+            json.dump(dictModeCustom[current_hash], f, ensure_ascii=False, indent=4)
         self.init_data_total()
 
     def tree_mode_detail_edit(self):
@@ -855,7 +855,7 @@ class ConfigUI(object):
             return
         mode_item = self.UIObject["tree_mode"].item(mode_selection[0])
         mode_name = mode_item["values"][0]
-        mode_data = dictDefsMode[self.UIData["hash_now"]].get(mode_name)
+        mode_data = dictModeCustom[self.UIData["hash_now"]].get(mode_name)
         if not mode_data:
             return
 
@@ -977,7 +977,7 @@ class ConfigUI(object):
     def save_mode_detail(self, mode_name, field_key, new_value):
         """保存模式字段配置"""
         current_hash = self.UIData["hash_now"]
-        mode_dict = dictDefsMode.get(current_hash, {})
+        mode_dict = dictModeCustom.get(current_hash, {})
         if mode_name not in mode_dict:
             return
         mode_data = mode_dict[mode_name]
@@ -1019,6 +1019,6 @@ class ConfigUI(object):
             return
         file_path = config.dataDirRoot + "/" + current_hash + "/customMode.json"
         with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(dictDefsMode[current_hash], f, ensure_ascii=False, indent=4)
+            json.dump(dictModeCustom[current_hash], f, ensure_ascii=False, indent=4)
 
     # endregion

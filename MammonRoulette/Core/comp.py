@@ -14,9 +14,9 @@ from ..msgCustom import (
     dictStrCustom,
     dictStrCustomNote,
     dictHelpDoc,
-    dictDefsMode,
-    dictDefsProp,
-    dictDefsEffect,
+    dictModeCustom,
+    dictPropCustom,
+    dictEffectCustom,
 )
 
 from AmorLib import Registerable
@@ -30,7 +30,7 @@ class ModeComp(Registerable):
         t_helpDoc = {}
         for mode_name, mode_cls in cls._register.items():
             mode_cls.init()
-            dictDefsMode["default"][mode_name] = {
+            dictModeCustom["default"][mode_name] = {
                 "brief": mode_cls.brief,
                 "points": mode_cls.points,
                 "seats": {
@@ -71,7 +71,7 @@ class PropComp(Registerable):
         t_helpDoc = {}
         for prop_name, prop_cls in cls._register.items():
             prop_cls.init()
-            dictDefsProp["default"][prop_name] = {
+            dictPropCustom["default"][prop_name] = {
                 "brief": prop_cls.brief,
             }
             t_helpDoc[f"恶赌道具 {prop_name}"] = prop_cls.brief
@@ -108,7 +108,7 @@ class EffectComp(Registerable):
         t_helpDoc = {}
         for effect_name, effect_cls in cls._register.items():
             effect_cls.init()
-            dictDefsEffect["default"][effect_name] = {
+            dictEffectCustom["default"][effect_name] = {
                 "brief": effect_cls.brief,
             }
             t_helpDoc[f"恶赌效果 {effect_name}"] = effect_cls.brief

@@ -12,7 +12,7 @@ import random
 import string
 
 from ..main import commands
-from ..msgCustom import dictHelpDoc, dictDefsMode
+from ..msgCustom import dictHelpDoc, dictModeCustom
 from ..Core.base import BaseProp
 from ..Core.comp import ModeComp, PropComp, EffectComp
 from ..Core.work import GameWork
@@ -255,7 +255,7 @@ class 放大镜(PropComp, BaseProp):
     def unapply(cls, msg_manager, prop_data):
         game_work = GameWork.from_manager(msg_manager)
         bot_hash = msg_manager.bot_hash
-        modf_cfg = dictDefsMode[bot_hash][game_work.game["mode"]["name"]]
+        modf_cfg = dictModeCustom[bot_hash][game_work.game["mode"]["name"]]
         game_work.ammo_show = modf_cfg["modify"]["ammo_show"]
         game_work.bullet_show = modf_cfg["modify"]["bullet_show"]
         return
@@ -361,7 +361,7 @@ class 扑克(PropComp, BaseProp):
     def unapply(cls, msg_manager, prop_data):
         game_work = GameWork.from_manager(msg_manager)
         bot_hash = msg_manager.bot_hash
-        modf_cfg = dictDefsMode[bot_hash][game_work.game["mode"]["name"]]
+        modf_cfg = dictModeCustom[bot_hash][game_work.game["mode"]["name"]]
         game_work.ammo_show = modf_cfg["modify"]["ammo_show"]
         game_work.bullet_show = modf_cfg["modify"]["bullet_show"]
         msg_reply = msg_manager.msg_format("strMrPropPoker_2")
