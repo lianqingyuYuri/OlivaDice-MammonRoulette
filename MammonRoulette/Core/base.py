@@ -32,6 +32,10 @@ class BaseMode:
     def join(cls, msg_manager, user_id):
         pass
 
+    @classmethod
+    def try_over(cls, msg_manager) -> bool:
+        return False
+
     # 装弹
     @classmethod
     def reload(cls, msg_manager):

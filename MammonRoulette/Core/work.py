@@ -363,7 +363,7 @@ class GameWork:
 
     def shoot(self, target):
         dmg_type = ""
-        is_attack_me = target == self.shooter
+        is_shoot_me = target == self.shooter
         murderer = self.shooter
         consume_action = None
         self.handle_event(
@@ -371,15 +371,15 @@ class GameWork:
             target=target,
             dmg=self.dmg,
             dmg_type=dmg_type,
-            is_attack_me=is_attack_me,
+            is_shoot_me=is_shoot_me,
             murderer=murderer,
             consume_action=consume_action,
         )
-        target, dmg, dmg_type, is_attack_me, murderer, consume_action = (
+        target, dmg, dmg_type, is_shoot_me, murderer, consume_action = (
             self.tmp["target"],
             self.tmp["dmg"],
             self.tmp["dmg_type"],
-            self.tmp["is_attack_me"],
+            self.tmp["is_shoot_me"],
             self.tmp["murderer"],
             self.tmp["consume_action"],
         )
@@ -406,7 +406,7 @@ class GameWork:
         else:
             self.ammo_blank -= 1
             if consume_action is None:
-                consume_action = 0 if is_attack_me else 1
+                consume_action = 0 if is_shoot_me else 1
             self.upsert_info(
                 self.msg_manager.msg_format(
                     "strMrGamblerWasAmmoBlankShot",
@@ -428,6 +428,7 @@ class GameWork:
             return
         dmg_type = self.tmp.get("dmg_type", "")
         check_dead = self.tmp.get("check_dead", True)
+        is_attack_me = target == murderer
         self.handle_event(
             "damage",
             target=target,
@@ -435,13 +436,15 @@ class GameWork:
             murderer=murderer,
             dmg_type=dmg_type,
             check_dead=check_dead,
+            is_attack_me=is_attack_me,
         )
-        target, dmg, murderer, dmg_type, check_dead = (
+        target, dmg, murderer, dmg_type, check_dead, is_attack_me = (
             self.tmp["target"],
             self.tmp["dmg"],
             self.tmp["murderer"],
             self.tmp["dmg_type"],
             self.tmp["check_dead"],
+            self.tmp["is_attack_me"],
         )
         pl_target = self.players[target]
         self.tmp["hp_before"] = pl_target["hp"]
@@ -456,16 +459,18 @@ class GameWork:
             return
         if not murderer:
             murderer = self.shooter
+        check_over = self.tmp.get("check_over", True)
+        is_attack_me = self.tmp.get("is_attack_me", target == murderer)
         pl_target, pl_murderer = self.players[target], self.players[murderer]
         name = pl_target["name"]
-        if self.players[target]["surrender"]:
+        if self.players[target]["surrender"]:  # 投降
             self.upsert_info(self.msg_manager.msg_format("strMrGamblerSurrender", {"tGamblerName": name}))
-        elif target == murderer:
+        elif is_attack_me:  # 自杀
             pl_target["suicide"] = True
             self.upsert_info(
                 self.msg_manager.msg_format("strMrGamblerSuicide", {"tGamblerName": name}),
             )
-        else:
+        else:  # 被杀
             pl_murderer["kills"] += 1
             pl_target["suicide"] = False
             self.upsert_info(
@@ -477,8 +482,7 @@ class GameWork:
         if target == self.shooter:
             self.switch()
         self.order.remove(target)
-        check_over = self.tmp.get("check_over", True)
-        self.handle_event("dead", target=target, murderer=murderer, check_over=check_over)
+        self.handle_event("dead", target=target, murderer=murderer, check_over=check_over, is_attack_me=is_attack_me)
         check_over = self.tmp["check_over"]
         if check_over:
             self.try_over()
@@ -517,6 +521,7 @@ class GameWork:
         if self.flag_over:
             return True
         self.tmp["check_over"] = True
+        flag_over = self.mode.try_over(self.msg_manager)
         if len(self.order) == 1:
             self.upsert_info(self.msg_manager.msg_format("strMrGameEnd", {"tWinnerName": self.get_name(self.order[0])}))
             self.over()
@@ -525,7 +530,7 @@ class GameWork:
             self.upsert_info(self.msg_manager.msg_format("strMrGameTied"))
             self.over()
             return True
-        return False
+        return flag_over
 
     def over(self):
         self.game["over"] = True
