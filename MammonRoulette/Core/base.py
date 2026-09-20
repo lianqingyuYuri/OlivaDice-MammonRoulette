@@ -67,7 +67,7 @@ class BaseProp:
     name: str = ""
     brief: str = ""
     allow_flag: bool = True
-    reply: list = []
+    reply: tuple = ()
 
     @classmethod
     def init(cls):
@@ -76,7 +76,7 @@ class BaseProp:
     # 使用
     @classmethod
     def apply(cls, msg_manager, target) -> bool | None:
-        pass
+        return False
 
     # 回调
     @classmethod
@@ -97,7 +97,7 @@ class BaseProp:
 class BaseEffect:
     name: str = ""
     brief: str = ""
-    reply: list = []
+    reply: tuple = ()
 
     @classmethod
     def init(cls):
@@ -106,7 +106,7 @@ class BaseEffect:
     # 应用
     @classmethod
     def apply(cls, msg_manager, target, stacks) -> bool | None:
-        raise NotImplementedError
+        return False
 
     # 回调
     @classmethod
