@@ -8,8 +8,6 @@
 @Desc      :    None
 """
 
-from __future__ import annotations
-
 import MammonRoulette as MR
 
 import time
@@ -18,6 +16,7 @@ from dataclasses import dataclass
 
 from AmorLib import DataBase, MsgManager
 
+from .base import BaseMode
 from .. import config
 
 
@@ -53,7 +52,7 @@ def modify_mirror(key):
 class GameWork:
     # region index
     msg_manager: MsgManager
-    mode: MR.Core.base.BaseMode
+    mode: BaseMode
     game: dict
     data: dict
     reply: dict
