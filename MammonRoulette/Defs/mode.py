@@ -239,7 +239,7 @@ class 赌徒(ModeComp, BaseMode):
         limit = 12
 
     class modify(BaseMode.modify):
-        ammo_show = False
+        flag_ammo_show = False
 
     @staticmethod
     def poker():

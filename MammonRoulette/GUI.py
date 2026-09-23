@@ -580,8 +580,8 @@ class ConfigUI(object):
             ("props_limit", "strModePropsLimit"),
             ("props_ban", "strModePropsBan"),
             ("modify_dmg", "strModeModifyDmg"),
-            ("modify_ammo_show", "strModeModifyAmmoShow"),
-            ("modify_bullet_show", "strModeModifyBulletShow"),
+            ("modify_flag_ammo_show", "strModeModifyAmmoShow"),
+            ("modify_flag_bullet_show", "strModeModifyBulletShow"),
         ]
 
         for field_key, note_key in field_configs:
@@ -613,10 +613,10 @@ class ConfigUI(object):
                 modify = mode_data.get("modify", {})
                 if field_key == "modify_dmg":
                     value = str(modify.get("dmg", 1))
-                elif field_key == "modify_ammo_show":
-                    value = str(int(modify.get("ammo_show", 1)))
-                elif field_key == "modify_bullet_show":
-                    value = str(int(modify.get("bullet_show", 0)))
+                elif field_key == "modify_flag_ammo_show":
+                    value = str(int(modify.get("flag_ammo_show", 1)))
+                elif field_key == "modify_flag_bullet_show":
+                    value = str(int(modify.get("flag_bullet_show", 0)))
             self.UIObject["tree_mode_detail"].insert(
                 "",
                 "end",
@@ -821,11 +821,11 @@ class ConfigUI(object):
                 current_data["props"]["limit"] = default_modes["props"]["limit"]
             elif field_key == "props_ban":
                 current_data["props"]["ban"] = default_modes["props"]["ban"]
-        elif field_key in ("modify_dmg", "modify_ammo_show", "modify_bullet_show"):
+        elif field_key in ("modify_dmg", "modify_flag_ammo_show", "modify_flag_bullet_show"):
             key_map = {
                 "modify_dmg": "dmg",
-                "modify_ammo_show": "ammo_show",
-                "modify_bullet_show": "bullet_show",
+                "modify_flag_ammo_show": "flag_ammo_show",
+                "modify_flag_bullet_show": "flag_bullet_show",
             }
             field_key = key_map[field_key]
             current_data["modify"][field_key] = default_modes["modify"][field_key]
@@ -885,10 +885,10 @@ class ConfigUI(object):
             modify = mode_data.get("modify", {})
             if field_key == "modify_dmg":
                 current_value = str(modify.get("dmg", 1))
-            elif field_key == "modify_ammo_show":
-                current_value = bool(modify.get("ammo_show", 1))
-            elif field_key == "modify_bullet_show":
-                current_value = bool(modify.get("bullet_show", 0))
+            elif field_key == "modify_flag_ammo_show":
+                current_value = bool(modify.get("flag_ammo_show", 1))
+            elif field_key == "modify_flag_bullet_show":
+                current_value = bool(modify.get("flag_bullet_show", 0))
 
         self.edit_mode_UI(
             root_class=self,
@@ -1010,10 +1010,10 @@ class ConfigUI(object):
                 modify = mode_data.setdefault("modify", {})
                 if field_key == "modify_dmg":
                     modify["dmg"] = int(new_value)
-                elif field_key == "modify_ammo_show":
-                    modify["ammo_show"] = bool(int(new_value))
-                elif field_key == "modify_bullet_show":
-                    modify["bullet_show"] = bool(int(new_value))
+                elif field_key == "modify_flag_ammo_show":
+                    modify["flag_ammo_show"] = bool(int(new_value))
+                elif field_key == "modify_flag_bullet_show":
+                    modify["flag_bullet_show"] = bool(int(new_value))
         except ValueError:
             messagebox.showerror("错误", "请输入正确的数值", parent=self.UIObject["root"])
             return

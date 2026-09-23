@@ -254,15 +254,15 @@ class 放大镜(PropComp, BaseProp):
         game_work = GameWork.from_manager(msg_manager)
         bot_hash = msg_manager.bot_hash
         modf_cfg = dictModeCustom[bot_hash][game_work.game["mode"]["name"]]
-        game_work.ammo_show = modf_cfg["modify"]["ammo_show"]
-        game_work.bullet_show = modf_cfg["modify"]["bullet_show"]
+        game_work.flag_ammo_show = modf_cfg["modify"]["flag_ammo_show"]
+        game_work.flag_bullet_show = modf_cfg["modify"]["flag_bullet_show"]
         return
 
     @classmethod
     def persist(cls, msg_manager, prop_data):
         game_work = GameWork.from_manager(msg_manager)
-        game_work.ammo_show = True
-        game_work.bullet_show = True
+        game_work.flag_ammo_show = True
+        game_work.flag_bullet_show = True
         return True
 
 
@@ -360,8 +360,8 @@ class 扑克(PropComp, BaseProp):
         game_work = GameWork.from_manager(msg_manager)
         bot_hash = msg_manager.bot_hash
         modf_cfg = dictModeCustom[bot_hash][game_work.game["mode"]["name"]]
-        game_work.ammo_show = modf_cfg["modify"]["ammo_show"]
-        game_work.bullet_show = modf_cfg["modify"]["bullet_show"]
+        game_work.flag_ammo_show = modf_cfg["modify"]["flag_ammo_show"]
+        game_work.flag_bullet_show = modf_cfg["modify"]["flag_bullet_show"]
         msg_reply = msg_manager.msg_format("strMrPropPoker_2")
         game_work.upsert_info(msg_reply)
         return
@@ -369,8 +369,8 @@ class 扑克(PropComp, BaseProp):
     @classmethod
     def persist(cls, msg_manager, prop_data):
         game_work = GameWork.from_manager(msg_manager)
-        game_work.ammo_show = False
-        game_work.bullet_show = False
+        game_work.flag_ammo_show = False
+        game_work.flag_bullet_show = False
         return
 
 

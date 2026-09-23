@@ -46,8 +46,8 @@ class ModeComp(Registerable):
                 },
                 "modify": {
                     "dmg": mode_cls.modify.dmg,
-                    "ammo_show": mode_cls.modify.ammo_show,
-                    "bullet_show": mode_cls.modify.bullet_show,
+                    "flag_ammo_show": mode_cls.modify.flag_ammo_show,
+                    "flag_bullet_show": mode_cls.modify.flag_bullet_show,
                 },
             }
             t_helpDoc[f"恶赌模式 {mode_name}"] = mode_cls.helpdoc
@@ -193,7 +193,7 @@ class BotComp(Registerable):
     #             continue
     #         if prop == "锯子" and MR.Core.work.RegGameWork.get_prop_data(msg_manager, prop_name="锯子"):
     #             continue
-    #         if prop == "放大镜" and modify["bullet_show"]:
+    #         if prop == "放大镜" and modify["flag_bullet_show"]:
     #             continue
     #         actions.append(f"使用{prop}")
     #         if prop in target_props:

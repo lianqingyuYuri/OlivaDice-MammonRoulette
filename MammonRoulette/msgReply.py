@@ -224,8 +224,8 @@ def match_game(plugin_event, Proc, msg_manager, groups):
                     "players": {},
                     "modify": {
                         "dmg": mode_cfg["modify"]["dmg"],
-                        "ammo_show": bool(mode_cfg["modify"]["ammo_show"]),
-                        "bullet_show": bool(mode_cfg["modify"]["bullet_show"]),
+                        "flag_ammo_show": bool(mode_cfg["modify"]["flag_ammo_show"]),
+                        "flag_bullet_show": bool(mode_cfg["modify"]["flag_bullet_show"]),
                         "flag_bot": False,
                     },
                     "props_event": [],
@@ -464,7 +464,7 @@ def situation(plugin_event, Proc, msg_manager, groups):
         {
             "tGameNowBullet": (
                 msg_manager.msg_format("strMrGameNowBulletShow", t_value)
-                if game_work.bullet_show
+                if game_work.flag_bullet_show
                 else msg_manager.msg_format("strMrGameNowBulletHide", t_value)
             )
         }
@@ -481,7 +481,7 @@ def situation(plugin_event, Proc, msg_manager, groups):
         {
             "tGameAmmo": (
                 msg_manager.msg_format("strMrGameAmmoShow", t_value)
-                if game_work.ammo_show
+                if game_work.flag_ammo_show
                 else msg_manager.msg_format("strMrGameAmmoHide", t_value)
             )
         }

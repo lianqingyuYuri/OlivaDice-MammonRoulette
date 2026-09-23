@@ -73,8 +73,8 @@ class GameWork:
     bullet = data_mirror("bullet")  # 当前子弹
     shooter = data_mirror("shooter")  # 枪手
     dmg = modify_mirror("dmg")  # 伤害
-    ammo_show = modify_mirror("ammo_show")  # 显示弹药
-    bullet_show = modify_mirror("bullet_show")  # 显示子弹
+    flag_ammo_show = modify_mirror("flag_ammo_show")  # 显示弹药
+    flag_bullet_show = modify_mirror("flag_bullet_show")  # 显示子弹
 
     @property
     def flag_bot(self) -> bool:  # 是否为AI玩家
@@ -152,7 +152,7 @@ class GameWork:
                     {
                         "tGameNowBullet": (
                             self.msg_manager.msg_format("strMrGameNowBulletShow", t_value)
-                            if self.bullet_show
+                            if self.flag_bullet_show
                             else self.msg_manager.msg_format("strMrGameNowBulletHide", t_value)
                         )
                     }
@@ -169,7 +169,7 @@ class GameWork:
                     {
                         "tGameAmmo": (
                             self.msg_manager.msg_format("strMrGameAmmoShow", t_value)
-                            if self.ammo_show
+                            if self.flag_ammo_show
                             else self.msg_manager.msg_format("strMrGameAmmoHide", t_value)
                         )
                     }
@@ -192,7 +192,9 @@ class GameWork:
                 msg_reply += "\n" + self.msg_manager.msg_format("strGameReplyNote", t_value)
         else:
             msg_reply = self.reply["only"]
-        self.reply.update({"info": [], "note": {"ammo": self.ammo_show or self.bullet_show, "round": False}, "only": ""})
+        self.reply.update(
+            {"info": [], "note": {"ammo": self.flag_ammo_show or self.flag_bullet_show, "round": False}, "only": ""}
+        )
         self.tmp.clear()
         return msg_reply
 
