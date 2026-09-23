@@ -18,7 +18,7 @@ from ..Core.work import GameWork
 
 class 经典(ModeComp, BaseMode):
     name = "经典"
-    brief = (
+    helpdoc = (
         "〈赏金〉50"
         "\n〈血量〉每名玩家4hp."
         "\n〈道具池〉(上限6)"
@@ -53,7 +53,7 @@ class 经典(ModeComp, BaseMode):
 
 class 道具(ModeComp, BaseMode):
     name = "道具"
-    brief = (
+    helpdoc = (
         "〈赏金〉40"
         "\n〈血量〉前3名玩家5hp, 其余玩家6hp."
         "\n〈道具池〉(上限16)"
@@ -97,7 +97,7 @@ class 道具(ModeComp, BaseMode):
 
 class 金币(ModeComp, BaseMode):
     name = "金币"
-    brief = (
+    helpdoc = (
         "〈赏金〉60"
         "\n〈血量〉每名玩家5hp."
         "\n〈道具池(上限12)〉\\{金币\\}"
@@ -149,7 +149,7 @@ class 金币(ModeComp, BaseMode):
 
 class 勇者(ModeComp, BaseMode):
     name = "勇者"
-    brief = (
+    helpdoc = (
         "〈赏金〉40"
         "\n〈血量〉每名玩家5hp."
         "\n〈道具池〉(上限12)"
@@ -206,7 +206,7 @@ class 勇者(ModeComp, BaseMode):
 
 class 赌徒(ModeComp, BaseMode):
     name = "赌徒"
-    brief = (
+    helpdoc = (
         "〈赏金〉40"
         "\n〈血量〉每名玩家5hp."
         "\n〈道具池〉(上限12)"
@@ -286,7 +286,7 @@ class 赌徒(ModeComp, BaseMode):
 
 class 大富翁(ModeComp, BaseMode):
     name = "大富翁"
-    brief = (
+    helpdoc = (
         "〈赏金〉20"
         "\n〈血量〉每名玩家2hp."
         "\n〈道具池〉(无上限)\\{金币\\}"

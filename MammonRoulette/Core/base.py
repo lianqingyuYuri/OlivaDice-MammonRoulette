@@ -1,6 +1,6 @@
 class BaseMode:
     name: str = ""
-    brief: str = ""
+    helpdoc: str = ""
     points: int = 0
     reply: tuple = ()
 
@@ -69,7 +69,7 @@ class BaseMode:
 
 class BaseProp:
     name: str = ""
-    brief: str = ""
+    helpdoc: str = ""
     allow_flag: bool = True
     reply: tuple = ()
 
@@ -100,7 +100,7 @@ class BaseProp:
 
 class BaseEffect:
     name: str = ""
-    brief: str = ""
+    helpdoc: str = ""
     reply: tuple = ()
 
     @classmethod

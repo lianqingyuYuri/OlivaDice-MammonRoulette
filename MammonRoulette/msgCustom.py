@@ -196,7 +196,7 @@ dictModeCustom = {"default": {}}
 dictPropCustom = {"default": {}}
 dictEffectCustom = {"default": {}}
 dictDefsNote = {
-    "strModeBrief": "模式简介",
+    "strModeHelpdoc": "模式简介",
     "strModePoints": "赏金",
     "strModeSeatsDefault": "默认玩家数",
     "strModeSeatsMax": "最大玩家数",

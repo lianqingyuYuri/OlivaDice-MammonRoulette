@@ -21,7 +21,7 @@ from ..Core.work import GameWork
 # region 道具
 class 手铐(PropComp, BaseProp):
     name = "手铐"
-    brief = "不能将枪手选为目标. 束缚目标行动 1 回合, 且在目标恢复行动前无法将其再次选为手铐目标."
+    helpdoc = "不能将枪手选为目标. 束缚目标行动 1 回合, 且在目标恢复行动前无法将其再次选为手铐目标."
     reply = (
         ("strMrPropHandcuffs_1", "手铐道具 使用成功", "{tGamblerName}被銬住了{limb}."),
         ("strMrPropHandcuffs_2", "手铐道具 使用失败", "{tGamblerName}已經被銬住了."),
@@ -54,7 +54,7 @@ class 手铐(PropComp, BaseProp):
 
 class 锯子(PropComp, BaseProp):
     name = "锯子"
-    brief = "每次开枪前只能使用 1 次. 下一发子弹若为实弹则伤害 +1."
+    helpdoc = "每次开枪前只能使用 1 次. 下一发子弹若为实弹则伤害 +1."
     reply = (
         ("strMrPropSaw_1", "锯子道具 使用成功", "槍管被鋸斷."),
         ("strMrPropSaw_2", "锯子道具 使用失败", "槍管早已被鋸斷."),
@@ -84,7 +84,7 @@ class 锯子(PropComp, BaseProp):
 
 class 邀请函(PropComp, BaseProp):
     name = "邀请函"
-    brief = "在特定道具池中, 使目标抽取 2 个道具, 并结束枪手回合."
+    helpdoc = "在特定道具池中, 使目标抽取 2 个道具, 并结束枪手回合."
     reply = (
         ("strMrPropInvite_1", "邀请函道具 对自己使用", "{tGamblerName}將邀請函撕碎."),
         ("strMrPropInvite_2", "邀请函道具 对目标使用", "{tGamblerName}邀請{tTargetName}參加宴會."),
@@ -111,7 +111,7 @@ class 邀请函(PropComp, BaseProp):
 
 class 花生(PropComp, BaseProp):
     name = "花生"
-    brief = "装填 1 发空包弹, 然后重新上膛."
+    helpdoc = "装填 1 发空包弹, 然后重新上膛."
     reply = (("strMrPropPeanut_1", "花生道具 使用成功", "{tGamblerName}花生被塞進彈倉."),)
 
     @classmethod
@@ -126,7 +126,7 @@ class 花生(PropComp, BaseProp):
 
 class 巧克力(PropComp, BaseProp):
     name = "巧克力"
-    brief = "装填 1 发实弹, 然后重新上膛."
+    helpdoc = "装填 1 发实弹, 然后重新上膛."
     reply = (
         ("strMrPropChocolate_1", "巧克力道具 使用成功", "{heart}巧克力被塞進彈倉."),
         ("strMrPropChocolateHeart", "巧克力道具 随机描述", "酒心|果仁|果醬|奶油|焦糖|咖啡|抹茶|香草|芝士|辣味|慕斯|奶油"),
@@ -147,7 +147,7 @@ class 巧克力(PropComp, BaseProp):
 
 class 香烟(PropComp, BaseProp):
     name = "香烟"
-    brief = "取出 1 发空包弹, 然后重新上膛. 若弹仓内只有实弹, 则取出 1 发实弹."
+    helpdoc = "取出 1 发空包弹, 然后重新上膛. 若弹仓内只有实弹, 则取出 1 发实弹."
     reply = (("strMrPropSmoke_1", "香烟道具 使用成功", "{tGamblerName}扔掉香煙, 取出一發{tNowBulletType}."),)
 
     @classmethod
@@ -171,7 +171,7 @@ class 香烟(PropComp, BaseProp):
 
 class 红牛(PropComp, BaseProp):
     name = "红牛"
-    brief = "使目标HP+1."
+    helpdoc = "使目标HP+1."
     reply = (
         (
             "strMrPropRedCow_1",
@@ -219,7 +219,7 @@ class 红牛(PropComp, BaseProp):
 
 class 放大镜(PropComp, BaseProp):
     name = "放大镜"
-    brief = "每次开枪前只能使用 1 次. 在开枪前持续显示下一发子弹的虚实."
+    helpdoc = "每次开枪前只能使用 1 次. 在开枪前持续显示下一发子弹的虚实."
     reply = (
         ("strMrPropMagnifier_1", "放大镜道具 使用成功", "{tGamblerName}砸碎放大鏡, 發現槍膛裏是{tNowBulletType}."),
         ("strMrPropMagnifier_2", "放大镜道具 使用失败", "已用放大镜, 开枪前可查看子弹虚实."),
@@ -268,7 +268,7 @@ class 放大镜(PropComp, BaseProp):
 
 class 口红(PropComp, BaseProp):
     name = "口红"
-    brief = "夺取目标口红和金币以外的 1 个道具, 或重新抽取 1 个道具."
+    helpdoc = "夺取目标口红和金币以外的 1 个道具, 或重新抽取 1 个道具."
     reply = (
         ("strMrPropLipstick_1", "口红道具 对自己使用或目标无道具", "{tGamblerName}{usage}{color}的口紅, 神明贈予{tPropName}."),
         ("strMrPropLipstick_2", "口红道具 对目标使用", "{tGamblerName}給{usage}{color}的口紅, {tTargetName}以{tPropName}回贈."),
@@ -310,7 +310,7 @@ class 口红(PropComp, BaseProp):
 
 class 扑克(PropComp, BaseProp):
     name = "扑克"
-    brief = "反转子弹虚实, 并在效果期间隐藏弹仓."
+    helpdoc = "反转子弹虚实, 并在效果期间隐藏弹仓."
     reply = (
         ("strMrPropPoker_1", "扑克道具 使用成功", "{tGamblerName}從牌堆抽到[{poker}], 命運已然改變."),
         ("strMrPropPoker_2", "扑克道具 失效", "迷霧被驅散了."),
@@ -376,7 +376,7 @@ class 扑克(PropComp, BaseProp):
 
 class 转盘(PropComp, BaseProp):
     name = "转盘"
-    brief = "以特殊比例重新装填弹仓, 并重置道具特效."
+    helpdoc = "以特殊比例重新装填弹仓, 并重置道具特效."
     reply = (("strMrPropRoulette_1", "转盘道具 使用成功", "鏽迹斑斑的轉盤開始變換……現在是世界線[{garbled}]."),)
 
     clear_prop = ["扑克"]
@@ -408,7 +408,7 @@ class 转盘(PropComp, BaseProp):
 
 class 牛奶(PropComp, BaseProp):
     name = "牛奶"
-    brief = "在特定道具池中, 使目标抽取 2 个道具, 其余赌徒抽取 1 个道具."
+    helpdoc = "在特定道具池中, 使目标抽取 2 个道具, 其余赌徒抽取 1 个道具."
     reply = (
         ("strMrPropMilk_1", "牛奶道具 对自己使用", "{tGamblerName}飲下{milk}, 在暈眩中神明降下賜福.."),
         ("strMrPropMilk_2", "牛奶道具 对目标使用", "{tGamblerName}讓{tTargetName}飲下{milk}, 在暈眩中神明降下賜福.."),
@@ -441,7 +441,7 @@ class 牛奶(PropComp, BaseProp):
 
 class 金币(PropComp, BaseProp):
     name = "金币"
-    brief = "兑换任意 1 个未被ban的道具, 部分道具兑换后将直接使用. 增加指令: 购买(道具名)."
+    helpdoc = "兑换任意 1 个未被ban的道具, 部分道具兑换后将直接使用. 增加指令: 购买(道具名)."
     direct_use = ["锯子", "花生", "巧克力", "香烟", "放大镜", "扑克", "转盘", "牛奶"]
 
     reply = (
@@ -504,7 +504,7 @@ class 金币(PropComp, BaseProp):
 
 class 止疼药(PropComp, BaseProp):
     name = "止疼药"
-    brief = "使目标在其回合结束前受到的伤害转变为等值的神经麻痹. 对自身使用时, 效果延长到下回合结束."
+    helpdoc = "使目标在其回合结束前受到的伤害转变为等值的神经麻痹. 对自身使用时, 效果延长到下回合结束."
     reply = (
         ("strMrPropPain_1", "止疼药道具 对自己使用", "{tGamblerName}服用止疼药."),
         ("strMrPropPain_2", "止疼药道具 对目标使用", "{tGamblerName}喂{tTargetName}服用止疼药."),
@@ -535,7 +535,7 @@ class 止疼药(PropComp, BaseProp):
 
 class 烟花(PropComp, BaseProp):
     name = "烟花"
-    brief = "所有赌徒各有1/2的概率HP-1. 每杀死一名赌徒, 重新生效一次, 且概率提高至2/3. 每生效一次, 所有赌徒抽取 1 个道具."
+    helpdoc = "所有赌徒各有1/2的概率HP-1. 每杀死一名赌徒, 重新生效一次, 且概率提高至2/3. 每生效一次, 所有赌徒抽取 1 个道具."
     reply = (("strMrPropFirework_1", "烟花道具 使用成功", "{tGamblerName}燃放煙花, 天空變得五彩斑斕."),)
 
     @classmethod
@@ -595,6 +595,6 @@ class 烟花(PropComp, BaseProp):
 # endregion
 # class 和你爆了(PropComp, BaseProp):
 #     name = "和你爆了"
-#     brief = ""
+#     helpdoc = ""
 #     allow_flag = False
 #     reply = []

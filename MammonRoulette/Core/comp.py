@@ -31,7 +31,7 @@ class ModeComp(Registerable):
         for mode_name, mode_cls in cls._register.items():
             mode_cls.init()
             dictModeCustom["default"][mode_name] = {
-                "brief": mode_cls.brief,
+                "helpdoc": mode_cls.helpdoc,
                 "points": mode_cls.points,
                 "seats": {
                     "default": mode_cls.seats.default,
@@ -50,7 +50,7 @@ class ModeComp(Registerable):
                     "bullet_show": mode_cls.modify.bullet_show,
                 },
             }
-            t_helpDoc[f"恶赌模式 {mode_name}"] = mode_cls.brief
+            t_helpDoc[f"恶赌模式 {mode_name}"] = mode_cls.helpdoc
             for reply in mode_cls.reply:
                 reply_field, reply_note, reply_msg = reply
                 dictStrCustom[reply_field] = reply_msg
@@ -72,9 +72,9 @@ class PropComp(Registerable):
         for prop_name, prop_cls in cls._register.items():
             prop_cls.init()
             dictPropCustom["default"][prop_name] = {
-                "brief": prop_cls.brief,
+                "helpdoc": prop_cls.helpdoc,
             }
-            t_helpDoc[f"恶赌道具 {prop_name}"] = prop_cls.brief
+            t_helpDoc[f"恶赌道具 {prop_name}"] = prop_cls.helpdoc
             for reply in prop_cls.reply:
                 reply_field, reply_note, reply_msg = reply
                 dictStrCustom[reply_field] = reply_msg
@@ -109,9 +109,9 @@ class EffectComp(Registerable):
         for effect_name, effect_cls in cls._register.items():
             effect_cls.init()
             dictEffectCustom["default"][effect_name] = {
-                "brief": effect_cls.brief,
+                "helpdoc": effect_cls.helpdoc,
             }
-            t_helpDoc[f"恶赌效果 {effect_name}"] = effect_cls.brief
+            t_helpDoc[f"恶赌效果 {effect_name}"] = effect_cls.helpdoc
             for reply in effect_cls.reply:
                 reply_field, reply_note, reply_msg = reply
                 dictStrCustom[reply_field] = reply_msg

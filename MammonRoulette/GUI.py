@@ -314,11 +314,11 @@ class ConfigUI(object):
 
         source_data = dictModeCustom["default"] if is_global_mode else dictModeCustom.get(self.UIData["hash_now"], {})
         for mode_name, mode_data in source_data.items():
-            brief = mode_data.get("brief", "").replace("\n", " ").strip()
+            helpdoc = mode_data.get("helpdoc", "").replace("\n", " ").strip()
             points = mode_data.get("points", 0)
             seats = mode_data.get("seats", {})
             seat_range = f"{seats.get('min', 2)}-{seats.get('max', 8)}"
-            self.UIObject["tree_mode"].insert("", "end", text=mode_name, values=(mode_name, points, seat_range, brief))
+            self.UIObject["tree_mode"].insert("", "end", text=mode_name, values=(mode_name, points, seat_range, helpdoc))
 
         # 恢复之前选中的模式
         if selected_mode_name is not None:
@@ -571,7 +571,7 @@ class ConfigUI(object):
 
         # 字段配置
         field_configs = [
-            ("brief", "strModeBrief"),
+            ("helpdoc", "strModeHelpdoc"),
             ("points", "strModePoints"),
             ("seats_default", "strModeSeatsDefault"),
             ("seats_min", "strModeSeatsMin"),
@@ -587,8 +587,8 @@ class ConfigUI(object):
         for field_key, note_key in field_configs:
             value = ""
             note_text = dictDefsNote.get(note_key, "")
-            if field_key == "brief":
-                value = mode_data.get("brief", "").replace("\n", "\\n")
+            if field_key == "helpdoc":
+                value = mode_data.get("helpdoc", "").replace("\n", "\\n")
             elif field_key == "points":
                 value = str(mode_data.get("points", 0))
             elif field_key.startswith("seats_"):
@@ -628,7 +628,7 @@ class ConfigUI(object):
     def update_mode_helpdoc(self, mode_name, mode_data):
         """更新帮助文档"""
         current_hash = self.UIData["hash_now"]
-        OlivaDiceCore.helpDocData.dictHelpDoc[current_hash][f"恶赌模式 {mode_name}"] = mode_data["brief"]
+        OlivaDiceCore.helpDocData.dictHelpDoc[current_hash][f"恶赌模式 {mode_name}"] = mode_data["helpdoc"]
 
     def reset_mode_default(self):
         """恢复模式默认值"""
@@ -802,9 +802,9 @@ class ConfigUI(object):
         default_modes = copy.deepcopy(dictModeCustom["default"][mode_name])
         current_data = dictModeCustom[current_hash][mode_name]
         # 根据字段类型更新数据
-        if field_key in ("brief", "points"):
+        if field_key in ("helpdoc", "points"):
             current_data[field_key] = default_modes[field_key]
-            if field_key == "brief":
+            if field_key == "helpdoc":
                 self.update_mode_helpdoc(mode_name, current_data)
         elif field_key in ("seats_default", "seats_min", "seats_max"):
             key_map = {
@@ -859,8 +859,8 @@ class ConfigUI(object):
         if not mode_data:
             return
 
-        if field_key == "brief":
-            current_value = mode_data.get("brief", "")
+        if field_key == "helpdoc":
+            current_value = mode_data.get("helpdoc", "")
         elif field_key == "points":
             current_value = str(mode_data.get("points", 0))
         elif field_key.startswith("seats_"):
@@ -983,8 +983,8 @@ class ConfigUI(object):
         mode_data = mode_dict[mode_name]
 
         try:
-            if field_key == "brief":
-                mode_data["brief"] = new_value
+            if field_key == "helpdoc":
+                mode_data["helpdoc"] = new_value
                 self.update_mode_helpdoc(mode_name, mode_data)
             elif field_key == "points":
                 mode_data["points"] = int(new_value)
