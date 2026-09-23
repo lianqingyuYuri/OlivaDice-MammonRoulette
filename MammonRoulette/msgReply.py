@@ -295,7 +295,7 @@ def join_bot(plugin_event, Proc, msg_manager, groups):
         situation(plugin_event, Proc, msg_manager, None)
     else:
         msg_reply = msg_manager.msg_format(
-            "strMrAiJoin", {"tAIName": bot_name, "tGameMode": mode_name, "tSeatsHas": len(game_work.order), "tSeatsMax": seats}
+            "strMrAiJoin", {"tBotName": bot_name, "tGameMode": mode_name, "tSeatsHas": len(game_work.order), "tSeatsMax": seats}
         )
         plugin_event.reply(msg_reply)
         return

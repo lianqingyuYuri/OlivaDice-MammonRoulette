@@ -40,11 +40,11 @@ dictStrCustom = {
     "strMrGameDismiss": "你已退出，对局解散.",
     "strMrGameRemain": "你已退出，剩余：{tSeatsHas}人.",
     "strMrGameExpired": "原{tGameMode}對局已過期, 自動解散.",
-    "strMrAiJoin": "{tAIName}降臨{tGameMode}对局[{tSeatsHas}/{tSeatsMax}].",
+    "strMrAiJoin": "{tBotName}降臨{tGameMode}对局[{tSeatsHas}/{tSeatsMax}].",
     "strMrGameAmmoRanOut": "彈藥耗盡，重新裝填中……",
     "strMrGameEnd": "{tWinnerName}用鮮血爲這場生死對局畫上句號.",
     "strMrGameTied": "這場對局沒有贏家.",
-    "strMrGamblerWasAmmoLiveShot": "“嘭！”{tGamblerName}被崩倒在地[hp {tHpBefore}->{tHpNow}].",
+    "strMrGamblerWasAmmoLiveShot": "“嘭！”{tGamblerName}被崩倒在地[hp {tHpOld}->{tHpNew}].",
     "strMrGamblerWasAmmoBlankShot": "“咔哒——”是空彈……",
     "strMrGamblerKilled": "{tGamblerName}死於他手.",
     "strMrGamblerSuicide": "{tGamblerName}自殺了……",
@@ -146,8 +146,8 @@ dictTValue = {
     "tSeatsMax": "N/A",  # 最大座位数
     "tSeatsMin": "N/A",  # 最小座位数
     "tSeatsDef": "N/A",  # 默认座位数
-    # AI相关
-    "tAIName": "N/A",  # AI名称
+    # BOT相关
+    "tBotName": "N/A",  # BOT名称
     # 道具相关
     "tPropName": "",  # 道具名称
     "tPropCount": "N/A",  # 道具数量
@@ -169,8 +169,8 @@ dictTValue = {
     "tGameNowBullet": "",  # 回复-当前子弹
     "tGameAmmo": "",  # 回复-弹药信息
     "tGameDeadList": "",  # 回复-死亡列表
-    "tHpBefore": "N/A",  # 玩家血量-受伤前
-    "tHpNow": "N/A",  # 玩家血量-受伤后
+    "tHpOld": "N/A",  # 玩家血量-受伤前
+    "tHpNew": "N/A",  # 玩家血量-受伤后
     "tWinnerName": "",  # 胜利者名称
 }
 

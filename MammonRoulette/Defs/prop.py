@@ -176,12 +176,12 @@ class 红牛(PropComp, BaseProp):
         (
             "strMrPropRedCow_1",
             "红牛道具 对自己使用",
-            "{tGamblerName}將混著{ingredients}的紅牛將其一飲而盡[hp {tHpBefore}->{tHpNow}].",
+            "{tGamblerName}將混著{ingredients}的紅牛將其一飲而盡[hp {tHpOld}->{tHpNew}].",
         ),
         (
             "strMrPropRedCow_2",
             "红牛道具 对他人使用",
-            "{tGamblerName}將混著{ingredients}的紅牛喂給{tTargetName}[hp {tHpBefore}->{tHpNow}].",
+            "{tGamblerName}將混著{ingredients}的紅牛喂給{tTargetName}[hp {tHpOld}->{tHpNew}].",
         ),
         ("strMrPropRedCowIngredients", "红牛道具 随机描述", "胰岛素|白開水|辣椒粉|薯片|益達|紅牛?"),
     )
@@ -198,8 +198,8 @@ class 红牛(PropComp, BaseProp):
                 {
                     "tGamblerName": name,
                     "ingredients": msg_manager.msg_format("strMrPropRedCowIngredients", flagSplit=True),
-                    "tHpBefore": game_work.tmp["hp_before"],
-                    "tHpNow": game_work.tmp["hp_now"],
+                    "tHpOld": game_work.tmp["old_hp"],
+                    "tHpNew": game_work.tmp["new_hp"],
                 },
             )
         else:
@@ -209,8 +209,8 @@ class 红牛(PropComp, BaseProp):
                     "tGamblerName": name,
                     "ingredients": msg_manager.msg_format("strMrPropRedCowIngredients", flagSplit=True),
                     "tTargetName": game_work.get_name(target),
-                    "tHpBefore": game_work.tmp["hp_before"],
-                    "tHpNow": game_work.tmp["hp_now"],
+                    "tHpOld": game_work.tmp["old_hp"],
+                    "tHpNew": game_work.tmp["new_hp"],
                 },
             )
         game_work.upsert_info(msg_reply)
@@ -549,17 +549,17 @@ class 烟花(PropComp, BaseProp):
         order_before = game_work.order.copy()
         for pl in order_before:
             c_hp = game_work.players[pl]["hp"]
-            game_work.tmp[f"{pl}_hp_before"] = c_hp
-            game_work.tmp[f"{pl}_hp_now"] = c_hp
+            game_work.tmp[f"{pl}_old_hp"] = c_hp
+            game_work.tmp[f"{pl}_new_hp"] = c_hp
             if random.randint(1, 2) == 1:
                 game_work.damage(pl, 1, game_work.shooter)
-                game_work.tmp[f"{pl}_hp_now"] = game_work.tmp["hp_now"]
+                game_work.tmp[f"{pl}_new_hp"] = game_work.tmp["new_hp"]
         cls.explosion(msg_manager, order_before)
         game_work.remove_props_event(prop_name=cls.name)
         situation = [
-            f"{game_work.get_name(pl)}[hp {game_work.tmp[f'{pl}_hp_before']}->{game_work.tmp[f'{pl}_hp_now']}]."
+            f"{game_work.get_name(pl)}[hp {game_work.tmp[f'{pl}_old_hp']}->{game_work.tmp[f'{pl}_new_hp']}]."
             for pl in order_before
-            if game_work.tmp[f"{pl}_hp_before"] != game_work.tmp[f"{pl}_hp_now"]
+            if game_work.tmp[f"{pl}_old_hp"] != game_work.tmp[f"{pl}_new_hp"]
         ]
         situation_str = "\n".join(situation)
         if not game_work.flag_over:
@@ -588,7 +588,7 @@ class 烟花(PropComp, BaseProp):
             for pl in order_before:
                 if random.randint(1, 3) != 3:
                     game_work.damage(pl, 1, game_work.shooter)
-                    game_work.tmp[f"{pl}_hp_now"] = game_work.tmp["hp_now"]
+                    game_work.tmp[f"{pl}_new_hp"] = game_work.tmp["new_hp"]
         return
 
 

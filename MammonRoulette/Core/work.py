@@ -392,15 +392,15 @@ class GameWork:
                 consume_action = 1
             self.ammo_live -= 1
             self.damage(target, dmg, murderer)
-            hp_before, hp_now = self.tmp["hp_before"], self.tmp["hp_now"]
-            if self.tmp["hp_now"] > 0:
+            old_hp, new_hp = self.tmp["old_hp"], self.tmp["new_hp"]
+            if self.tmp["new_hp"] > 0:
                 self.upsert_info(
                     self.msg_manager.msg_format(
                         "strMrGamblerWasAmmoLiveShot",
                         {
                             "tGamblerName": pl_target["name"],
-                            "tHpBefore": hp_before,
-                            "tHpNow": hp_now,
+                            "tHpOld": old_hp,
+                            "tHpNew": new_hp,
                         },
                     ),
                     t_reply_id,
@@ -414,8 +414,8 @@ class GameWork:
                     "strMrGamblerWasAmmoBlankShot",
                     {
                         "tGamblerName": pl_target["name"],
-                        "tHpBefore": pl_target["hp"],
-                        "tHpNow": pl_target["hp"],
+                        "tHpOld": pl_target["hp"],
+                        "tHpNew": pl_target["hp"],
                     },
                 ),
                 t_reply_id,
@@ -449,9 +449,9 @@ class GameWork:
             self.tmp["is_attack_me"],
         )
         pl_target = self.players[target]
-        self.tmp["hp_before"] = pl_target["hp"]
+        self.tmp["old_hp"] = pl_target["hp"]
         pl_target["hp"] -= dmg
-        self.tmp["hp_now"] = pl_target["hp"]
+        self.tmp["new_hp"] = pl_target["hp"]
         self.tmp["is_killed"] = False
         if pl_target["hp"] <= 0 and target in self.order and check_dead:
             self.tmp["is_killed"] = True
