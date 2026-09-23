@@ -78,7 +78,7 @@ dictStrCustomNote = {
     "strMrLeaderboardResult": "【恶魔排行】指令 显示排行榜.",
     "strMrLink": "同类个体的连接符号 如道具、死亡玩家.",
     "strMrAmmoLive": "实弹",
-    "strMrAmmoBlank": "空包弹",
+    "strMrAmmoBlank": "空弹",
     "strMrGamePrep": "【匹配】指令 正在等待其他玩家加入.",
     "strMrGameSeatsError": "【匹配】指令 席位设置不在允许范围.",
     "strMrGameStarted": "【匹配】指令 对局已经开始, 无法加入.",
@@ -108,7 +108,7 @@ dictStrCustomNote = {
     "strMrGameShooter": "枪手 当前枪手的显示.",
     "strMrGameNowBulletShow": "子弹 显示当前子弹的类型.",
     "strMrGameNowBulletHide": "子弹 隐藏当前子弹时的显示.",
-    "strMrGameAmmoShow": "弹药 显示实弹、空包弹、总弹药.",
+    "strMrGameAmmoShow": "弹药 显示实弹、空弹、总弹药.",
     "strMrGameAmmoHide": "弹药 隐藏弹药时的显示.",
     "strMrGameDeadList": "死亡列表 显示死亡的玩家.",
     "strMrGameDeadNone": "死亡列表 没有玩家死亡时的显示.",
@@ -160,7 +160,7 @@ dictTValue = {
     # 子弹/弹药相关
     "tNowBulletType": "N/A",  # 当前子弹类型
     "tAmmoLiveCount": "N/A",  # 实弹数量
-    "tAmmoBlankCount": "N/A",  # 空包弹数量
+    "tAmmoBlankCount": "N/A",  # 空弹数量
     "tAmmoCount": "N/A",  # 总弹药数
     # 回复相关
     "tDeadList": "",  # 死亡列表

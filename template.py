@@ -15,8 +15,8 @@ game = {
         },
     },
     "data": {
-        "ammo_live": int,  # 实弹
-        "ammo_blank": int,  # 空包弹
+        "ammo_live": int,  # 实弹数
+        "ammo_blank": int,  # 空弹数
         "bullet": int,  # 当前子弹
         "shooter": str,  # 枪手
         "order": [],  # 行动顺序

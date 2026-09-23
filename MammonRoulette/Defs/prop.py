@@ -111,7 +111,7 @@ class 邀请函(PropComp, BaseProp):
 
 class 花生(PropComp, BaseProp):
     name = "花生"
-    helpdoc = "装填 1 发空包弹, 然后重新上膛."
+    helpdoc = "装填 1 发空弹, 然后重新上膛."
     reply = (("strMrPropPeanut_1", "花生道具 使用成功", "{tGamblerName}花生被塞進彈倉."),)
 
     @classmethod
@@ -147,7 +147,7 @@ class 巧克力(PropComp, BaseProp):
 
 class 香烟(PropComp, BaseProp):
     name = "香烟"
-    helpdoc = "取出 1 发空包弹, 然后重新上膛. 若弹仓内只有实弹, 则取出 1 发实弹."
+    helpdoc = "取出 1 发空弹, 然后重新上膛. 若弹仓内只有实弹, 则取出 1 发实弹."
     reply = (("strMrPropSmoke_1", "香烟道具 使用成功", "{tGamblerName}扔掉香煙, 取出一發{tNowBulletType}."),)
 
     @classmethod

@@ -68,8 +68,8 @@ class GameWork:
     props_ban: list
     props_limit: int
 
-    ammo_live = data_mirror("ammo_live")  # 实弹
-    ammo_blank = data_mirror("ammo_blank")  # 空包弹
+    ammo_live = data_mirror("ammo_live")  # 实弹数
+    ammo_blank = data_mirror("ammo_blank")  # 空弹数
     bullet = data_mirror("bullet")  # 当前子弹
     shooter = data_mirror("shooter")  # 枪手
     dmg = modify_mirror("dmg")  # 伤害
