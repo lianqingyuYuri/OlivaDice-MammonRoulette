@@ -12,8 +12,8 @@
 class BaseMode:
     name: str = ""
     helpdoc: str = ""
-    points: int = 0
     reply: tuple = ()
+    points: int = 0
 
     class seats:
         default: int = 2
