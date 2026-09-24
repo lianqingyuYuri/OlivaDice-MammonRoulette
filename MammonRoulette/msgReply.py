@@ -295,7 +295,7 @@ def join_bot(plugin_event, Proc, msg_manager, groups):
         situation(plugin_event, Proc, msg_manager, None)
     else:
         msg_reply = msg_manager.msg_format(
-            "strMrAiJoin", {"tBotName": bot_name, "tGameMode": mode_name, "tSeatsHas": len(game_work.order), "tSeatsMax": seats}
+            "strMrBotJoin", {"tBotName": bot_name, "tGameMode": mode_name, "tSeatsHas": len(game_work.order), "tSeatsMax": seats}
         )
         plugin_event.reply(msg_reply)
         return
@@ -372,7 +372,7 @@ def use_prop(plugin_event, Proc, msg_manager, groups):
     prop, target = groups[0], groups[1]
     # 检查是否持有道具
     if prop not in game_work.players[user_id]["props"]:
-        msg_reply = msg_manager.msg_format("strMrGamblerNoProp", {"tPropName": prop})
+        msg_reply = msg_manager.msg_format("strMrGamblerPropNone", {"tPropName": prop})
         plugin_event.reply(msg_reply)
         return
     # 确认目标

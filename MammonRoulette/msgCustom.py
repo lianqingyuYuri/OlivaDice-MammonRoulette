@@ -40,18 +40,18 @@ dictStrCustom = {
     "strMrGameDismiss": "你已退出，对局解散.",
     "strMrGameRemain": "你已退出，剩余：{tSeatsHas}人.",
     "strMrGameExpired": "原{tGameMode}對局已過期, 自動解散.",
-    "strMrAiJoin": "{tBotName}降臨{tGameMode}对局[{tSeatsHas}/{tSeatsMax}].",
+    "strMrBotJoin": "{tBotName}降臨{tGameMode}对局[{tSeatsHas}/{tSeatsMax}].",
     "strMrGameAmmoRanOut": "彈藥耗盡，重新裝填中……",
-    "strMrGameEnd": "{tWinnerName}用鮮血爲這場生死對局畫上句號.",
+    "strMrGameOver": "{tWinnerName}用鮮血爲這場生死對局畫上句號.",
     "strMrGameTied": "這場對局沒有贏家.",
-    "strMrGamblerWasAmmoLiveShot": "“嘭！”{tGamblerName}被崩倒在地[hp {tHpOld}->{tHpNew}].",
-    "strMrGamblerWasAmmoBlankShot": "“咔哒——”是空彈……",
+    "strMrGamblerWasShotWithLiveAmmo": "“嘭！”{tGamblerName}被崩倒在地[hp {tHpOld}->{tHpNew}].",
+    "strMrGamblerWasShotWithBlankAmmo": "“咔哒——”是空彈……",
     "strMrGamblerKilled": "{tGamblerName}死於他手.",
     "strMrGamblerSuicide": "{tGamblerName}自殺了……",
     "strMrGamblerSurrender": "{tGamblerName}臨陣脫逃.",
     "strMrGamblerTurn": "現在是{tGamblerName}的回合.",
-    "strMrGamblerNoProp": "你没有{tPropName}道具.",
-    "strMrGamblerDrawnProps": "{tGamblerName}抽取: {tDrawnProps}.",
+    "strMrGamblerPropNone": "你没有{tPropName}道具.",
+    "strMrGamblerPropsDraw": "{tGamblerName}抽取: {tDrawnProps}.",
     "strMrGamblerData": "〔{tGamblerIdx}〕 {tGamblerName}\n「hp: {tGamblerHp}」{tGamblerEffect}\n{tGamblerProps}\n",
     "strMrPropOneNode": "{tPropName}",
     "strMrPropManyNode": "{tPropName}*{tPropCount}",
@@ -86,18 +86,18 @@ dictStrCustomNote = {
     "strMrGameDismiss": "【退出】指令 退出游戏后, 对局解散.",
     "strMrGameRemain": "【退出】指令 退出游戏后的剩余人数显示.",
     "strMrGameExpired": "对局过期时的显示.",
-    "strMrAiJoin": "【加入AI】指令 AI加入匹配对局时的显示.",
+    "strMrBotJoin": "【加入AI】指令 AI加入匹配对局时的显示.",
     "strMrGameAmmoRanOut": "实弹耗尽, 重新装弹时的显示.",
-    "strMrGameEnd": "游戏结束时的显示.",
+    "strMrGameOver": "游戏结束时的显示.",
     "strMrGameTied": "游戏平局时的显示.",
-    "strMrGamblerWasAmmoLiveShot": "开枪 子弹为[AmmoLive]",
-    "strMrGamblerWasAmmoBlankShot": "开枪 子弹为[AmmoBlank]",
+    "strMrGamblerWasShotWithLiveAmmo": "开枪 子弹为[AmmoLive]",
+    "strMrGamblerWasShotWithBlankAmmo": "开枪 子弹为[AmmoBlank]",
     "strMrGamblerKilled": "玩家被其他玩家杀死时的显示.",
     "strMrGamblerSuicide": "玩家被自己杀死时的显示.",
     "strMrGamblerSurrender": "【投降】指令 玩家投降时的显示.",
     "strMrGamblerTurn": "显示当前行动的玩家.\n一般在行动换人或非行动玩家行动时显示.",
-    "strMrGamblerNoProp": "【使用道具】指令 没有使用的道具.",
-    "strMrGamblerDrawnProps": "显示玩家抽取的道具.",
+    "strMrGamblerPropNone": "【使用道具】指令 没有使用的道具.",
+    "strMrGamblerPropsDraw": "显示玩家抽取的道具.",
     "strMrGamblerData": "玩家数据显示模板.\n包含道具列表.",
     "strMrPropOneNode": "道具列表 同名道具只有一个时的显示模板.",
     "strMrPropManyNode": "道具列表 同名道具有多个时的显示模板.",
@@ -163,6 +163,8 @@ dictTValue = {
     "tAmmoBlankCount": "N/A",  # 空弹数量
     "tAmmoCount": "N/A",  # 总弹药数
     # 回复相关
+    "tTargetName": "",  # 目标玩家名称
+    "tSourceName": "",  # 来源玩家名称
     "tDeadList": "",  # 死亡列表
     "tGamblerData": "",  # 赌徒数据
     "tShooter": "",  # 枪手信息

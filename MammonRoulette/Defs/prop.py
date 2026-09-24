@@ -472,7 +472,7 @@ class 金币(PropComp, BaseProp):
                 plugin_event.reply(msg_reply)
                 return
             if not game_work.remove_prop(user_id, cls.name):
-                msg_reply = msg_manager.msg_format("strMrGamblerNoProp", {"tPropName": cls.name})
+                msg_reply = msg_manager.msg_format("strMrGamblerPropNone", {"tPropName": cls.name})
                 plugin_event.reply(msg_reply)
                 return
             prop = groups[0]

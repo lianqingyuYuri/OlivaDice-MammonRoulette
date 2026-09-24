@@ -297,7 +297,7 @@ class GameWork:
             link = self.msg_manager.msg_format("strMrLink")
             self.upsert_info(
                 self.msg_manager.msg_format(
-                    "strMrGamblerDrawnProps",
+                    "strMrGamblerPropsDraw",
                     {
                         "tGamblerName": self.get_name(user_id),
                         "tDrawnProps": link.join(t_draw_props),
@@ -393,7 +393,7 @@ class GameWork:
             if self.tmp["new_hp"] > 0:
                 self.upsert_info(
                     self.msg_manager.msg_format(
-                        "strMrGamblerWasAmmoLiveShot",
+                        "strMrGamblerWasShotWithLiveAmmo",
                         {
                             "tGamblerName": pl_target["name"],
                             "tHpOld": self.tmp["old_hp"],
@@ -408,7 +408,7 @@ class GameWork:
                 consume_action = 0 if is_shoot_me else 1
             self.upsert_info(
                 self.msg_manager.msg_format(
-                    "strMrGamblerWasAmmoBlankShot",
+                    "strMrGamblerWasShotWithBlankAmmo",
                     {
                         "tGamblerName": pl_target["name"],
                         "tHpOld": pl_target["hp"],
@@ -518,7 +518,7 @@ class GameWork:
         self.tmp["check_over"] = True
         flag_over = self.mode.try_over(self.msg_manager)
         if len(self.order) == 1:
-            self.upsert_info(self.msg_manager.msg_format("strMrGameEnd", {"tWinnerName": self.get_name(self.order[0])}))
+            self.upsert_info(self.msg_manager.msg_format("strMrGameOver", {"tWinnerName": self.get_name(self.order[0])}))
             flag_over = True
         elif len(self.order) < 1:
             self.upsert_info(self.msg_manager.msg_format("strMrGameTied"))
