@@ -369,11 +369,11 @@ class GameWork:
         self.handle_event(
             "shoot",
             target=target,
-            source=source,
-            is_shoot_me=target == source,
-            dmg=self.dmg,
-            dmg_type="",
-            consume_action=None,
+            source=self.tmp.get("source", source),
+            is_shoot_me=self.tmp.get("is_shoot_me", target == source),
+            dmg=self.tmp.get("dmg", self.dmg),
+            dmg_type=self.tmp.get("dmg_type", ""),
+            consume_action=self.tmp.get("consume_action", None),
         )
         target, source, is_shoot_me, dmg, dmg_type, consume_action = (
             self.tmp["target"],
@@ -431,7 +431,7 @@ class GameWork:
             "damage",
             target=target,
             source=source,
-            is_attack_me=target == source,
+            is_attack_me=self.tmp.get("is_attack_me", target == source),
             dmg=dmg,
             dmg_type=self.tmp.get("dmg_type", ""),
             is_check_dead=self.tmp.get("is_check_dead", True),
@@ -511,7 +511,7 @@ class GameWork:
         if self.shooter != shooter:
             self.shooter = shooter
             self.reply["note"]["flag_shooter"] = True
-            self.handle_event("switch", shooter=shooter, consume_action=0)
+            self.handle_event("switch", shooter=shooter)
         return
 
     def try_over(self):
