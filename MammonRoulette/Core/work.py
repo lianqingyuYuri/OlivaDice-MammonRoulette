@@ -395,7 +395,8 @@ class GameWork:
                     self.msg_manager.msg_format(
                         "strMrGamblerWasShotWithLiveAmmo",
                         {
-                            "tGamblerName": pl_target["name"],
+                            "tTargetName": pl_target["name"],
+                            "tSourceName": self.get_name(source),
                             "tHpOld": self.tmp["old_hp"],
                             "tHpNew": self.tmp["new_hp"],
                         },
@@ -410,7 +411,8 @@ class GameWork:
                 self.msg_manager.msg_format(
                     "strMrGamblerWasShotWithBlankAmmo",
                     {
-                        "tGamblerName": pl_target["name"],
+                        "tTargetName": pl_target["name"],
+                        "tSourceName": self.get_name(source),
                         "tHpOld": pl_target["hp"],
                         "tHpNew": pl_target["hp"],
                     },
@@ -471,7 +473,7 @@ class GameWork:
             self.upsert_info(
                 self.msg_manager.msg_format(
                     "strMrGamblerKilled",
-                    {"tGamblerName": pl_target["name"], "tsourceName": pl_source["name"]},
+                    {"tTargetName": pl_target["name"], "tSourceName": pl_source["name"]},
                 ),
             )
         if target == self.shooter:
