@@ -87,7 +87,7 @@ class 邀请函(PropComp, BaseProp):
     helpdoc = "在特定道具池中, 使目标抽取 2 个道具, 并结束枪手回合."
     reply = (
         ("strMrPropInvite_1", "邀请函道具 对自己使用", "{tGamblerName}將邀請函撕碎."),
-        ("strMrPropInvite_2", "邀请函道具 对目标使用", "{tGamblerName}邀請{tTargetName}參加宴會."),
+        ("strMrPropInvite_2", "邀请函道具 对目标使用", "{tSourceName}邀請{tTargetName}參加宴會."),
     )
     pool = ("手铐", "锯子", "红牛", "放大镜", "口红", "牛奶", "止疼药")
 
@@ -100,7 +100,7 @@ class 邀请函(PropComp, BaseProp):
         else:
             msg_reply = msg_manager.msg_format(
                 "strMrPropInvite_2",
-                {"tGamblerName": name, "tTargetName": game_work.get_name(target)},
+                {"tSourceName": name, "tTargetName": game_work.get_name(target)},
             )
         game_work.upsert_info(msg_reply)
         game_work.draw_prop(target, 2, cls.pool)
@@ -181,7 +181,7 @@ class 红牛(PropComp, BaseProp):
         (
             "strMrPropRedCow_2",
             "红牛道具 对他人使用",
-            "{tGamblerName}將混著{ingredients}的紅牛喂給{tTargetName}[hp {tOldHp}->{tNewHp}].",
+            "{tSourceName}將混著{ingredients}的紅牛喂給{tTargetName}[hp {tOldHp}->{tNewHp}].",
         ),
         ("strMrPropRedCowIngredients", "红牛道具 随机描述", "胰岛素|白開水|辣椒粉|薯片|益達|紅牛?"),
     )
@@ -206,7 +206,7 @@ class 红牛(PropComp, BaseProp):
             msg_reply = msg_manager.msg_format(
                 "strMrPropRedCow_2",
                 {
-                    "tGamblerName": name,
+                    "tSourceName": name,
                     "ingredients": msg_manager.msg_format("strMrPropRedCowIngredients", flagSplit=True),
                     "tTargetName": game_work.get_name(target),
                     "tOldHp": game_work.tmp["old_hp"],
@@ -271,7 +271,7 @@ class 口红(PropComp, BaseProp):
     helpdoc = "夺取目标口红和金币以外的 1 个道具, 或重新抽取 1 个道具."
     reply = (
         ("strMrPropLipstick_1", "口红道具 对自己使用或目标无道具", "{tGamblerName}{usage}{color}的口紅, 神明贈予{tPropName}."),
-        ("strMrPropLipstick_2", "口红道具 对目标使用", "{tGamblerName}給{usage}{color}的口紅, {tTargetName}以{tPropName}回贈."),
+        ("strMrPropLipstick_2", "口红道具 对目标使用", "{tSourceName}給{usage}{color}的口紅, {tTargetName}以{tPropName}回贈."),
         ("strMrPropLipstickUsage", "口红道具 随机描述", "塗上|塗上|吃下"),
         (
             "strMrPropLipstickColor",
@@ -299,7 +299,7 @@ class 口红(PropComp, BaseProp):
             target_name = game_work.get_name(target)
             msg_reply = msg_manager.msg_format(
                 "strMrPropLipstick_2",
-                {"tGamblerName": name, "usage": usage, "color": color, "tTargetName": target_name, "tPropName": prop},
+                {"tSourceName": name, "usage": usage, "color": color, "tTargetName": target_name, "tPropName": prop},
             )
             game_work.upsert_info(msg_reply)
             game_work.remove_prop(target, prop)
@@ -411,7 +411,7 @@ class 牛奶(PropComp, BaseProp):
     helpdoc = "在特定道具池中, 使目标抽取 2 个道具, 其余赌徒抽取 1 个道具."
     reply = (
         ("strMrPropMilk_1", "牛奶道具 对自己使用", "{tGamblerName}飲下{milk}, 在暈眩中神明降下賜福.."),
-        ("strMrPropMilk_2", "牛奶道具 对目标使用", "{tGamblerName}讓{tTargetName}飲下{milk}, 在暈眩中神明降下賜福.."),
+        ("strMrPropMilk_2", "牛奶道具 对目标使用", "{tSourceName}讓{tTargetName}飲下{milk}, 在暈眩中神明降下賜福.."),
         (
             "strMrPropMilkType",
             "牛奶道具 随机描述",
@@ -429,7 +429,7 @@ class 牛奶(PropComp, BaseProp):
             msg_reply = msg_manager.msg_format("strMrPropMilk_1", {"tGamblerName": name, "milk": milk})
         else:
             msg_reply = msg_manager.msg_format(
-                "strMrPropMilk_2", {"tGamblerName": name, "tTargetName": game_work.get_name(target), "milk": milk}
+                "strMrPropMilk_2", {"tSourceName": name, "tTargetName": game_work.get_name(target), "milk": milk}
             )
         game_work.upsert_info(msg_reply)
         game_work.draw_prop(target, 2, cls.pool)
@@ -507,7 +507,7 @@ class 止疼药(PropComp, BaseProp):
     helpdoc = "使目标在其回合结束前受到的伤害转变为等值的神经麻痹. 对自身使用时, 效果延长到下回合结束."
     reply = (
         ("strMrPropPain_1", "止疼药道具 对自己使用", "{tGamblerName}服用止疼药."),
-        ("strMrPropPain_2", "止疼药道具 对目标使用", "{tGamblerName}喂{tTargetName}服用止疼药."),
+        ("strMrPropPain_2", "止疼药道具 对目标使用", "{tSourceName}喂{tTargetName}服用止疼药."),
         ("strMrPropPain_3", "止疼药道具 使用失败", "{tGamblerName}已服用止疼药."),
     )
 
@@ -524,7 +524,7 @@ class 止疼药(PropComp, BaseProp):
             msg_reply = msg_manager.msg_format(
                 "strMrPropPain_2",
                 {
-                    "tGamblerName": game_work.get_name(),
+                    "tSourceName": game_work.get_name(),
                     "tTargetName": game_work.get_name(target),
                 },
             )
@@ -593,12 +593,12 @@ class 烟花(PropComp, BaseProp):
 
 
 # endregion
-# class 和你爆了(PropComp, BaseProp):
-#     name = "和你爆了"
-#     helpdoc = ""
-#     reply = ()
-#     allow_flag = False
+class 和你爆了(PropComp, BaseProp):
+    name = "和你爆了"
+    helpdoc = ""
+    reply = ()
+    allow_flag = False
 
-#     @classmethod
-#     def apply(cls, msg_manager, target):
-#         return
+    @classmethod
+    def apply(cls, msg_manager, target):
+        return
