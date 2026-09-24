@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 """
-@File      :    MammonRoulette/Core/cmop.py
+@File      :    MammonRoulette/Core/comp.py
 @Author    :    lianqingyuYuri恋倾雨
 @Contact   :    xinghu2408@foxmail.com
 @License   :    AGPLv3

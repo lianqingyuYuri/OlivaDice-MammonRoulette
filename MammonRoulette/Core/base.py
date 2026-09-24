@@ -1,3 +1,14 @@
+# -*- encoding: utf-8 -*-
+"""
+@File      :    MammonRoulette/Core/base.py
+@Author    :    lianqingyuYuri恋倾雨
+@Contact   :    xinghu2408@foxmail.com
+@License   :    AGPLv3
+@Copyright :    (C) 2026 MammonRoulette
+@Desc      :    None
+"""
+
+
 class BaseMode:
     name: str = ""
     helpdoc: str = ""
