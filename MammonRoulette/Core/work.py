@@ -300,7 +300,7 @@ class GameWork:
                     "strMrGamblerPropsDraw",
                     {
                         "tGamblerName": self.get_name(user_id),
-                        "tDrawnProps": link.join(t_draw_props),
+                        "tDrawProps": link.join(t_draw_props),
                     },
                 ),
             )
@@ -397,8 +397,8 @@ class GameWork:
                         {
                             "tTargetName": pl_target["name"],
                             "tSourceName": self.get_name(source),
-                            "tHpOld": self.tmp["old_hp"],
-                            "tHpNew": self.tmp["new_hp"],
+                            "tOldHp": self.tmp["old_hp"],
+                            "tNewHp": self.tmp["new_hp"],
                         },
                     ),
                     t_reply_id,
@@ -413,8 +413,8 @@ class GameWork:
                     {
                         "tTargetName": pl_target["name"],
                         "tSourceName": self.get_name(source),
-                        "tHpOld": pl_target["hp"],
-                        "tHpNew": pl_target["hp"],
+                        "tOldHp": pl_target["hp"],
+                        "tNewHp": pl_target["hp"],
                     },
                 ),
                 t_reply_id,

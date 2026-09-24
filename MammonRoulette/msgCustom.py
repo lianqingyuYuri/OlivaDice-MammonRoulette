@@ -44,14 +44,14 @@ dictStrCustom = {
     "strMrGameAmmoRanOut": "彈藥耗盡，重新裝填中……",
     "strMrGameOver": "{tWinnerName}用鮮血爲這場生死對局畫上句號.",
     "strMrGameTied": "這場對局沒有贏家.",
-    "strMrGamblerWasShotWithLiveAmmo": "“嘭！”{tTargetName}被崩倒在地[hp {tHpOld}->{tHpNew}].",
+    "strMrGamblerWasShotWithLiveAmmo": "“嘭！”{tTargetName}被崩倒在地[hp {tOldHp}->{tNewHp}].",
     "strMrGamblerWasShotWithBlankAmmo": "“咔哒——”是空彈……",
     "strMrGamblerKilled": "{tTargetName}死於他手.",
     "strMrGamblerSuicide": "{tGamblerName}自殺了……",
     "strMrGamblerSurrender": "{tGamblerName}臨陣脫逃.",
     "strMrGamblerTurn": "現在是{tGamblerName}的回合.",
     "strMrGamblerPropNone": "你没有{tPropName}道具.",
-    "strMrGamblerPropsDraw": "{tGamblerName}抽取: {tDrawnProps}.",
+    "strMrGamblerPropsDraw": "{tGamblerName}抽取: {tDrawProps}.",
     "strMrGamblerData": "〔{tGamblerIdx}〕 {tGamblerName}\n「hp: {tGamblerHp}」{tGamblerEffect}\n{tGamblerProps}\n",
     "strMrPropOneNode": "{tPropName}",
     "strMrPropManyNode": "{tPropName}*{tPropCount}",
@@ -152,7 +152,7 @@ dictTValue = {
     "tPropName": "",  # 道具名称
     "tPropCount": "N/A",  # 道具数量
     "tGamblerProps": "N/A",  # 赌徒持有的道具
-    "tDrawnProps": "N/A",  # 玩家抽取的道具
+    "tDrawProps": "N/A",  # 玩家抽取的道具
     # 效果相关
     "tEffectName": "",  # 效果名称
     "tEffectStacks": "N/A",  # 效果层数
@@ -171,8 +171,8 @@ dictTValue = {
     "tGameNowBullet": "",  # 回复-当前子弹
     "tGameAmmo": "",  # 回复-弹药信息
     "tGameDeadList": "",  # 回复-死亡列表
-    "tHpOld": "N/A",  # 玩家血量-受伤前
-    "tHpNew": "N/A",  # 玩家血量-受伤后
+    "tOldHp": "N/A",  # 玩家血量-受伤前
+    "tNewHp": "N/A",  # 玩家血量-受伤后
     "tWinnerName": "",  # 胜利者名称
 }
 

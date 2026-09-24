@@ -176,12 +176,12 @@ class 红牛(PropComp, BaseProp):
         (
             "strMrPropRedCow_1",
             "红牛道具 对自己使用",
-            "{tGamblerName}將混著{ingredients}的紅牛將其一飲而盡[hp {tHpOld}->{tHpNew}].",
+            "{tGamblerName}將混著{ingredients}的紅牛將其一飲而盡[hp {tOldHp}->{tNewHp}].",
         ),
         (
             "strMrPropRedCow_2",
             "红牛道具 对他人使用",
-            "{tGamblerName}將混著{ingredients}的紅牛喂給{tTargetName}[hp {tHpOld}->{tHpNew}].",
+            "{tGamblerName}將混著{ingredients}的紅牛喂給{tTargetName}[hp {tOldHp}->{tNewHp}].",
         ),
         ("strMrPropRedCowIngredients", "红牛道具 随机描述", "胰岛素|白開水|辣椒粉|薯片|益達|紅牛?"),
     )
@@ -198,8 +198,8 @@ class 红牛(PropComp, BaseProp):
                 {
                     "tGamblerName": name,
                     "ingredients": msg_manager.msg_format("strMrPropRedCowIngredients", flagSplit=True),
-                    "tHpOld": game_work.tmp["old_hp"],
-                    "tHpNew": game_work.tmp["new_hp"],
+                    "tOldHp": game_work.tmp["old_hp"],
+                    "tNewHp": game_work.tmp["new_hp"],
                 },
             )
         else:
@@ -209,8 +209,8 @@ class 红牛(PropComp, BaseProp):
                     "tGamblerName": name,
                     "ingredients": msg_manager.msg_format("strMrPropRedCowIngredients", flagSplit=True),
                     "tTargetName": game_work.get_name(target),
-                    "tHpOld": game_work.tmp["old_hp"],
-                    "tHpNew": game_work.tmp["new_hp"],
+                    "tOldHp": game_work.tmp["old_hp"],
+                    "tNewHp": game_work.tmp["new_hp"],
                 },
             )
         game_work.upsert_info(msg_reply)
@@ -596,5 +596,9 @@ class 烟花(PropComp, BaseProp):
 # class 和你爆了(PropComp, BaseProp):
 #     name = "和你爆了"
 #     helpdoc = ""
+#     reply = ()
 #     allow_flag = False
-#     reply = []
+
+#     @classmethod
+#     def apply(cls, msg_manager, target):
+#         return

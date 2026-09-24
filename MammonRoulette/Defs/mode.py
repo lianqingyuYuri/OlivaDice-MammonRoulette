@@ -311,14 +311,16 @@ class 大富翁(ModeComp, BaseMode):
             "游戏开始时, 所有玩家抽取 2 个道具",
             "贷款: 玩家死亡时复活, 并失去半数金币",
             "老虎机: 玩家复活时摇动老虎机, 有1/6概率中奖(1 枚金币), 若未中奖, 则本次奖励叠加到下次奖励中",
+            "掠夺: 击杀其他玩家时, 获得对方半数金币",
             "每对其他玩家造成 1 点伤害, 获得 1 枚金币",
-            "击杀其他玩家时, 获得对方半数金币",
             "率先持有6枚金币的玩家获胜",
         ),
     )
     reply = (
-        ("strMrModeMonopoly_1", "大富翁模式 老虎机中奖回复词", "老虎机拉杆落下, [{jackpot}], {tGamblerName}赢得{gold}枚金币."),
-        ("strMrModeMonopoly_2", "大富翁模式 老虎机未中奖回复词", "老虎机拉杆落下, [{jackpot}]."),
+        ("strMrModeMonopoly_1", "大富翁模式 贷款机制回复词", "{tGamblerName}申請‘無償’救助[hp {tOldHp}->{tNewHp}]."),
+        ("strMrModeMonopoly_2", "大富翁模式 老虎机中奖回复词", "老虎機拉桿落下, [{jackpot}], {tGamblerName}贏得{gold}枚金幣."),
+        ("strMrModeMonopoly_3", "大富翁模式 老虎机未中奖回复词", "老虎機拉桿落下, [{jackpot}]."),
+        ("strMrModeMonopoly_4", "大富翁模式 掠夺机制回复词", "{tTargetName}拾取{tSourceName}的{tNum}枚金幣."),
     )
     points = 20
 
@@ -364,8 +366,7 @@ class 大富翁(ModeComp, BaseMode):
     def damage(cls, msg_manager):
         game_work = GameWork.from_manager(msg_manager)
         if not game_work.tmp["is_attack_me"]:
-            for _ in range(game_work.tmp["dmg"]):
-                game_work.get_prop(game_work.tmp["source"], "金币")
+            game_work.draw_prop(game_work.tmp["source"], game_work.tmp["dmg"], ("金币",))
             game_work.try_over()
 
     @classmethod
@@ -377,7 +378,11 @@ class 大富翁(ModeComp, BaseMode):
             game_work.modify["order_copy"].remove(target)
         else:
             game_work.order = game_work.modify["order_copy"].copy()
+            old_hp = pl_target["hp"]
             pl_target["hp"] = 2
+            game_work.upsert_info(
+                msg_manager.msg_format("strMrModeMonopoly_1", {"tGamblerName": target, "tOldHp": old_hp, "tNewHp": 2})
+            )
             # 摇动老虎机
             if random.randint(1, 6) == 1:
                 gold = game_work.modify["gold"]
@@ -386,13 +391,13 @@ class 大富翁(ModeComp, BaseMode):
                 game_work.modify["gold"] = 0
                 jackpot = str(random.randint(0, 9)) * 3
                 msg_reply = msg_manager.msg_format(
-                    "strMrModeMonopoly_1", {"jackpot": jackpot, "tGamblerName": target, "gold": gold}
+                    "strMrModeMonopoly_2", {"jackpot": jackpot, "tGamblerName": target, "gold": gold}
                 )
             else:
                 game_work.modify["gold"] += 1
                 choices = [f"{i:03d}" for i in range(1000) if i % 111 != 0]
                 jackpot = random.choice(choices)
-                msg_reply = msg_manager.msg_format("strMrModeMonopoly_2", {"jackpot": jackpot})
+                msg_reply = msg_manager.msg_format("strMrModeMonopoly_3", {"jackpot": jackpot})
             game_work.upsert_info(msg_reply)
             # 失去一半金币
             gold_count = pl_target["props"].count("金币")
@@ -404,4 +409,9 @@ class 大富翁(ModeComp, BaseMode):
                 game_work.players[source]["kills"] = 0
                 for _ in range(gold_count_half):
                     game_work.get_prop(source, "金币")
+                game_work.upsert_info(
+                    msg_manager.msg_format(
+                        "strMrModeMonopoly_4", {"tTargetName": target, "tSourceName": source, "tNum": gold_count_half}
+                    )
+                )
             game_work.try_over()
