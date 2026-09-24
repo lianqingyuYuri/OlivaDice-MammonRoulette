@@ -55,7 +55,7 @@ class 神经麻痹(EffectComp, BaseEffect):
         effect_data = players[target]["effects_event"][cls.name]
         if stacks > 0:
             effect_data["stacks"] += stacks
-            effect_data["data"].append({"dmg": stacks, "murderer": game_work.tmp["murderer"]})
+            effect_data["data"].append({"dmg": stacks, "source": game_work.tmp["source"]})
         return True
 
     @classmethod
@@ -77,7 +77,7 @@ class 神经麻痹(EffectComp, BaseEffect):
             )
             game_work.upsert_info(msg_reply)
             return False
-        elif moment == "end_round" and target == game_work.shooter:
+        elif moment == "done" and target == game_work.shooter:
             effect_data = players[target]["effects_event"][cls.name]
             if not effect_data["expired"]:
                 effect_data["expired"] = True
@@ -86,7 +86,7 @@ class 神经麻痹(EffectComp, BaseEffect):
             tmp["check_over"] = False
             old_hp = players[target]["hp"]
             for data in effect_data["data"]:
-                game_work.damage(target, data["dmg"], data["murderer"])
+                game_work.damage(target, data["dmg"], data["source"])
             if not game_work.try_over():
                 if effect_data["stacks"] > 0:
                     msg_reply = msg_manager.msg_format(

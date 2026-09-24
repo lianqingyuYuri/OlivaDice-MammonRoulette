@@ -81,7 +81,7 @@ class GameWork:
         return self.players[self.shooter]["bot_model"] is not None
 
     @property
-    def flag_over(self):
+    def flag_over(self) -> bool:
         return self.game["over"]
 
     @classmethod
@@ -143,7 +143,7 @@ class GameWork:
             info, note = self.reply["info"], self.reply["note"]
             t_value = {}
             t_value.update({"tInfo": "\n".join([item["data"] for item in info if item["data"]])})
-            if note["ammo"]:
+            if note["flag_ammo"]:
                 # 子弹
                 t_value.update(
                     {"tNowBulletType": self.msg_manager.msg_format("strMrAmmoLive" if self.bullet else "strMrAmmoBlank")}
@@ -174,7 +174,7 @@ class GameWork:
                         )
                     }
                 )
-            if note["round"]:
+            if note["flag_shooter"]:
                 # 枪手
                 t_value.update(
                     {
@@ -188,12 +188,12 @@ class GameWork:
                     }
                 )
             msg_reply = self.msg_manager.msg_format("strGameReplyInfo", t_value)
-            if not self.flag_over and (note["ammo"] or note["round"]):
+            if not self.flag_over and (note["flag_ammo"] or note["flag_shooter"]):
                 msg_reply += "\n" + self.msg_manager.msg_format("strGameReplyNote", t_value)
         else:
             msg_reply = self.reply["only"]
         self.reply.update(
-            {"info": [], "note": {"ammo": self.flag_ammo_show or self.flag_bullet_show, "round": False}, "only": ""}
+            {"info": [], "note": {"flag_ammo": self.flag_ammo_show or self.flag_bullet_show, "flag_shooter": False}, "only": ""}
         )
         self.tmp.clear()
         return msg_reply
@@ -333,25 +333,25 @@ class GameWork:
     def start(self):
         self.game["start"] = True
         self.game["expireTime"] = int(time.time()) // 60 + 120
-        self.chamber_round()
+        self.chamber()
         random.shuffle(self.order)
         self.shooter = self.order[0]
         self.players[self.shooter]["actions"] = 1
         self.mode.start(self.msg_manager)
-        self.reply.update({"info": [], "note": {"ammo": False, "round": False}, "only": ""})
+        self.reply.update({"info": [], "note": {"flag_ammo": False, "flag_shooter": False}, "only": ""})
         if self.flag_bot:
             MR.Core.comp.BotComp.action(self.msg_manager)
         return
 
-    def chamber_round(self):
+    def chamber(self):
         if self.flag_over:
             return
-        if self.data["ammo_live"] < 1:
+        if self.ammo_live < 1:
             ammo_live, ammo_blank = self.reload()
         else:
-            ammo_live, ammo_blank = self.data["ammo_live"], self.data["ammo_blank"]
-        self.data["bullet"] = random.randint(1, ammo_live + ammo_blank) > ammo_blank
-        self.reply["note"]["ammo"] = True
+            ammo_live, ammo_blank = self.ammo_live, self.ammo_blank
+        self.bullet = random.randint(1, ammo_live + ammo_blank) > ammo_blank
+        self.reply["note"]["flag_ammo"] = True
         return
 
     def reload(self):
@@ -361,46 +361,43 @@ class GameWork:
         self.data["ammo_live"], self.data["ammo_blank"] = ammo_live, ammo_blank
         self.upsert_info(self.msg_manager.msg_format("strMrGameAmmoRanOut"))
         self.handle_event("reload")
+        self.reply["note"]["flag_ammo"] = True
         return ammo_live, ammo_blank
 
     def shoot(self, target):
-        dmg_type = ""
-        is_shoot_me = target == self.shooter
-        murderer = self.shooter
-        consume_action = None
+        source = self.shooter
         self.handle_event(
             "shoot",
             target=target,
+            source=source,
+            is_shoot_me=target == source,
             dmg=self.dmg,
-            dmg_type=dmg_type,
-            is_shoot_me=is_shoot_me,
-            murderer=murderer,
-            consume_action=consume_action,
+            dmg_type="",
+            consume_action=None,
         )
-        target, dmg, dmg_type, is_shoot_me, murderer, consume_action = (
+        target, source, is_shoot_me, dmg, dmg_type, consume_action = (
             self.tmp["target"],
+            self.tmp["source"],
+            self.tmp["is_shoot_me"],
             self.tmp["dmg"],
             self.tmp["dmg_type"],
-            self.tmp["is_shoot_me"],
-            self.tmp["murderer"],
             self.tmp["consume_action"],
         )
         pl_target = self.players[target]
         t_reply_id = self.upsert_info()
-        if self.data["bullet"]:
+        if self.bullet:
             if consume_action is None:
                 consume_action = 1
             self.ammo_live -= 1
-            self.damage(target, dmg, murderer)
-            old_hp, new_hp = self.tmp["old_hp"], self.tmp["new_hp"]
+            self.damage(target, dmg, source)
             if self.tmp["new_hp"] > 0:
                 self.upsert_info(
                     self.msg_manager.msg_format(
                         "strMrGamblerWasAmmoLiveShot",
                         {
                             "tGamblerName": pl_target["name"],
-                            "tHpOld": old_hp,
-                            "tHpNew": new_hp,
+                            "tHpOld": self.tmp["old_hp"],
+                            "tHpNew": self.tmp["new_hp"],
                         },
                     ),
                     t_reply_id,
@@ -421,82 +418,78 @@ class GameWork:
                 t_reply_id,
             )
         self.tmp["consume_action"] = consume_action
-        self.chamber_round()
-        self.end_round()
+        self.chamber()
+        self.done()
         return
 
-    def damage(self, target, dmg, murderer):
+    def damage(self, target, dmg, source):
         if self.flag_over:
             return
-        dmg_type = self.tmp.get("dmg_type", "")
-        check_dead = self.tmp.get("check_dead", True)
-        is_attack_me = target == murderer
         self.handle_event(
             "damage",
             target=target,
+            source=source,
+            is_attack_me=target == source,
             dmg=dmg,
-            murderer=murderer,
-            dmg_type=dmg_type,
-            check_dead=check_dead,
-            is_attack_me=is_attack_me,
+            dmg_type=self.tmp.get("dmg_type", ""),
+            is_check_dead=self.tmp.get("is_check_dead", True),
         )
-        target, dmg, murderer, dmg_type, check_dead, is_attack_me = (
+        target, source, is_attack_me, dmg, dmg_type, is_check_dead = (
             self.tmp["target"],
-            self.tmp["dmg"],
-            self.tmp["murderer"],
-            self.tmp["dmg_type"],
-            self.tmp["check_dead"],
+            self.tmp["source"],
             self.tmp["is_attack_me"],
+            self.tmp["dmg"],
+            self.tmp["dmg_type"],
+            self.tmp["is_check_dead"],
         )
         pl_target = self.players[target]
         self.tmp["old_hp"] = pl_target["hp"]
         pl_target["hp"] -= dmg
         self.tmp["new_hp"] = pl_target["hp"]
-        self.tmp["is_killed"] = False
-        if pl_target["hp"] <= 0 and target in self.order and check_dead:
-            self.tmp["is_killed"] = True
-            self.dead(target, murderer)
+        self.tmp["is_dead"] = False
+        if pl_target["hp"] <= 0 and target in self.order and is_check_dead:
+            self.tmp["is_dead"] = True
+            self.dead(target, source)
         return
 
-    def dead(self, target, murderer):
+    def dead(self, target, source):
         if self.flag_over:
             return
-        if not murderer:
-            murderer = self.shooter
-        check_over = self.tmp.get("check_over", True)
-        is_attack_me = self.tmp.get("is_attack_me", target == murderer)
-        pl_target, pl_murderer = self.players[target], self.players[murderer]
-        name = pl_target["name"]
-        if self.players[target]["surrender"]:  # 投降
-            self.upsert_info(self.msg_manager.msg_format("strMrGamblerSurrender", {"tGamblerName": name}))
+        if not source:
+            source = self.shooter
+        is_attack_me = self.tmp.get("is_attack_me", target == source)
+
+        pl_target, pl_source = self.players[target], self.players[source]
+        if pl_target["surrender"]:  # 投降
+            self.upsert_info(self.msg_manager.msg_format("strMrGamblerSurrender", {"tGamblerName": pl_target["name"]}))
         elif is_attack_me:  # 自杀
             pl_target["suicide"] = True
-            self.upsert_info(
-                self.msg_manager.msg_format("strMrGamblerSuicide", {"tGamblerName": name}),
-            )
+            self.upsert_info(self.msg_manager.msg_format("strMrGamblerSuicide", {"tGamblerName": pl_target["name"]}))
         else:  # 被杀
-            pl_murderer["kills"] += 1
+            pl_source["kills"] += 1
             pl_target["suicide"] = False
             self.upsert_info(
                 self.msg_manager.msg_format(
                     "strMrGamblerKilled",
-                    {"tGamblerName": name, "tMurdererName": pl_murderer["name"]},
+                    {"tGamblerName": pl_target["name"], "tsourceName": pl_source["name"]},
                 ),
             )
         if target == self.shooter:
             self.switch()
         self.order.remove(target)
-        self.handle_event("dead", target=target, murderer=murderer, check_over=check_over, is_attack_me=is_attack_me)
+        self.handle_event(
+            "dead", target=target, source=source, is_attack_me=is_attack_me, check_over=self.tmp.get("check_over", True)
+        )
         check_over = self.tmp["check_over"]
         if check_over:
             self.try_over()
         return
 
-    def end_round(self):
+    def done(self):
         if self.flag_over:
             return
-        self.handle_event("end_round")
-        consume_action = self.tmp.get("consume_action") or 0
+        self.handle_event("done", consume_action=self.tmp.get("consume_action", 0))
+        consume_action = self.tmp["consume_action"]
         pl_shooter = self.players[self.shooter]
         pl_shooter["actions"] -= consume_action
         if pl_shooter["actions"] < 1:
@@ -506,8 +499,7 @@ class GameWork:
         return
 
     def switch(self):
-        self.tmp["consume_action"] = 0
-        shooter = self.data["shooter"]
+        shooter = self.shooter
         while True:
             shooter = self.order[(self.order.index(shooter) + 1) % len(self.order)]
             pl_shooter = self.players[shooter]
@@ -516,9 +508,8 @@ class GameWork:
                 break
         if self.shooter != shooter:
             self.shooter = shooter
-            pl_shooter = self.players[shooter]
-            self.reply["note"]["round"] = True
-            self.handle_event("switch")
+            self.reply["note"]["flag_shooter"] = True
+            self.handle_event("switch", shooter=shooter, consume_action=0)
         return
 
     def try_over(self):

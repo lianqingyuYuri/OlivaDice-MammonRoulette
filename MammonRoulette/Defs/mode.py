@@ -347,14 +347,14 @@ class 大富翁(ModeComp, BaseMode):
         game_work = GameWork.from_manager(msg_manager)
         if not game_work.tmp["is_attack_me"]:
             for _ in range(game_work.tmp["dmg"]):
-                game_work.get_prop(game_work.tmp["murderer"], "金币")
+                game_work.get_prop(game_work.tmp["source"], "金币")
             game_work.try_over()
 
     @classmethod
     def dead(cls, msg_manager):
         game_work = GameWork.from_manager(msg_manager)
         target = game_work.tmp["target"]
-        murderer = game_work.tmp["murderer"]
+        source = game_work.tmp["source"]
         if game_work.players[target]["surrender"]:
             game_work.modify["order_copy"].remove(target)
         else:
@@ -383,7 +383,7 @@ class 大富翁(ModeComp, BaseMode):
                 game_work.remove_prop(target, "金币")
             # 获得对方一半金币
             if not game_work.tmp["is_attack_me"]:
-                game_work.players[murderer]["kills"] = 0
+                game_work.players[source]["kills"] = 0
                 for _ in range(gold_count_half):
-                    game_work.get_prop(murderer, "金币")
+                    game_work.get_prop(source, "金币")
             game_work.try_over()

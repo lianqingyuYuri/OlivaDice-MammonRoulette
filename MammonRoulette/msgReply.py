@@ -233,8 +233,8 @@ def match_game(plugin_event, Proc, msg_manager, groups):
                 "reply": {
                     "info": [],
                     "note": {
-                        "ammo": False,
-                        "round": False,
+                        "flag_ammo": False,
+                        "flag_shooter": False,
                     },
                     "only": "",
                 },

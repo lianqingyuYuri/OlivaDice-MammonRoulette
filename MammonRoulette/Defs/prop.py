@@ -105,7 +105,7 @@ class 邀请函(PropComp, BaseProp):
         game_work.upsert_info(msg_reply)
         game_work.draw_prop(target, 2, cls.pool)
         game_work.tmp["consume_action"] = 1
-        game_work.end_round()
+        game_work.done()
         return True
 
 
@@ -120,7 +120,7 @@ class 花生(PropComp, BaseProp):
         msg_reply = msg_manager.msg_format("strMrPropPeanut_1", {"tGamblerName": game_work.get_name()})
         game_work.upsert_info(msg_reply)
         game_work.ammo_blank += 1
-        game_work.chamber_round()
+        game_work.chamber()
         return True
 
 
@@ -141,7 +141,7 @@ class 巧克力(PropComp, BaseProp):
         )
         game_work.upsert_info(msg_reply)
         game_work.ammo_live += 1
-        game_work.chamber_round()
+        game_work.chamber()
         return True
 
 
@@ -165,7 +165,7 @@ class 香烟(PropComp, BaseProp):
         }
         msg_reply = msg_manager.msg_format("strMrPropSmoke_1", t_value)
         game_work.upsert_info(msg_reply)
-        game_work.chamber_round()
+        game_work.chamber()
         return True
 
 
@@ -397,12 +397,12 @@ class 转盘(PropComp, BaseProp):
         ammo_blank = ammo - random.randint(1, ammo)
         ammo_live = ammo - ammo_blank
         game_work.ammo_live, game_work.ammo_blank = ammo_live, ammo_blank
-        game_work.chamber_round()
+        game_work.chamber()
         for clear_prop in cls.clear_prop:
             prop_data = game_work.get_prop_data(prop_name=clear_prop)
             if prop_data:
                 game_work.remove_props_event(prop_data[0]["id"])
-        game_work.reply["note"]["ammo"] = True
+        game_work.reply["note"]["flag_ammo"] = True
         return True
 
 

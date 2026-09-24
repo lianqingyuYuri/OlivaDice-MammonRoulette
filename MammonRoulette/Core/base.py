@@ -58,7 +58,7 @@ class BaseMode:
 
     # 回合结束
     @classmethod
-    def end_round(cls, msg_manager):
+    def done(cls, msg_manager):
         pass
 
     # 换人

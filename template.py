@@ -45,12 +45,24 @@ game = {
     "reply": {
         "info": [],  # 常规信息
         "note": {
-            "ammo": bool,  # 弹药消息
-            "round": bool,  # 轮次信息
+            "flag_ammo": bool,  # 弹药消息
+            "flag_shooter": bool,  # 枪手信息
         },  # 分割线以下的消息
         "only": "",  # 会覆盖其他消息
     },
-    "tmp": {},
+    "tmp": {
+        "target": str,  # 目标玩家ID
+        "source": str,  # 来源玩家ID
+        "is_shoot_me": bool,  # 是否射击自己
+        "is_attack_me": bool,  # 是否攻击自己
+        "dmg": int,  # 伤害值
+        "dmg_type": str,  # 伤害类型
+        "consume_action": bool,  # 消耗行动力（None/0/1）
+        "new_hp": int,  # 新血量
+        "old_hp": int,  # 旧血量
+        "is_dead": bool,  # 是否死亡
+        "is_check_dead": bool,  # 是否检查死亡
+    },
 }
 
 moment = [
@@ -58,7 +70,7 @@ moment = [
     "shoot",
     "damage",
     "dead",
-    "end_round",
+    "done",
     "switch",
 ]
 # 特殊事件
