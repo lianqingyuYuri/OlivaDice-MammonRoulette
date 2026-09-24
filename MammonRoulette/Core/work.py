@@ -480,10 +480,10 @@ class GameWork:
             self.switch()
         self.order.remove(target)
         self.handle_event(
-            "dead", target=target, source=source, is_attack_me=is_attack_me, check_over=self.tmp.get("check_over", True)
+            "dead", target=target, source=source, is_attack_me=is_attack_me, is_check_over=self.tmp.get("is_check_over", True)
         )
-        check_over = self.tmp["check_over"]
-        if check_over:
+        is_check_over = self.tmp["is_check_over"]
+        if is_check_over:
             self.try_over()
         return
 
@@ -517,7 +517,7 @@ class GameWork:
     def try_over(self):
         if self.flag_over:
             return True
-        self.tmp["check_over"] = True
+        self.tmp["is_check_over"] = True
         flag_over = self.mode.try_over(self.msg_manager)
         if len(self.order) == 1:
             self.upsert_info(self.msg_manager.msg_format("strMrGameOver", {"tWinnerName": self.get_name(self.order[0])}))

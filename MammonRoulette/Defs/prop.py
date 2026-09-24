@@ -545,7 +545,7 @@ class 烟花(PropComp, BaseProp):
         game_work.upsert_info(msg_reply)
         prop_data = {"name": cls.name, "data": {"reactivation": 0, "draws": 1}}
         game_work.create_props_event(prop_data)
-        game_work.tmp["check_over"] = False
+        game_work.tmp["is_check_over"] = False
         order_before = game_work.order.copy()
         for pl in order_before:
             c_hp = game_work.players[pl]["hp"]

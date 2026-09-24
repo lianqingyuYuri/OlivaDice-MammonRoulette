@@ -57,11 +57,12 @@ game = {
         "is_attack_me": bool,  # 是否攻击自己
         "dmg": int,  # 伤害值
         "dmg_type": str,  # 伤害类型
-        "consume_action": bool,  # 消耗行动力（None/0/1）
+        "consume_action": int,  # 消耗行动力（0/1）
         "new_hp": int,  # 新血量
         "old_hp": int,  # 旧血量
         "is_dead": bool,  # 是否死亡
         "is_check_dead": bool,  # 是否检查死亡
+        "is_check_over": bool,  # 是否检查游戏结束
     },
 }
 
