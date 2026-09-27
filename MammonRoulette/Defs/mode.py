@@ -33,11 +33,11 @@ def generate_helpdoc(
     if props_limit:
         lines.append(f"〈道具池〉(上限{props_limit})")
     if props_pool:
-        lines.append(f"[{', '.join(props_pool)}]")
+        lines.append(f"  {', '.join(props_pool)}")
     if props_allow:
-        lines.append(f"特殊道具[{', '.join(props_allow)}]")
+        lines.append(f"|特殊道具|\n  {', '.join(props_allow)}")
     if props_ban:
-        lines.append(f"禁用道具[{', '.join(props_ban)}]")
+        lines.append(f"|禁用道具|\n  {', '.join(props_ban)}")
     if mechanisms:
         lines.append("〔机制〕")
         lines.extend(f"{i}. {m}{'.' if i == len(mechanisms) else ';'}" for i, m in enumerate(mechanisms, 1))
