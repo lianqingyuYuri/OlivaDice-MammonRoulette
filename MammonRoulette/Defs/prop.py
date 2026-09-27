@@ -627,4 +627,5 @@ class 和你爆了(PropComp, BaseProp):
         for pl in max_dice_pl:
             game_work.players[pl]["props"] = []
             game_work.damage(pl, 999, game_work.shooter)
+        game_work.damage(game_work.shooter, 1, game_work.shooter)
         return
