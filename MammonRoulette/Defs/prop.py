@@ -21,7 +21,7 @@ from ..Core.work import GameWork
 # region 道具
 class 手铐(PropComp, BaseProp):
     name = "手铐"
-    helpdoc = "不能将枪手选为目标. 束缚目标行动 1 回合, 且在目标恢复行动前无法将其再次选为手铐目标."
+    helpdoc = "不能选枪手为目标. 束缚目标行动 1 回合, 且在目标恢复行动前无法将其再次选为手铐目标."
     reply = (
         ("strMrPropHandcuffs_1", "手铐道具 使用成功", "{tGamblerName}被銬住了{limb}."),
         ("strMrPropHandcuffs_2", "手铐道具 使用失败", "{tGamblerName}已經被銬住了."),
@@ -171,7 +171,7 @@ class 香烟(PropComp, BaseProp):
 
 class 红牛(PropComp, BaseProp):
     name = "红牛"
-    helpdoc = "使目标HP+1."
+    helpdoc = "目标HP +1."
     reply = (
         (
             "strMrPropRedCow_1",
@@ -219,7 +219,7 @@ class 红牛(PropComp, BaseProp):
 
 class 放大镜(PropComp, BaseProp):
     name = "放大镜"
-    helpdoc = "每次开枪前只能使用 1 次. 在开枪前持续显示下一发子弹的虚实."
+    helpdoc = "每次开枪前只能使用 1 次. 在开枪前持续显示当前子弹的虚实."
     reply = (
         ("strMrPropMagnifier_1", "放大镜道具 使用成功", "{tGamblerName}砸碎放大鏡, 發現槍膛裏是{tNowBulletType}."),
         ("strMrPropMagnifier_2", "放大镜道具 使用失败", "已用放大镜, 开枪前可查看子弹虚实."),
@@ -376,7 +376,7 @@ class 扑克(PropComp, BaseProp):
 
 class 转盘(PropComp, BaseProp):
     name = "转盘"
-    helpdoc = "以特殊比例重新装填弹仓, 并重置道具特效."
+    helpdoc = "以特殊比例重新装填弹仓, 并卸载特定道具."
     reply = (("strMrPropRoulette_1", "转盘道具 使用成功", "鏽迹斑斑的轉盤開始變換……現在是世界線[{garbled}]."),)
 
     clear_prop = ["扑克"]
@@ -441,7 +441,7 @@ class 牛奶(PropComp, BaseProp):
 
 class 金币(PropComp, BaseProp):
     name = "金币"
-    helpdoc = "兑换任意 1 个未被ban的道具, 部分道具兑换后将直接使用. 增加指令: 购买(道具名)."
+    helpdoc = "兑换任意 1 个道具, 部分道具兑换后将直接使用. 增加指令: 购买(道具名)."
     direct_use = ["锯子", "花生", "巧克力", "香烟", "放大镜", "扑克", "转盘", "牛奶"]
 
     reply = (
@@ -504,7 +504,7 @@ class 金币(PropComp, BaseProp):
 
 class 止疼药(PropComp, BaseProp):
     name = "止疼药"
-    helpdoc = "使目标在其回合结束前受到的伤害转变为等值的神经麻痹. 对自身使用时, 效果延长到下回合结束."
+    helpdoc = "目标在其回合结束前受到的伤害转变为等值的神经麻痹. 若对枪手使用时, 效果延长到下回合结束."
     reply = (
         ("strMrPropPain_1", "止疼药道具 对自己使用", "{tGamblerName}服用止疼药."),
         ("strMrPropPain_2", "止疼药道具 对目标使用", "{tSourceName}喂{tTargetName}服用止疼药."),
@@ -535,7 +535,7 @@ class 止疼药(PropComp, BaseProp):
 
 class 烟花(PropComp, BaseProp):
     name = "烟花"
-    helpdoc = "所有赌徒各有1/2的概率HP-1. 每杀死一名赌徒, 重新生效一次, 且概率提高至2/3. 每生效一次, 所有赌徒抽取 1 个道具."
+    helpdoc = "所有赌徒各有1/2的概率HP -1. 每杀死一名赌徒, 重新生效一次, 且概率提高至2/3. 每生效一次, 所有赌徒抽取 1 个道具."
     reply = (("strMrPropFirework_1", "烟花道具 使用成功", "{tGamblerName}燃放煙花, 天空變得五彩斑斕."),)
 
     @classmethod
@@ -595,10 +595,36 @@ class 烟花(PropComp, BaseProp):
 # endregion
 class 和你爆了(PropComp, BaseProp):
     name = "和你爆了"
-    helpdoc = ""
-    reply = ()
+    helpdoc = "所有赌徒投掷d6, 点数最大者移除所有道具并受到 999伤害. 随即使用者受到 1点伤害."
+    reply = (
+        ("strMrPropBoom_Dice", "和你爆了道具 骰子点数", "{tGamblerName}擲出[{tDice}]."),
+        ("strMrPropBoom_1", "和你爆了道具 使用成功", "骰聲迴響, {tAllGamblerDice}\n{tAllMaxDiceGambler}被炸飛了."),
+    )
     allow_flag = False
 
     @classmethod
     def apply(cls, msg_manager, target):
+        game_work = GameWork.from_manager(msg_manager)
+        t_value = {}
+        link = msg_manager.msg_format("strMrLink")
+        pls_dice = {}
+        for pl in game_work.order:
+            pls_dice[pl] = random.randint(1, 6)
+        max_dice = max(pls_dice.values())
+        max_dice_pl = [pl for pl, v in pls_dice.items() if v == max_dice]
+        t_value = {
+            "tAllGamblerDice": "\n".join(
+                [
+                    msg_manager.msg_format("strMrPropBoom_Dice", {"tGamblerName": game_work.get_name(pl), "tDice": v})
+                    for pl, v in pls_dice.items()
+                ]
+            ),
+            "tAllMaxDiceGambler": link.join([game_work.get_name(pl) for pl in max_dice_pl]),
+        }
+        game_work.upsert_info(msg_manager.msg_format("strMrPropBoom_1", t_value))
+        game_work.tmp["is_attack_me"] = True
+        game_work.tmp["dmg_type"] = cls.name
+        for pl in max_dice_pl:
+            game_work.players[pl]["props"] = []
+            game_work.damage(pl, 999, game_work.shooter)
         return

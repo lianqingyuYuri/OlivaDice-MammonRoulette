@@ -377,9 +377,26 @@ class 大富翁(ModeComp, BaseMode):
         if pl_target["surrender"]:
             game_work.modify["order_copy"].remove(target)
         else:
+            gold_count = pl_target["props"].count("金币")
+            gold_count_half = (gold_count + 1) // 2
+            if gold_count_half > 0:
+                # 失去一半金币
+                for _ in range(gold_count_half):
+                    game_work.remove_prop(target, "金币")
+                # 获得对方一半金币
+                if not game_work.tmp["is_attack_me"]:
+                    game_work.players[source]["kills"] = 0
+                    for _ in range(gold_count_half):
+                        game_work.get_prop(source, "金币")
+                    game_work.upsert_info(
+                        msg_manager.msg_format(
+                            "strMrModeMonopoly_4", {"tTargetName": target, "tSourceName": source, "tNum": gold_count_half}
+                        )
+                    )
+            # 贷款复活
             game_work.order = game_work.modify["order_copy"].copy()
             old_hp = pl_target["hp"]
-            pl_target["hp"] = 2
+            pl_target.update({"hp": 2, "kills": 0, "suicide": False})
             game_work.upsert_info(
                 msg_manager.msg_format("strMrModeMonopoly_1", {"tGamblerName": target, "tOldHp": old_hp, "tNewHp": 2})
             )
@@ -399,19 +416,4 @@ class 大富翁(ModeComp, BaseMode):
                 jackpot = random.choice(choices)
                 msg_reply = msg_manager.msg_format("strMrModeMonopoly_3", {"jackpot": jackpot})
             game_work.upsert_info(msg_reply)
-            # 失去一半金币
-            gold_count = pl_target["props"].count("金币")
-            gold_count_half = (gold_count + 1) // 2
-            for _ in range(gold_count_half):
-                game_work.remove_prop(target, "金币")
-            # 获得对方一半金币
-            if not game_work.tmp["is_attack_me"]:
-                game_work.players[source]["kills"] = 0
-                for _ in range(gold_count_half):
-                    game_work.get_prop(source, "金币")
-                game_work.upsert_info(
-                    msg_manager.msg_format(
-                        "strMrModeMonopoly_4", {"tTargetName": target, "tSourceName": source, "tNum": gold_count_half}
-                    )
-                )
             game_work.try_over()
