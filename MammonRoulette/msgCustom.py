@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 """
-@File      :    MammonRoulette/custom.py
+@File      :    MammonRoulette/msgCustom.py
 @Author    :    lianqingyuYuri恋倾雨
 @Contact   :    xinghu2408@foxmail.com
 @License   :    AGPLv3
@@ -8,6 +8,7 @@
 @Desc      :    None
 """
 
+# region OlivaDiceCore
 dictStrCustom = {
     "strMrSignedResult": "{tGamblerName}在生死狀簽下姓名.",
     "strMrCardHas": (
@@ -38,17 +39,19 @@ dictStrCustom = {
     "strMrGameModeError": "已开设{tGameMode}对局.",
     "strMrGameDismiss": "你已退出，对局解散.",
     "strMrGameRemain": "你已退出，剩余：{tSeatsHas}人.",
+    "strMrGameExpired": "原{tGameMode}對局已過期, 自動解散.",
+    "strMrBotJoin": "{tBotName}降臨{tGameMode}对局[{tSeatsHas}/{tSeatsMax}].",
     "strMrGameAmmoRanOut": "彈藥耗盡，重新裝填中……",
-    "strMrGameEnd": "{tWinnerName}用鮮血爲這場生死對局畫上句號.",
+    "strMrGameOver": "{tWinnerName}用鮮血爲這場生死對局畫上句號.",
     "strMrGameTied": "這場對局沒有贏家.",
-    "strMrGamblerWasAmmoLiveShot": "“嘭！”{tGamblerName}被崩倒在地[hp {tHpBefore}->{tHpNow}].",
-    "strMrGamblerWasAmmoBlankShot": "“咔哒——”是空彈……",
-    "strMrGamblerKilled": "{tGamblerName}死於他手.",
+    "strMrGamblerWasShotWithLiveAmmo": "“嘭！”{tTargetName}被崩倒在地[hp {tOldHp}->{tNewHp}].",
+    "strMrGamblerWasShotWithBlankAmmo": "“咔哒——”是空彈……",
+    "strMrGamblerKilled": "{tTargetName}死於他手.",
     "strMrGamblerSuicide": "{tGamblerName}自殺了……",
     "strMrGamblerSurrender": "{tGamblerName}臨陣脫逃.",
     "strMrGamblerTurn": "現在是{tGamblerName}的回合.",
-    "strMrGamblerNoProp": "你没有{tPropName}道具.",
-    "strMrGamblerDrawnProps": "{tGamblerName}抽取: {tDrawnProps}.",
+    "strMrGamblerPropNone": "你没有{tPropName}道具.",
+    "strMrGamblerPropsDraw": "{tGamblerName}抽取: {tDrawProps}.",
     "strMrGamblerData": "〔{tGamblerIdx}〕 {tGamblerName}\n「hp: {tGamblerHp}」{tGamblerEffect}\n{tGamblerProps}\n",
     "strMrPropOneNode": "{tPropName}",
     "strMrPropManyNode": "{tPropName}*{tPropCount}",
@@ -75,24 +78,26 @@ dictStrCustomNote = {
     "strMrLeaderboardResult": "【恶魔排行】指令 显示排行榜.",
     "strMrLink": "同类个体的连接符号 如道具、死亡玩家.",
     "strMrAmmoLive": "实弹",
-    "strMrAmmoBlank": "空包弹",
+    "strMrAmmoBlank": "空弹",
     "strMrGamePrep": "【匹配】指令 正在等待其他玩家加入.",
     "strMrGameSeatsError": "【匹配】指令 席位设置不在允许范围.",
     "strMrGameStarted": "【匹配】指令 对局已经开始, 无法加入.",
     "strMrGameModeError": "【匹配】指令 已开设其他模式的对局.",
     "strMrGameDismiss": "【退出】指令 退出游戏后, 对局解散.",
     "strMrGameRemain": "【退出】指令 退出游戏后的剩余人数显示.",
+    "strMrGameExpired": "对局过期时的显示.",
+    "strMrBotJoin": "【加入AI】指令 AI加入匹配对局时的显示.",
     "strMrGameAmmoRanOut": "实弹耗尽, 重新装弹时的显示.",
-    "strMrGameEnd": "游戏结束时的显示.",
+    "strMrGameOver": "游戏结束时的显示.",
     "strMrGameTied": "游戏平局时的显示.",
-    "strMrGamblerWasAmmoLiveShot": "开枪 子弹为[AmmoLive]",
-    "strMrGamblerWasAmmoBlankShot": "开枪 子弹为[AmmoBlank]",
+    "strMrGamblerWasShotWithLiveAmmo": "开枪 子弹为[AmmoLive]",
+    "strMrGamblerWasShotWithBlankAmmo": "开枪 子弹为[AmmoBlank]",
     "strMrGamblerKilled": "玩家被其他玩家杀死时的显示.",
     "strMrGamblerSuicide": "玩家被自己杀死时的显示.",
     "strMrGamblerSurrender": "【投降】指令 玩家投降时的显示.",
     "strMrGamblerTurn": "显示当前行动的玩家.\n一般在行动换人或非行动玩家行动时显示.",
-    "strMrGamblerNoProp": "【使用道具】指令 没有使用的道具.",
-    "strMrGamblerDrawnProps": "显示玩家抽取的道具.",
+    "strMrGamblerPropNone": "【使用道具】指令 没有使用的道具.",
+    "strMrGamblerPropsDraw": "显示玩家抽取的道具.",
     "strMrGamblerData": "玩家数据显示模板.\n包含道具列表.",
     "strMrPropOneNode": "道具列表 同名道具只有一个时的显示模板.",
     "strMrPropManyNode": "道具列表 同名道具有多个时的显示模板.",
@@ -103,7 +108,7 @@ dictStrCustomNote = {
     "strMrGameShooter": "枪手 当前枪手的显示.",
     "strMrGameNowBulletShow": "子弹 显示当前子弹的类型.",
     "strMrGameNowBulletHide": "子弹 隐藏当前子弹时的显示.",
-    "strMrGameAmmoShow": "弹药 显示实弹、空包弹、总弹药.",
+    "strMrGameAmmoShow": "弹药 显示实弹、空弹、总弹药.",
     "strMrGameAmmoHide": "弹药 隐藏弹药时的显示.",
     "strMrGameDeadList": "死亡列表 显示死亡的玩家.",
     "strMrGameDeadNone": "死亡列表 没有玩家死亡时的显示.",
@@ -141,11 +146,13 @@ dictTValue = {
     "tSeatsMax": "N/A",  # 最大座位数
     "tSeatsMin": "N/A",  # 最小座位数
     "tSeatsDef": "N/A",  # 默认座位数
+    # BOT相关
+    "tBotName": "N/A",  # BOT名称
     # 道具相关
     "tPropName": "",  # 道具名称
     "tPropCount": "N/A",  # 道具数量
     "tGamblerProps": "N/A",  # 赌徒持有的道具
-    "tDrawnProps": "N/A",  # 玩家抽取的道具
+    "tDrawProps": "N/A",  # 玩家抽取的道具
     # 效果相关
     "tEffectName": "",  # 效果名称
     "tEffectStacks": "N/A",  # 效果层数
@@ -153,29 +160,55 @@ dictTValue = {
     # 子弹/弹药相关
     "tNowBulletType": "N/A",  # 当前子弹类型
     "tAmmoLiveCount": "N/A",  # 实弹数量
-    "tAmmoBlankCount": "N/A",  # 空包弹数量
+    "tAmmoBlankCount": "N/A",  # 空弹数量
     "tAmmoCount": "N/A",  # 总弹药数
     # 回复相关
+    "tTargetName": "",  # 目标玩家名称
+    "tSourceName": "",  # 来源玩家名称
     "tDeadList": "",  # 死亡列表
     "tGamblerData": "",  # 赌徒数据
     "tShooter": "",  # 枪手信息
     "tGameNowBullet": "",  # 回复-当前子弹
     "tGameAmmo": "",  # 回复-弹药信息
     "tGameDeadList": "",  # 回复-死亡列表
-    "tHpBefore": "N/A",  # 玩家血量-受伤前
-    "tHpNow": "N/A",  # 玩家血量-受伤后
+    "tOldHp": "N/A",  # 玩家血量-受伤前
+    "tNewHp": "N/A",  # 玩家血量-受伤后
     "tWinnerName": "",  # 胜利者名称
 }
 
-dictHelpDoc = {}
-
+dictHelpDoc = {
+    "恶赌 戳一戳命令": (
+        "#戳一戳骰娘\n未加入对局: 加入正则匹配的对局;\n"
+        "对局匹配中: 退出正则匹配的对局;\n"
+        "对局进行时: 查看局势.\n"
+        "#戳一戳玩家: 向其开枪."
+    )
+}
 dictConsoleSwitch = {
     "MrMainEnabled": 1,
     "MrPokeEnabled": 1,
-    "MrDebugEnabled": -1,
 }
 dictConsoleSwitchNote = {
-    "MrMainEnabled": "[恶魔轮盘]全局开关, 默认开启\n-1 关闭\n0 跟随全局\n1 开启",
-    "MrPokeEnabled": "[恶魔轮盘]poke开关, 默认开启\n-1 关闭\n0 跟随全局\n1 开启",
-    "MrDebugEnabled": "[恶魔轮盘]调试开关, 默认关闭\n-1 关闭\n0 跟随全局\n1 开启",
+    "MrMainEnabled": "[恶魔轮盘]全局开关, 默认开启\n0 关闭\n1 开启",
+    "MrPokeEnabled": "[恶魔轮盘]poke开关, 默认开启\n0 关闭\n1 开启",
 }
+# endregion
+# region MammonRoulette
+dictModeCustom = {"default": {}}
+dictPropCustom = {"default": {}}
+dictEffectCustom = {"default": {}}
+dictDefsNote = {
+    "strModeHelpdoc": "模式简介",
+    "strModePoints": "赏金",
+    "strModeSeatsDefault": "默认玩家数",
+    "strModeSeatsMax": "最大玩家数",
+    "strModeSeatsMin": "最小玩家数",
+    "strModePropsPool": "道具池",
+    "strModePropsLimit": "道具上限",
+    "strModePropsAllow": "许可列表",
+    "strModePropsBan": "禁用列表",
+    "strModeModifyDmg": "伤害修改",
+    "strModeModifyAmmoShow": "弹药显示",
+    "strModeModifyBulletShow": "子弹显示",
+}
+# endregion
