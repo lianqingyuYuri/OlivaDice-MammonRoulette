@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from AmorLib import DataBase, MsgManager
 
 from .base import BaseMode
-from .. import config
+from .. import console
 
 
 def data_mirror(key):
@@ -310,7 +310,7 @@ class GameWork:
     # region action
     def join(self, user_id, bot_model=None):
         if bot_model is None:
-            with DataBase(config.DB_PATH) as db:
+            with DataBase(console.DB_PATH) as db:
                 name = db.select("gambler", "name", "user_id = ?", user_id)[0][0]
         else:
             name = bot_model
@@ -531,7 +531,7 @@ class GameWork:
 
     def over(self):
         self.game["over"] = True
-        with DataBase(config.DB_PATH) as db:
+        with DataBase(console.DB_PATH) as db:
             for pl in self.players.keys():
                 if self.players[pl]["bot_model"] is None:
                     continue

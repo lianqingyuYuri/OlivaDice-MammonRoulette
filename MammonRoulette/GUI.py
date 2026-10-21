@@ -26,7 +26,7 @@ import re
 
 from PIL import Image, ImageTk
 
-from . import config
+from . import console
 from .msgCustom import (
     dictHelpDoc,
     dictModeCustom,
@@ -646,7 +646,7 @@ class ConfigUI(object):
         for mode_name, mode_data in default_modes.items():
             self.update_mode_helpdoc(mode_name, mode_data)
         # 保存到文件
-        file_path = config.dataDirRoot + "/" + current_hash + "/customMode.json"
+        file_path = console.dataDirRoot + "/" + current_hash + "/customMode.json"
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(default_modes, f, ensure_ascii=False, indent=4)
         self.init_data_total()
@@ -682,7 +682,7 @@ class ConfigUI(object):
                 for mode_name, mode_data in import_data.items():
                     self.update_mode_helpdoc(mode_name, mode_data)
                 # 保存文件
-                file_path = config.dataDirRoot + "/" + current_hash + "/customMode.json"
+                file_path = console.dataDirRoot + "/" + current_hash + "/customMode.json"
                 with open(file_path, "w", encoding="utf-8") as f:
                     json.dump(import_data, f, ensure_ascii=False, indent=4)
                 self.init_data_total()
@@ -725,7 +725,7 @@ class ConfigUI(object):
         ):
             return
         current_hash = self.UIData["hash_now"]
-        file_path = config.dataDirRoot + "/" + current_hash + "/customMode.json"
+        file_path = console.dataDirRoot + "/" + current_hash + "/customMode.json"
         backup = copy.deepcopy(dictModeCustom.get(current_hash, {}))
         try:
             if os.path.exists(file_path):
@@ -767,7 +767,7 @@ class ConfigUI(object):
             return
         dictModeCustom[current_hash][mode_name] = copy.deepcopy(dictModeCustom["default"][mode_name])
         self.update_mode_helpdoc(mode_name, dictModeCustom[current_hash][mode_name])
-        file_path = config.dataDirRoot + "/" + current_hash + "/customMode.json"
+        file_path = console.dataDirRoot + "/" + current_hash + "/customMode.json"
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(dictModeCustom[current_hash], f, ensure_ascii=False, indent=4)
         self.init_data_total()
@@ -830,7 +830,7 @@ class ConfigUI(object):
             field_key = key_map[field_key]
             current_data["modify"][field_key] = default_modes["modify"][field_key]
         # 保存并刷新
-        file_path = config.dataDirRoot + "/" + current_hash + "/customMode.json"
+        file_path = console.dataDirRoot + "/" + current_hash + "/customMode.json"
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(dictModeCustom[current_hash], f, ensure_ascii=False, indent=4)
         self.init_data_total()
@@ -1017,7 +1017,7 @@ class ConfigUI(object):
         except ValueError:
             messagebox.showerror("错误", "请输入正确的数值", parent=self.UIObject["root"])
             return
-        file_path = config.dataDirRoot + "/" + current_hash + "/customMode.json"
+        file_path = console.dataDirRoot + "/" + current_hash + "/customMode.json"
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(dictModeCustom[current_hash], f, ensure_ascii=False, indent=4)
 

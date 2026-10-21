@@ -8,7 +8,7 @@
 @Desc      :    None
 """
 
-from . import config
+from . import console
 
 from . import Core
 from . import Defs

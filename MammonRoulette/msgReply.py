@@ -14,7 +14,7 @@ from collections import Counter
 
 from AmorLib import DataBase
 
-from . import config
+from . import console
 from .main import commands, COMMON_CMD
 from .msgCustom import dictHelpDoc, dictModeCustom
 from .Core.comp import ModeComp, PropComp, BotComp
@@ -37,7 +37,7 @@ commands_helpdoc.append("(名称)签署[生死状,契约] //注册角色或修�
 def signed(plugin_event, Proc, msg_manager, groups):
     name = groups[0]
     user_id = msg_manager.user_id
-    with DataBase(config.DB_PATH) as db:
+    with DataBase(console.DB_PATH) as db:
         gambler_info = db.select("gambler", "user_id", "user_id = ?", user_id)
         if gambler_info:
             db.update("gambler", {"name": name}, "user_id = ?", user_id)
@@ -67,7 +67,7 @@ commands_helpdoc.append("恶魔名片(数值,留空) //查看自己或他人的�
 def card(plugin_event, Proc, msg_manager, groups):
     user_id = msg_manager.user_id
     target = groups[0] if groups[0] != "" else user_id
-    with DataBase(config.DB_PATH) as db:
+    with DataBase(console.DB_PATH) as db:
         gambler_info = db.select("gambler", "*", "user_id = ?", target)
         if not gambler_info:
             msg_reply = msg_manager.msg_format("strMrCardNone")
@@ -113,7 +113,7 @@ def leaderboard(plugin_event, Proc, msg_manager, groups):
         leaderboard_type = "surrender"
     else:
         leaderboard_type = "points"
-    with DataBase(config.DB_PATH) as db:
+    with DataBase(console.DB_PATH) as db:
         gambler_list = db.select(
             "gambler",
             f"name, {leaderboard_type}",
@@ -158,7 +158,7 @@ commands_helpdoc.append("(模式名)[匹配,对局] //以默认人数匹配对�
 def match_game(plugin_event, Proc, msg_manager, groups):
     user_id, game = msg_manager.user_id, msg_manager.val["game"]
     # region 自动注册
-    with DataBase(config.DB_PATH) as db:
+    with DataBase(console.DB_PATH) as db:
         gambler_info = db.select("gambler", "user_id", "user_id = ?", user_id)
     if not gambler_info:
         name = f"{random.choice(poker['suits'])+random.choice(poker['ranks'])}"
