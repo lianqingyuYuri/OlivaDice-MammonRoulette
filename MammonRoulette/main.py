@@ -13,9 +13,8 @@ import MammonRoulette
 
 import json
 import os
-import platform
 
-from AmorLib import DataBase, FsmRouter, MsgManager, init_msgCustom
+from AmorLib import DataBase, FsmRouter, MsgManager, initCustom, readCustom, saveCustom, loadCustomInto, is_windows, has_NativeGUI
 
 from . import console
 from .Core.comp import ModeComp, PropComp, EffectComp, BotComp
@@ -72,7 +71,10 @@ class Event(object):
         BotComp.load_all()
         console.readConfig(Proc)
         console.saveConfig(Proc)
-        init_msgCustom(MammonRoulette, Proc)
+        initCustom(MammonRoulette, Proc)
+        readCustom(MammonRoulette, Proc)
+        saveCustom(MammonRoulette, Proc)
+        loadCustomInto(MammonRoulette, Proc)
 
     def save(plugin_event, Proc):  # type: ignore
         with open(console.TMP_GAME_PATH, "w", encoding="utf-8") as f:
@@ -123,7 +125,7 @@ class Event(object):
                 )
             # GUI
             elif plugin_event.data.event == "MammonRoulette_Menu_manage":  # type: ignore
-                if MammonRoulette.console.has_NativeGUI and platform.system() == "Windows":
+                if has_NativeGUI and is_windows:
                     MammonRoulette.GUI.ConfigUI(
                         Model_name="MammonRoulette_manage",
                         logger_proc=Proc.Proc_info.logger_proc.log,

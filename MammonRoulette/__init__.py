@@ -17,7 +17,7 @@ from . import main
 from . import msgCustom
 from . import msgReply
 
-import platform
+from AmorLib import has_NativeGUI
 
-if platform.system() == "Windows":
+if has_NativeGUI:
     from . import GUI

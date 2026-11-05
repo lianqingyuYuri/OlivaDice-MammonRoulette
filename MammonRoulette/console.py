@@ -8,18 +8,10 @@
 @Desc      :    None
 """
 
-try:
-    import OlivaDiceNativeGUI
-
-    has_NativeGUI = True
-except ImportError:
-    has_NativeGUI = False
-
 import copy
 import json
-import os
 
-from AmorLib import IniConfig
+from AmorLib import IniConfig, releaseDir
 
 from .msgCustom import dictModeCustom, dictPropCustom, dictEffectCustom
 
@@ -41,11 +33,6 @@ DEBUG_FLAG = 0
 
 default_bot_model_dir = "plugin/data/MammonRoulette/data/bot_model/"
 BOT_MODEL_DIR = ""
-
-
-def releaseDir(dir_path):
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
 
 
 def initConfig(Proc):
