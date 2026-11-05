@@ -16,7 +16,7 @@ from AmorLib import DataBase
 
 from . import console
 from .main import commands, COMMON_CMD
-from .custom import dictHelpDoc, dictModeCustom
+from .custom import dictHelpDocTemplate, dictModeCustom
 from .Core.comp import ModeComp, PropComp, BotComp
 from .Core.work import GameWork
 
@@ -507,4 +507,4 @@ def situation(plugin_event, Proc, msg_manager, groups):
 # endregion
 
 
-dictHelpDoc["恶赌 命令"] = "\n".join(commands_helpdoc)
+dictHelpDocTemplate["default"]["恶赌 命令"] = "\n".join(commands_helpdoc)

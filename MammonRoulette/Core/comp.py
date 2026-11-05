@@ -11,9 +11,9 @@
 import MammonRoulette as MR
 
 from ..custom import (
-    dictStrCustom,
     dictStrCustomNote,
-    dictHelpDoc,
+    dictStrCustomTemplate,
+    dictHelpDocTemplate,
     dictModeCustom,
     dictPropCustom,
     dictEffectCustom,
@@ -53,9 +53,9 @@ class ModeComp(Registerable):
             t_helpDoc[f"恶赌模式 {mode_name}"] = mode_cls.helpdoc
             for reply in mode_cls.reply:
                 reply_field, reply_note, reply_msg = reply
-                dictStrCustom[reply_field] = reply_msg
+                dictStrCustomTemplate["default"][reply_field] = reply_msg
                 dictStrCustomNote[reply_field] = reply_note
-        dictHelpDoc.update(t_helpDoc)
+        dictHelpDocTemplate["default"].update(t_helpDoc)
         return
 
     @classmethod
@@ -77,9 +77,9 @@ class PropComp(Registerable):
             t_helpDoc[f"恶赌道具 {prop_name}"] = prop_cls.helpdoc
             for reply in prop_cls.reply:
                 reply_field, reply_note, reply_msg = reply
-                dictStrCustom[reply_field] = reply_msg
+                dictStrCustomTemplate["default"][reply_field] = reply_msg
                 dictStrCustomNote[reply_field] = reply_note
-        dictHelpDoc.update(t_helpDoc)
+        dictHelpDocTemplate["default"].update(t_helpDoc)
         return
 
     @classmethod
@@ -114,9 +114,9 @@ class EffectComp(Registerable):
             t_helpDoc[f"恶赌效果 {effect_name}"] = effect_cls.helpdoc
             for reply in effect_cls.reply:
                 reply_field, reply_note, reply_msg = reply
-                dictStrCustom[reply_field] = reply_msg
+                dictStrCustomTemplate["default"][reply_field] = reply_msg
                 dictStrCustomNote[reply_field] = reply_note
-        dictHelpDoc.update(t_helpDoc)
+        dictHelpDocTemplate["default"].update(t_helpDoc)
         return
 
     @classmethod

@@ -12,7 +12,7 @@ import random
 import string
 
 from ..main import commands
-from ..custom import dictHelpDoc, dictModeCustom
+from ..custom import dictHelpDocTemplate, dictModeCustom
 from ..Core.base import BaseProp
 from ..Core.comp import ModeComp, PropComp, EffectComp
 from ..Core.work import GameWork
@@ -458,7 +458,7 @@ class 金币(PropComp, BaseProp):
     @classmethod
     def init(cls):
         prop_list = (prop for prop in PropComp.list() if prop != cls.name)
-        dictHelpDoc["恶赌 命令"] += "\n[购买,購買](道具名) //使用金币兑换道具."
+        dictHelpDocTemplate["default"]["恶赌 命令"] += "\n[购买,購買](道具名) //使用金币兑换道具."
 
         @commands.route("play", f"^(?:购买|購買) *({'|'.join(prop_list)})$")
         def purchase(plugin_event, Proc, msg_manager, groups):

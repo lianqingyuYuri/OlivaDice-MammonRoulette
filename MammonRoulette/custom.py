@@ -8,117 +8,12 @@
 @Desc      :    None
 """
 
-# region OlivaDiceCore
-dictStrCustom = {
-    "strMrSignedResult": "{tGamblerName}在生死狀簽下姓名.",
-    "strMrCardHas": (
-        "『惡魔資料卡』"
-        "\n真名: {tGamblerName}"
-        "\n排名: {tGamblerRanking}"
-        "\n賞金: {tGamblerPoints}"
-        "\n槍下亡魂: {tGamblerKills}"
-        "\n自取滅亡: {tGamblerSuicide}"
-        "\n臨陣脫逃: {tGamblerSurrender}"
-        "\n取勝: {tGamblerWins}｜戰敗: {tGamblerLosses}"
-        "\n奪標率: {tGamblerWinRate}"
-    ),
-    "strMrCardNone": "只是个没有战绩的观众.",
-    "strMrGamblerRankNode": "[{tGamblerRanking}] {tGamblerName}｜{tGamblerRecord}",
-    "strMrLeaderboardResult": (
-        "『惡魔{tLeaderboardType}榜』\n"
-        "{tGamblerTopList}\n"
-        "▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁\n"
-        "排名 {tRankingPageHome}-{tRankingPageEnd}｜总计上榜恶魔 {tGamblerCount}"
-    ),
-    "strMrLink": ",",
-    "strMrAmmoLive": "實彈",
-    "strMrAmmoBlank": "空包彈",
-    "strMrGamePrep": "{tGameMode}對局靜候惡魔[{tSeatsHas}/{tSeatsMax}].",
-    "strMrGameSeatsError": "非法人数, {tGameMode}模式限定人数为[{tSeatsMin},{tSeatsMax}] Defaults to {tSeatsDef}.",
-    "strMrGameStarted": "对局已经开始, 无法加入.",
-    "strMrGameModeError": "已开设{tGameMode}对局.",
-    "strMrGameDismiss": "你已退出，对局解散.",
-    "strMrGameRemain": "你已退出，剩余：{tSeatsHas}人.",
-    "strMrGameExpired": "原{tGameMode}對局已過期, 自動解散.",
-    "strMrBotJoin": "{tBotName}降臨{tGameMode}对局[{tSeatsHas}/{tSeatsMax}].",
-    "strMrGameAmmoRanOut": "彈藥耗盡，重新裝填中……",
-    "strMrGameOver": "{tWinnerName}用鮮血爲這場生死對局畫上句號.",
-    "strMrGameTied": "這場對局沒有贏家.",
-    "strMrGamblerWasShotWithLiveAmmo": "“嘭！”{tTargetName}被崩倒在地[hp {tOldHp}->{tNewHp}].",
-    "strMrGamblerWasShotWithBlankAmmo": "“咔哒——”是空彈……",
-    "strMrGamblerKilled": "{tTargetName}死於他手.",
-    "strMrGamblerSuicide": "{tGamblerName}自殺了……",
-    "strMrGamblerSurrender": "{tGamblerName}臨陣脫逃.",
-    "strMrGamblerTurn": "現在是{tGamblerName}的回合.",
-    "strMrGamblerPropNone": "你没有{tPropName}道具.",
-    "strMrGamblerPropsDraw": "{tGamblerName}抽取: {tDrawProps}.",
-    "strMrGamblerData": "〔{tGamblerIdx}〕 {tGamblerName}\n「hp: {tGamblerHp}」{tGamblerEffect}\n{tGamblerProps}\n",
-    "strMrPropOneNode": "{tPropName}",
-    "strMrPropManyNode": "{tPropName}*{tPropCount}",
-    "strMrPropNoneNode": "無道具",
-    "strMrEffectOneNode": "[{tEffectName}]",
-    "strMrEffectManyNode": "[{tEffectName}:{tEffectStacks}]",
-    "strMrEffectNoneNode": "",
-    "strMrGameShooter": "\n槍手:〔{tGamblerIdx}〕{tGamblerName}",
-    "strMrGameNowBulletShow": " 當前子彈: {tNowBulletType}",
-    "strMrGameNowBulletHide": "",
-    "strMrGameAmmoShow": "\n彈仓: {tAmmoLiveCount} / {tAmmoCount}",
-    "strMrGameAmmoHide": "\n霰彈槍隱匿于迷霧之中.",
-    "strMrGameDeadList": "\n滅亡: {tDeadList}",
-    "strMrGameDeadNone": "",
-    "strGameReplyInfo": "{tInfo}",
-    "strGameReplyNote": "▁▁▁▁▁▁▁▁▁▁▁▁▁▁{tShooter}{tGameAmmo}{tGameNowBullet}",
-    "strMrSituationResult": "{tGamblerData}▁▁▁▁▁▁▁▁▁▁▁▁▁▁{tShooter}{tGameAmmo}{tGameNowBullet}{tGameDeadList}",
-}
-dictStrCustomNote = {
-    "strMrSignedResult": "【签署生死状】指令 注册或修改名称.",
-    "strMrCardHas": "【恶魔名片】指令 显示玩家的资料.",
-    "strMrCardNone": "【恶魔名片】指令 查看的玩家没有资料.",
-    "strMrGamblerRankNode": "【恶魔排行】指令 每行玩家数据的显示格式.",
-    "strMrLeaderboardResult": "【恶魔排行】指令 显示排行榜.",
-    "strMrLink": "同类个体的连接符号 如道具、死亡玩家.",
-    "strMrAmmoLive": "实弹",
-    "strMrAmmoBlank": "空弹",
-    "strMrGamePrep": "【匹配】指令 正在等待其他玩家加入.",
-    "strMrGameSeatsError": "【匹配】指令 席位设置不在允许范围.",
-    "strMrGameStarted": "【匹配】指令 对局已经开始, 无法加入.",
-    "strMrGameModeError": "【匹配】指令 已开设其他模式的对局.",
-    "strMrGameDismiss": "【退出】指令 退出游戏后, 对局解散.",
-    "strMrGameRemain": "【退出】指令 退出游戏后的剩余人数显示.",
-    "strMrGameExpired": "对局过期时的显示.",
-    "strMrBotJoin": "【加入AI】指令 AI加入匹配对局时的显示.",
-    "strMrGameAmmoRanOut": "实弹耗尽, 重新装弹时的显示.",
-    "strMrGameOver": "游戏结束时的显示.",
-    "strMrGameTied": "游戏平局时的显示.",
-    "strMrGamblerWasShotWithLiveAmmo": "开枪 子弹为[AmmoLive]",
-    "strMrGamblerWasShotWithBlankAmmo": "开枪 子弹为[AmmoBlank]",
-    "strMrGamblerKilled": "玩家被其他玩家杀死时的显示.",
-    "strMrGamblerSuicide": "玩家被自己杀死时的显示.",
-    "strMrGamblerSurrender": "【投降】指令 玩家投降时的显示.",
-    "strMrGamblerTurn": "显示当前行动的玩家.\n一般在行动换人或非行动玩家行动时显示.",
-    "strMrGamblerPropNone": "【使用道具】指令 没有使用的道具.",
-    "strMrGamblerPropsDraw": "显示玩家抽取的道具.",
-    "strMrGamblerData": "玩家数据显示模板.\n包含道具列表.",
-    "strMrPropOneNode": "道具列表 同名道具只有一个时的显示模板.",
-    "strMrPropManyNode": "道具列表 同名道具有多个时的显示模板.",
-    "strMrPropNoneNode": "道具列表 玩家没有道具时的显示模板.",
-    "strMrEffectOneNode": "效果列表 同名效果只有一个时的显示模板.",
-    "strMrEffectManyNode": "效果列表 同名效果有多个时的显示模板.",
-    "strMrEffectNoneNode": "效果列表 玩家没有效果时的显示模板.",
-    "strMrGameShooter": "枪手 当前枪手的显示.",
-    "strMrGameNowBulletShow": "子弹 显示当前子弹的类型.",
-    "strMrGameNowBulletHide": "子弹 隐藏当前子弹时的显示.",
-    "strMrGameAmmoShow": "弹药 显示实弹、空弹、总弹药.",
-    "strMrGameAmmoHide": "弹药 隐藏弹药时的显示.",
-    "strMrGameDeadList": "死亡列表 显示死亡的玩家.",
-    "strMrGameDeadNone": "死亡列表 没有玩家死亡时的显示.",
-    "strGameReplyInfo": "回复 显示游戏常规信息.",
-    "strGameReplyNote": "回复 显示游戏局势信息.",
-    "strMrSituationResult": "【局势】指令 显示当前游戏局势.\n包括玩家数据、枪手、当前子弹、弹药、死亡玩家.",
-}
-
+# region
+# 常量回复
 dictStrConst = {}
+# 全局变量
 dictGValue = {}
+# 局部变量
 dictTValue = {
     # 赌徒基础信息
     "tGamblerName": "",  # 赌徒名称
@@ -176,22 +71,152 @@ dictTValue = {
     "tWinnerName": "",  # 胜利者名称
 }
 
-dictHelpDoc = {
-    "恶赌 戳一戳命令": (
-        "#戳一戳骰娘\n未加入对局: 加入正则匹配的对局;\n"
-        "对局匹配中: 退出正则匹配的对局;\n"
-        "对局进行时: 查看局势.\n"
-        "#戳一戳玩家: 向其开枪."
-    )
+
+# 回复词
+dictStrCustom = {}
+# 自定义回复词
+dictStrCustomUpdate = {}
+# 回复词说明
+dictStrCustomNote = {
+    "strMrSignedResult": "【签署生死状】指令 注册或修改名称.",
+    "strMrCardHas": "【恶魔名片】指令 显示玩家的资料.",
+    "strMrCardNone": "【恶魔名片】指令 查看的玩家没有资料.",
+    "strMrGamblerRankNode": "【恶魔排行】指令 每行玩家数据的显示格式.",
+    "strMrLeaderboardResult": "【恶魔排行】指令 显示排行榜.",
+    "strMrLink": "同类个体的连接符号 如道具、死亡玩家.",
+    "strMrAmmoLive": "实弹",
+    "strMrAmmoBlank": "空弹",
+    "strMrGamePrep": "【匹配】指令 正在等待其他玩家加入.",
+    "strMrGameSeatsError": "【匹配】指令 席位设置不在允许范围.",
+    "strMrGameStarted": "【匹配】指令 对局已经开始, 无法加入.",
+    "strMrGameModeError": "【匹配】指令 已开设其他模式的对局.",
+    "strMrGameDismiss": "【退出】指令 退出游戏后, 对局解散.",
+    "strMrGameRemain": "【退出】指令 退出游戏后的剩余人数显示.",
+    "strMrGameExpired": "对局过期时的显示.",
+    "strMrBotJoin": "【加入AI】指令 AI加入匹配对局时的显示.",
+    "strMrGameAmmoRanOut": "实弹耗尽, 重新装弹时的显示.",
+    "strMrGameOver": "游戏结束时的显示.",
+    "strMrGameTied": "游戏平局时的显示.",
+    "strMrGamblerWasShotWithLiveAmmo": "开枪 子弹为[AmmoLive]",
+    "strMrGamblerWasShotWithBlankAmmo": "开枪 子弹为[AmmoBlank]",
+    "strMrGamblerKilled": "玩家被其他玩家杀死时的显示.",
+    "strMrGamblerSuicide": "玩家被自己杀死时的显示.",
+    "strMrGamblerSurrender": "【投降】指令 玩家投降时的显示.",
+    "strMrGamblerTurn": "显示当前行动的玩家.\n一般在行动换人或非行动玩家行动时显示.",
+    "strMrGamblerPropNone": "【使用道具】指令 没有使用的道具.",
+    "strMrGamblerPropsDraw": "显示玩家抽取的道具.",
+    "strMrGamblerData": "玩家数据显示模板.\n包含道具列表.",
+    "strMrPropOneNode": "道具列表 同名道具只有一个时的显示模板.",
+    "strMrPropManyNode": "道具列表 同名道具有多个时的显示模板.",
+    "strMrPropNoneNode": "道具列表 玩家没有道具时的显示模板.",
+    "strMrEffectOneNode": "效果列表 同名效果只有一个时的显示模板.",
+    "strMrEffectManyNode": "效果列表 同名效果有多个时的显示模板.",
+    "strMrEffectNoneNode": "效果列表 玩家没有效果时的显示模板.",
+    "strMrGameShooter": "枪手 当前枪手的显示.",
+    "strMrGameNowBulletShow": "子弹 显示当前子弹的类型.",
+    "strMrGameNowBulletHide": "子弹 隐藏当前子弹时的显示.",
+    "strMrGameAmmoShow": "弹药 显示实弹、空弹、总弹药.",
+    "strMrGameAmmoHide": "弹药 隐藏弹药时的显示.",
+    "strMrGameDeadList": "死亡列表 显示死亡的玩家.",
+    "strMrGameDeadNone": "死亡列表 没有玩家死亡时的显示.",
+    "strGameReplyInfo": "回复 显示游戏常规信息.",
+    "strGameReplyNote": "回复 显示游戏局势信息.",
+    "strMrSituationResult": "【局势】指令 显示当前游戏局势.\n包括玩家数据、枪手、当前子弹、弹药、死亡玩家.",
 }
-dictConsoleSwitch = {
-    "MrMainEnabled": 1,
-    "MrPokeEnabled": 1,
+# 默认回复词
+dictStrCustomTemplate = {
+    "default": {
+        "strMrSignedResult": "{tGamblerName}在生死狀簽下姓名.",
+        "strMrCardHas": (
+            "『惡魔資料卡』"
+            "\n真名: {tGamblerName}"
+            "\n排名: {tGamblerRanking}"
+            "\n賞金: {tGamblerPoints}"
+            "\n槍下亡魂: {tGamblerKills}"
+            "\n自取滅亡: {tGamblerSuicide}"
+            "\n臨陣脫逃: {tGamblerSurrender}"
+            "\n取勝: {tGamblerWins}｜戰敗: {tGamblerLosses}"
+            "\n奪標率: {tGamblerWinRate}"
+        ),
+        "strMrCardNone": "只是个没有战绩的观众.",
+        "strMrGamblerRankNode": "[{tGamblerRanking}] {tGamblerName}｜{tGamblerRecord}",
+        "strMrLeaderboardResult": (
+            "『惡魔{tLeaderboardType}榜』\n"
+            "{tGamblerTopList}\n"
+            "▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁\n"
+            "排名 {tRankingPageHome}-{tRankingPageEnd}｜总计上榜恶魔 {tGamblerCount}"
+        ),
+        "strMrLink": ",",
+        "strMrAmmoLive": "實彈",
+        "strMrAmmoBlank": "空包彈",
+        "strMrGamePrep": "{tGameMode}對局靜候惡魔[{tSeatsHas}/{tSeatsMax}].",
+        "strMrGameSeatsError": "非法人数, {tGameMode}模式限定人数为[{tSeatsMin},{tSeatsMax}] Defaults to {tSeatsDef}.",
+        "strMrGameStarted": "对局已经开始, 无法加入.",
+        "strMrGameModeError": "已开设{tGameMode}对局.",
+        "strMrGameDismiss": "你已退出，对局解散.",
+        "strMrGameRemain": "你已退出，剩余：{tSeatsHas}人.",
+        "strMrGameExpired": "原{tGameMode}對局已過期, 自動解散.",
+        "strMrBotJoin": "{tBotName}降臨{tGameMode}对局[{tSeatsHas}/{tSeatsMax}].",
+        "strMrGameAmmoRanOut": "彈藥耗盡，重新裝填中……",
+        "strMrGameOver": "{tWinnerName}用鮮血爲這場生死對局畫上句號.",
+        "strMrGameTied": "這場對局沒有贏家.",
+        "strMrGamblerWasShotWithLiveAmmo": "“嘭！”{tTargetName}被崩倒在地[hp {tOldHp}->{tNewHp}].",
+        "strMrGamblerWasShotWithBlankAmmo": "“咔哒——”是空彈……",
+        "strMrGamblerKilled": "{tTargetName}死於他手.",
+        "strMrGamblerSuicide": "{tGamblerName}自殺了……",
+        "strMrGamblerSurrender": "{tGamblerName}臨陣脫逃.",
+        "strMrGamblerTurn": "現在是{tGamblerName}的回合.",
+        "strMrGamblerPropNone": "你没有{tPropName}道具.",
+        "strMrGamblerPropsDraw": "{tGamblerName}抽取: {tDrawProps}.",
+        "strMrGamblerData": "〔{tGamblerIdx}〕 {tGamblerName}\n「hp: {tGamblerHp}」{tGamblerEffect}\n{tGamblerProps}\n",
+        "strMrPropOneNode": "{tPropName}",
+        "strMrPropManyNode": "{tPropName}*{tPropCount}",
+        "strMrPropNoneNode": "無道具",
+        "strMrEffectOneNode": "[{tEffectName}]",
+        "strMrEffectManyNode": "[{tEffectName}:{tEffectStacks}]",
+        "strMrEffectNoneNode": "",
+        "strMrGameShooter": "\n槍手:〔{tGamblerIdx}〕{tGamblerName}",
+        "strMrGameNowBulletShow": " 當前子彈: {tNowBulletType}",
+        "strMrGameNowBulletHide": "",
+        "strMrGameAmmoShow": "\n彈仓: {tAmmoLiveCount} / {tAmmoCount}",
+        "strMrGameAmmoHide": "\n霰彈槍隱匿于迷霧之中.",
+        "strMrGameDeadList": "\n滅亡: {tDeadList}",
+        "strMrGameDeadNone": "",
+        "strGameReplyInfo": "{tInfo}",
+        "strGameReplyNote": "▁▁▁▁▁▁▁▁▁▁▁▁▁▁{tShooter}{tGameAmmo}{tGameNowBullet}",
+        "strMrSituationResult": "{tGamblerData}▁▁▁▁▁▁▁▁▁▁▁▁▁▁{tShooter}{tGameAmmo}{tGameNowBullet}{tGameDeadList}",
+    }
 }
+
+# 帮助文档
+dictHelpDoc = {}
+# help文档模板
+dictHelpDocTemplate = {
+    "default": {
+        "恶赌 戳一戳命令": (
+            "#戳一戳骰娘\n未加入对局: 加入正则匹配的对局;\n"
+            "对局匹配中: 退出正则匹配的对局;\n"
+            "对局进行时: 查看局势.\n"
+            "#戳一戳玩家: 向其开枪."
+        )
+    }
+}
+
+# 控制台开关
+dictConsoleSwitch = {}
+# 控制台开关说明
 dictConsoleSwitchNote = {
     "MrMainEnabled": "[恶魔轮盘]全局开关, 默认开启\n0 关闭\n1 开启",
     "MrPokeEnabled": "[恶魔轮盘]poke开关, 默认开启\n0 关闭\n1 开启",
 }
+# 默认控制台开关
+dictConsoleSwitchTemplate = {
+    "default": {
+        "MrMainEnabled": 1,
+        "MrPokeEnabled": 1,
+    }
+}
+
 # endregion
 # region MammonRoulette
 dictModeCustom = {"default": {}}
