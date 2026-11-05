@@ -10,7 +10,7 @@
 
 import MammonRoulette as MR
 
-from ..msgCustom import (
+from ..custom import (
     dictStrCustom,
     dictStrCustomNote,
     dictHelpDoc,

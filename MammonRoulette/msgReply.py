@@ -16,7 +16,7 @@ from AmorLib import DataBase
 
 from . import console
 from .main import commands, COMMON_CMD
-from .msgCustom import dictHelpDoc, dictModeCustom
+from .custom import dictHelpDoc, dictModeCustom
 from .Core.comp import ModeComp, PropComp, BotComp
 from .Core.work import GameWork
 

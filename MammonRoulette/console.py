@@ -13,7 +13,7 @@ import json
 
 from AmorLib import IniConfig, releaseDir
 
-from .msgCustom import dictModeCustom, dictPropCustom, dictEffectCustom
+from .custom import dictModeCustom, dictPropCustom, dictEffectCustom
 
 MammonRoulette_name = "恶魔轮盘"
 MammonRoulette_ver = "2.18.0-alpha"

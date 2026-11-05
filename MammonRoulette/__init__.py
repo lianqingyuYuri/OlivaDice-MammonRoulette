@@ -8,13 +8,12 @@
 @Desc      :    None
 """
 
-from . import console
-
 from . import Core
 from . import Defs
 
 from . import main
-from . import msgCustom
+from . import custom
+from . import console
 from . import msgReply
 
 from AmorLib import has_NativeGUI

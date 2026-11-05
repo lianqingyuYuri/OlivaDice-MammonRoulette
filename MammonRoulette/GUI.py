@@ -27,7 +27,7 @@ import re
 from PIL import Image, ImageTk
 
 from . import console
-from .msgCustom import (
+from .custom import (
     dictHelpDoc,
     dictModeCustom,
     dictPropCustom,
