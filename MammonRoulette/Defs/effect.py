@@ -15,7 +15,7 @@ from ..Core.work import GameWork
 
 class 束缚(EffectComp, BaseEffect):
     name = "束缚"
-    helpdoc = "被手铐囚禁的标识."
+    helpDocDefault = {"恶赌效果 束缚": "被手链囚禁的标识."}
 
     @classmethod
     def apply(cls, msg_manager, target, stacks):
@@ -34,12 +34,12 @@ class 束缚(EffectComp, BaseEffect):
 
 class 神经麻痹(EffectComp, BaseEffect):
     name = "神经麻痹"
-    helpdoc = "回合结束时失去所有[神经麻痹], 并失去等值的HP."
-    reply = (
-        ("strMrEffectPain_1", "神经麻痹效果 层数增加", "{tGamblerName}沒感到疼痛[神经麻痹 {old_stacks}->{new_stacks}]."),
-        ("strMrEffectPain_2", "神经麻痹效果 结算1", "{tGamblerName}的神經在悲鳴[hp {old_hp}->{new_hp}]……"),
-        ("strMrEffectPain_3", "神经麻痹效果 结算2", "{tGamblerName}的藥效衰減, 不再止疼."),
-    )
+    helpDocDefault = {"恶赌效果 神经麻痹": "回合结束时失去所有[神经麻痹], 并失去等值的HP."}
+    strCustomDefault = {
+        "strMrEffectPain_1": ("神经麻痹效果 层数增加", "{tGamblerName}沒感到疼痛[神经麻痹 {old_stacks}->{new_stacks}]."),
+        "strMrEffectPain_2": ("神经麻痹效果 结算1", "{tGamblerName}的神經在悲鳴[hp {old_hp}->{new_hp}]……"),
+        "strMrEffectPain_3": ("神经麻痹效果 结算2", "{tGamblerName}的藥效衰減, 不再止疼."),
+    }
 
     @classmethod
     def apply(cls, msg_manager, target, stacks):

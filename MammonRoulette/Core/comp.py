@@ -10,6 +10,7 @@
 
 import MammonRoulette as MR
 
+from .base import BaseMode, BaseProp, BaseEffect
 from ..custom import (
     dictStrCustomNote,
     dictStrCustomTemplate,
@@ -28,6 +29,7 @@ class ModeComp(Registerable):
     @classmethod
     def init_after(cls):
         for mode_name, mode_cls in cls._register.items():
+            mode_cls: BaseMode
             mode_cls.init()
             dictModeCustom["default"][mode_name] = {
                 "points": mode_cls.points,
@@ -65,6 +67,7 @@ class PropComp(Registerable):
     @classmethod
     def init_after(cls):
         for prop_name, prop_cls in cls._register.items():
+            prop_cls: BaseProp
             prop_cls.init()
             dictPropCustom["default"][prop_name] = {}
             dictHelpDocTemplate["default"].update(prop_cls.helpDocDefault)
@@ -96,18 +99,14 @@ class EffectComp(Registerable):
 
     @classmethod
     def init_after(cls):
-        t_helpDoc = {}
         for effect_name, effect_cls in cls._register.items():
+            effect_cls: BaseEffect
             effect_cls.init()
-            dictEffectCustom["default"][effect_name] = {
-                "helpdoc": effect_cls.helpdoc,
-            }
-            t_helpDoc[f"恶赌效果 {effect_name}"] = effect_cls.helpdoc
-            for reply in effect_cls.reply:
-                reply_field, reply_note, reply_msg = reply
-                dictStrCustomTemplate["default"][reply_field] = reply_msg
-                dictStrCustomNote[reply_field] = reply_note
-        dictHelpDocTemplate["default"].update(t_helpDoc)
+            dictEffectCustom["default"][effect_name] = {}
+            dictHelpDocTemplate["default"].update(effect_cls.helpDocDefault)
+            for field, (note, msg) in effect_cls.strCustomDefault.items():
+                dictStrCustomNote[field] = note
+                dictStrCustomTemplate["default"][field] = msg
         return
 
     @classmethod

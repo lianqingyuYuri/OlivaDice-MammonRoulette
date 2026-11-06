@@ -111,8 +111,8 @@ class BaseProp:
 
 class BaseEffect:
     name: str = ""
-    helpdoc: str = ""
-    reply: tuple = ()
+    strCustomDefault: dict = {}
+    helpDocDefault: dict = {}
 
     @classmethod
     def init(cls):
