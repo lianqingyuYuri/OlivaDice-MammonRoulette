@@ -20,40 +20,33 @@ MammonRoulette_ver = "2.18.0-alpha"
 MammonRoulette_svn = 58
 MammonRoulette_ver_short = "%s(%s)" % (str(MammonRoulette_ver), str(MammonRoulette_svn))
 
+debug = 0
+
 dataDirRoot = "plugin/data/MammonRoulette/data"
 configPath = "plugin/data/MammonRoulette/data/config.ini"
 
-default_db_path = "plugin/data/MammonRoulette/Roulette.db"
-DB_PATH = ""
-default_tmp_game_path = "plugin/tmp/MammonRoulette_data.json"
-TMP_GAME_PATH = ""
-
-default_debug_flag = False
-DEBUG_FLAG = 0
-
-default_bot_model_dir = "plugin/data/MammonRoulette/data/bot_model/"
-BOT_MODEL_DIR = ""
+dbPath = "plugin/data/MammonRoulette/Roulette.db"
+tmpGameDataPath = "plugin/tmp/MammonRoulette_data.json"
+botModelDir = "plugin/data/MammonRoulette/data/bot_model/"
 
 
 def initConfig(Proc):
-    global DB_PATH, TMP_GAME_PATH, DEBUG_FLAG, BOT_MODEL_DIR
+    global dbPath, tmpGameDataPath, botModelDir
     with IniConfig(configPath) as cfg:
-        DB_PATH = cfg.get("path", "db_path", default_db_path)
-        TMP_GAME_PATH = cfg.get("path", "tmp_game_path", default_tmp_game_path)
-        DEBUG_FLAG = cfg.getboolean("flags", "debug_flag", default_debug_flag)
-        BOT_MODEL_DIR = cfg.get("dir", "bot_model_dir", default_bot_model_dir)
-    releaseDir(BOT_MODEL_DIR)
+        dbPath = cfg.get("path", "db_path", "plugin/data/MammonRoulette/Roulette.db")
+        tmpGameDataPath = cfg.get("path", "tmp_game_path", "plugin/tmp/MammonRoulette_data.json")
+        botModelDir = cfg.get("dir", "bot_model_dir", "plugin/data/MammonRoulette/data/bot_model/")
+    releaseDir(botModelDir)
     for hash_this in Proc.Proc_data["bot_info_dict"]:
         releaseDir(dataDirRoot + "/" + hash_this)
 
 
 def readConfig(Proc):
-    global DB_PATH, TMP_GAME_PATH, DEBUG_FLAG, BOT_MODEL_DIR
+    global dbPath, tmpGameDataPath, botModelDir
     with IniConfig(configPath) as cfg:
-        DB_PATH = cfg.get("path", "db_path", default_db_path)
-        TMP_GAME_PATH = cfg.get("path", "tmp_game_path", default_tmp_game_path)
-        DEBUG_FLAG = cfg.getboolean("flags", "debug_flag", default_debug_flag)
-        BOT_MODEL_DIR = cfg.get("dir", "bot_model_dir", default_bot_model_dir)
+        dbPath = cfg.get("path", "db_path", "plugin/data/MammonRoulette/Roulette.db")
+        tmpGameDataPath = cfg.get("path", "tmp_game_path", "plugin/tmp/MammonRoulette_data.json")
+        botModelDir = cfg.get("dir", "bot_model_dir", "plugin/data/MammonRoulette/data/bot_model/")
     for hash_this in Proc.Proc_data["bot_info_dict"]:
         custom_path = dataDirRoot + "/" + hash_this
         releaseDir(custom_path)
@@ -82,10 +75,9 @@ def readConfig(Proc):
 
 def saveConfig(Proc):
     with IniConfig(configPath) as cfg:
-        cfg.set("path", "db_path", DB_PATH)
-        cfg.set("path", "tmp_game_path", TMP_GAME_PATH)
-        cfg.set("flags", "debug_flag", DEBUG_FLAG)
-        cfg.set("dir", "bot_model_dir", BOT_MODEL_DIR)
+        cfg.set("path", "db_path", dbPath)
+        cfg.set("path", "tmp_game_path", tmpGameDataPath)
+        cfg.set("dir", "bot_model_dir", botModelDir)
         cfg.save()
     for hash_this in Proc.Proc_data["bot_info_dict"]:
         custom_path = dataDirRoot + "/" + hash_this

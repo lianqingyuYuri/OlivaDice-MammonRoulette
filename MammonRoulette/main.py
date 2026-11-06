@@ -30,7 +30,7 @@ class Event(object):
     def init_after(plugin_event, Proc):  # type: ignore
         MR.console.initConfig(Proc)
         # region 初始化数据库
-        with DataBase(MR.console.DB_PATH) as db:
+        with DataBase(MR.console.dbPath) as db:
             db.create(
                 "gambler",
                 {
@@ -48,8 +48,8 @@ class Event(object):
         # endregion
         # region 加载对局数据
         try:
-            if os.path.exists(MR.console.TMP_GAME_PATH):
-                with open(MR.console.TMP_GAME_PATH, "r", encoding="utf-8") as f:
+            if os.path.exists(MR.console.tmpGameDataPath):
+                with open(MR.console.tmpGameDataPath, "r", encoding="utf-8") as f:
                     global game_data
                     game_data = json.load(f)
             else:
@@ -57,7 +57,7 @@ class Event(object):
                     1,
                     "[unity] - [恶魔轮盘] - <game_data> - 本地对局数据存储文件不存在, 尝试创建.",
                 )
-                with open(MR.console.TMP_GAME_PATH, "w", encoding="utf-8") as f:
+                with open(MR.console.tmpGameDataPath, "w", encoding="utf-8") as f:
                     json.dump({}, f)
         except Exception as e:
             Proc.log(
@@ -77,7 +77,7 @@ class Event(object):
         loadCustomInto(MR, Proc)
 
     def save(plugin_event, Proc):  # type: ignore
-        with open(MR.console.TMP_GAME_PATH, "w", encoding="utf-8") as f:
+        with open(MR.console.tmpGameDataPath, "w", encoding="utf-8") as f:
             json.dump(game_data, f, ensure_ascii=False, indent=4)
         BotComp.save_all()
 
@@ -102,17 +102,17 @@ class Event(object):
                 )
             # debug模式
             elif plugin_event.data.event == "MammonRoulette_Menu_debug":  # type: ignore
-                MR.console.DEBUG_FLAG = not MR.console.DEBUG_FLAG
+                MR.console.debug = not MR.console.debug
                 MR.console.saveConfig(Proc)
-                with open(MR.console.TMP_GAME_PATH, "w", encoding="utf-8") as f:
-                    json.dump(game_data if MR.console.DEBUG_FLAG else {}, f, ensure_ascii=False, indent=4)
+                with open(MR.console.tmpGameDataPath, "w", encoding="utf-8") as f:
+                    json.dump(game_data if MR.console.debug else {}, f, ensure_ascii=False, indent=4)
                 Proc.log(
                     2,
-                    "[unity] - [恶魔轮盘] - <MammonRoulette_Menu_debug> - " + str(MR.console.DEBUG_FLAG),
+                    "[unity] - [恶魔轮盘] - <MammonRoulette_Menu_debug> - " + str(MR.console.debug),
                 )
             # 清除缓存
             elif plugin_event.data.event == "MammonRoulette_Menu_clear_cache":  # type: ignore
-                with open(MR.console.TMP_GAME_PATH, "w", encoding="utf-8") as f:
+                with open(MR.console.tmpGameDataPath, "w", encoding="utf-8") as f:
                     json.dump({}, f)
                 game_data.clear()
                 Proc.log(2, "[unity] - [恶魔轮盘] - <game_data> - None")
@@ -188,9 +188,9 @@ def unity_state(msg_manager):
 def unity_reply(plugin_event, Proc, msg_manager):
     if not msg_manager.allow_reply:
         return
-    if MR.console.DEBUG_FLAG:
+    if MR.console.debug:
         global game_data
-        with open(MR.console.TMP_GAME_PATH, "r", encoding="utf-8") as f:
+        with open(MR.console.tmpGameDataPath, "r", encoding="utf-8") as f:
             game_data = json.load(f)
     unity_state(msg_manager)
     game = msg_manager.val["game"]
@@ -220,7 +220,7 @@ def unity_reply(plugin_event, Proc, msg_manager):
         handler(plugin_event, Proc, msg_manager, groups)
         if game.get("over", False):
             game.clear()
-    if MR.console.DEBUG_FLAG:
-        with open(MR.console.TMP_GAME_PATH, "w", encoding="utf-8") as f:
+    if MR.console.debug:
+        with open(MR.console.tmpGameDataPath, "w", encoding="utf-8") as f:
             json.dump(game_data, f, ensure_ascii=False, indent=4)
         Proc.log(0, f"[unity] - [恶魔轮盘] - [debug] - commands({state}, {msg}).")
