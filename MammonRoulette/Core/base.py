@@ -11,8 +11,8 @@
 
 class BaseMode:
     name: str = ""
-    helpdoc: str = ""
-    reply: tuple = ()
+    strCustomDefault: dict = {}
+    helpDocDefault: dict = {}
     points: int = 0
 
     class seats:

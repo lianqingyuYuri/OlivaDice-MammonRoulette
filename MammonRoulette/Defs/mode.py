@@ -46,13 +46,15 @@ def generate_helpdoc(
 
 class 经典(ModeComp, BaseMode):
     name = "经典"
-    helpdoc = generate_helpdoc(
-        points=50,
-        hp_str="每名玩家4hp.",
-        props_limit=6,
-        props_pool=("手铐", "锯子", "花生", "巧克力", "香烟", "红牛", "邀请函", "放大镜"),
-        mechanisms=("游戏开始时, 首发玩家抽取 2 个道具, 非首发玩家抽取 1 个道具", "玩家回合开始时抽取 2 个道具"),
-    )
+    helpDocDefault = {
+        "恶赌模式 经典": generate_helpdoc(
+            points=50,
+            hp_str="每名玩家 4hp.",
+            props_limit=6,
+            props_pool=("手铐", "锯子", "花生", "巧克力", "香烟", "红牛", "邀请函", "放大镜"),
+            mechanisms=("游戏开始时, 首发玩家抽取 2 个道具, 非首发玩家抽取 1 个道具", "玩家回合开始时抽取 2 个道具"),
+        )
+    }
     points = 50
 
     class props(BaseMode.props):
@@ -79,28 +81,30 @@ class 经典(ModeComp, BaseMode):
 
 class 道具(ModeComp, BaseMode):
     name = "道具"
-    helpdoc = generate_helpdoc(
-        points=40,
-        hp_str="前3名玩家5hp, 其余玩家6hp.",
-        props_limit=16,
-        props_pool=(
-            "手铐",
-            "锯子",
-            "邀请函",
-            "花生",
-            "巧克力",
-            "香烟",
-            "红牛",
-            "放大镜",
-            "口红",
-            "扑克",
-            "转盘",
-            "牛奶",
-            "止疼药",
-            "烟花",
-        ),
-        mechanisms=("装弹时所有玩家抽取 4 个道具",),
-    )
+    helpDocDefault = {
+        "恶赌模式 道具": generate_helpdoc(
+            points=40,
+            hp_str="前 3 名玩家 5hp, 其余玩家 6hp.",
+            props_limit=16,
+            props_pool=(
+                "手铐",
+                "锯子",
+                "邀请函",
+                "花生",
+                "巧克力",
+                "香烟",
+                "红牛",
+                "放大镜",
+                "口红",
+                "扑克",
+                "转盘",
+                "牛奶",
+                "止疼药",
+                "烟花",
+            ),
+            mechanisms=("装弹时所有玩家抽取 4 个道具",),
+        )
+    }
     points = 40
 
     class props(BaseMode.props):
@@ -137,17 +141,19 @@ class 道具(ModeComp, BaseMode):
 
 class 金币(ModeComp, BaseMode):
     name = "金币"
-    helpdoc = generate_helpdoc(
-        points=60,
-        hp_str="每名玩家5hp.",
-        props_limit=12,
-        props_pool=("金币",),
-        mechanisms=("玩家回合开始时获得 1 枚金币", "玩家血量首次低至 2 时, 获得 1 枚金币"),
-    )
-    reply = (
-        ("strMrModeGold_1", "金币模式 机制2的回复词", "金光乍現！一枚金幣落入{tGamblerName}手中."),
-        ("strMrModeGold_2", "金币模式 机制2的回复词", "金光乍現！一枚含金量0%的金幣?落入{tGamblerName}手中."),
-    )
+    strCustomDefault = {
+        "strMrModeGold_1": ("金币模式 机制2的回复词", "金光乍現！一枚金幣落入{tGamblerName}手中."),
+        "strMrModeGold_2": ("金币模式 机制2的回复词", "金光乍現！一枚含金量0%的金幣?落入{tGamblerName}手中."),
+    }
+    helpDocDefault = {
+        "恶赌模式 金币": generate_helpdoc(
+            points=60,
+            hp_str="每名玩家 5hp.",
+            props_limit=12,
+            props_pool=("金币",),
+            mechanisms=("玩家回合开始时获得 1 枚金币", "玩家血量首次低至 2 时, 获得 1 枚金币"),
+        )
+    }
     points = 60
 
     class props(BaseMode.props):
@@ -187,18 +193,37 @@ class 金币(ModeComp, BaseMode):
 
 class 勇者(ModeComp, BaseMode):
     name = "勇者"
-    helpdoc = generate_helpdoc(
-        points=40,
-        hp_str="每名玩家5hp.",
-        props_limit=12,
-        props_pool=("手铐", "锯子", "邀请函", "花生", "巧克力", "香烟", "红牛", "放大镜", "口红", "扑克", "转盘", "牛奶", "金币"),
-        mechanisms=(
-            "游戏开始时, 首发玩家抽取 1 个道具, 非首发玩家抽取 2 个道具",
-            "玩家吞枪且为空弹时抽取 2 个道具",
-            "魔弹: 开枪且为实弹时有1/3概率使伤害+1",
-        ),
-    )
-    reply = (("strMrModeHero_1", "勇者模式 魔弹机制回复词", "伴隨七彩光芒，魔彈發射."),)
+    strCustomDefault = {
+        "strMrModeHero_1": ("勇者模式 魔弹机制回复词", "伴隨七彩光芒，魔彈發射."),
+    }
+    helpDocDefault = {
+        "恶赌模式 勇者": generate_helpdoc(
+            points=40,
+            hp_str="每名玩家 5hp.",
+            props_limit=12,
+            props_pool=(
+                "手铐",
+                "锯子",
+                "邀请函",
+                "花生",
+                "巧克力",
+                "香烟",
+                "红牛",
+                "放大镜",
+                "口红",
+                "扑克",
+                "转盘",
+                "牛奶",
+                "金币",
+            ),
+            mechanisms=(
+                "游戏开始时, 首发玩家抽取 1 个道具, 非首发玩家抽取 2 个道具",
+                "玩家吞枪且为空弹时抽取 2 个道具",
+                "魔弹: 开枪且为实弹时有 1/3 概率使伤害 +1",
+            ),
+        )
+    }
+
     points = 40
 
     class props(BaseMode.props):
@@ -230,23 +255,25 @@ class 勇者(ModeComp, BaseMode):
 
 class 赌徒(ModeComp, BaseMode):
     name = "赌徒"
-    helpdoc = generate_helpdoc(
-        points=40,
-        hp_str="每名玩家5hp.",
-        props_limit=12,
-        props_pool=("手铐", "锯子", "邀请函", "红牛", "放大镜", "口红", "牛奶", "金币", "烟花"),
-        mechanisms=(
-            "游戏开始时, 所有玩家抽取 2 个道具",
-            "玩家吞枪且为空弹时抽取 3 个道具",
-            "魔弹: 开枪且为实弹时有1/3概率使伤害+1",
-            "扑克: 开枪有1/3概率反转子弹虚实",
-            "隐藏显示弹药数量",
-        ),
-    )
-    reply = (
-        ("strMrModeGambler_1", "赌徒模式 扑克机制回复词", "子彈擊穿突然出現的{poker}."),
-        ("strMrModeGambler_2", "赌徒模式 魔弹机制回复词", "伴隨七彩光芒，魔彈發射."),
-    )
+    strCustomDefault = {
+        "strMrModeGambler_1": ("赌徒模式 扑克机制回复词", "子彈擊穿突然出現的{poker}."),
+        "strMrModeGambler_2": ("赌徒模式 魔弹机制回复词", "伴隨七彩光芒，魔彈發射."),
+    }
+    helpDocDefault = {
+        "恶赌模式 赌徒": generate_helpdoc(
+            points=40,
+            hp_str="每名玩家 5hp.",
+            props_limit=12,
+            props_pool=("手铐", "锯子", "邀请函", "红牛", "放大镜", "口红", "牛奶", "金币", "烟花"),
+            mechanisms=(
+                "游戏开始时, 所有玩家抽取 2 个道具",
+                "玩家吞枪且为空弹时抽取 3 个道具",
+                "魔弹: 开枪且为实弹时有 1/3 概率使伤害 +1",
+                "扑克: 开枪有 1/3 概率反转子弹虚实",
+                "隐藏显示弹药数量",
+            ),
+        )
+    }
     points = 40
 
     class props(BaseMode.props):
@@ -300,28 +327,31 @@ class 赌徒(ModeComp, BaseMode):
 
 class 大富翁(ModeComp, BaseMode):
     name = "大富翁"
-    helpdoc = generate_helpdoc(
-        points=20,
-        hp_str="每名玩家2hp.",
-        props_limit="∞",
-        props_pool=("锯子", "邀请函", "花生", "巧克力", "香烟", "放大镜", "扑克", "转盘", "牛奶"),
-        props_allow=("和你爆了",),
-        props_ban=("手铐", "口红", "止疼药", "红牛"),
-        mechanisms=(
-            "游戏开始时, 所有玩家抽取 2 个道具",
-            "贷款: 玩家死亡时复活, 并失去半数金币",
-            "老虎机: 玩家复活时摇动老虎机, 有1/6概率中奖(1 枚金币), 若未中奖, 则本次奖励叠加到下次奖励中",
-            "掠夺: 击杀其他玩家时, 获得对方半数金币",
-            "每对其他玩家造成 1 点伤害, 获得 1 枚金币",
-            "率先持有6枚金币的玩家获胜",
-        ),
-    )
-    reply = (
-        ("strMrModeMonopoly_1", "大富翁模式 贷款机制回复词", "{tGamblerName}申請‘無償’救助[hp {tOldHp}->{tNewHp}]."),
-        ("strMrModeMonopoly_2", "大富翁模式 老虎机中奖回复词", "老虎機拉桿落下, [{jackpot}], {tGamblerName}贏得{gold}枚金幣."),
-        ("strMrModeMonopoly_3", "大富翁模式 老虎机未中奖回复词", "老虎機拉桿落下, [{jackpot}]."),
-        ("strMrModeMonopoly_4", "大富翁模式 掠夺机制回复词", "{tTargetName}拾取{tSourceName}的{tNum}枚金幣."),
-    )
+    strCustomDefault = {
+        "strMrModeMonopoly_1": ("大富翁模式 贷款机制回复词", "{tGamblerName}申請‘無償’救助[hp {tOldHp}->{tNewHp}]."),
+        "strMrModeMonopoly_2": ("大富翁模式 老虎机中奖回复词", "老虎機拉桿落下, [{jackpot}], {tGamblerName}贏得{gold}枚金幣."),
+        "strMrModeMonopoly_3": ("大富翁模式 老虎机未中奖回复词", "老虎機拉桿落下, [{jackpot}]."),
+        "strMrModeMonopoly_4": ("大富翁模式 掠夺机制回复词", "{tTargetName}拾取{tSourceName}的{tNum}枚金幣."),
+    }
+    helpDocDefault = {
+        "恶赌模式 大富翁": generate_helpdoc(
+            points=20,
+            hp_str="每名玩家 2hp.",
+            props_limit="∞",
+            props_pool=("锯子", "邀请函", "花生", "巧克力", "香烟", "放大镜", "扑克", "转盘", "牛奶"),
+            props_allow=("和你爆了",),
+            props_ban=("手铐", "口红", "止疼药", "红牛"),
+            mechanisms=(
+                "游戏开始时, 所有玩家抽取 2 个道具",
+                "贷款: 玩家死亡时复活, 并失去半数金币",
+                "老虎机: 玩家复活时摇动老虎机, 有 1/6 概率中奖(1 枚金币), 若未中奖, 则本次奖励叠加到下次奖励中",
+                "掠夺: 击杀其他玩家时, 获得对方半数金币",
+                "每对其他玩家造成 1 点伤害, 获得 1 枚金币",
+                "率先持有 6 枚金币的玩家获胜",
+            ),
+        )
+    }
+
     points = 20
 
     class seats(BaseMode.seats):

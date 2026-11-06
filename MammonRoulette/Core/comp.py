@@ -27,7 +27,6 @@ class ModeComp(Registerable):
 
     @classmethod
     def init_after(cls):
-        t_helpDoc = {}
         for mode_name, mode_cls in cls._register.items():
             mode_cls.init()
             dictModeCustom["default"][mode_name] = {
@@ -50,12 +49,10 @@ class ModeComp(Registerable):
                     "flag_bullet_show": mode_cls.modify.flag_bullet_show,
                 },
             }
-            t_helpDoc[f"恶赌模式 {mode_name}"] = mode_cls.helpdoc
-            for reply in mode_cls.reply:
-                reply_field, reply_note, reply_msg = reply
-                dictStrCustomTemplate["default"][reply_field] = reply_msg
-                dictStrCustomNote[reply_field] = reply_note
-        dictHelpDocTemplate["default"].update(t_helpDoc)
+            dictHelpDocTemplate["default"].update(mode_cls.helpDocDefault)
+            for field, (note, msg) in mode_cls.strCustomDefault.items():
+                dictStrCustomNote[field] = note
+                dictStrCustomTemplate["default"][field] = msg
         return
 
     @classmethod
