@@ -80,9 +80,9 @@ class BaseMode:
 
 class BaseProp:
     name: str = ""
-    helpdoc: str = ""
+    strCustomDefault: dict = {}
+    helpDocDefault: dict = {}
     allow_flag: bool = True
-    reply: tuple = ()
 
     @classmethod
     def init(cls):

@@ -30,7 +30,6 @@ class ModeComp(Registerable):
         for mode_name, mode_cls in cls._register.items():
             mode_cls.init()
             dictModeCustom["default"][mode_name] = {
-                "helpdoc": mode_cls.helpdoc,
                 "points": mode_cls.points,
                 "seats": {
                     "default": mode_cls.seats.default,
@@ -65,18 +64,13 @@ class PropComp(Registerable):
 
     @classmethod
     def init_after(cls):
-        t_helpDoc = {}
         for prop_name, prop_cls in cls._register.items():
             prop_cls.init()
-            dictPropCustom["default"][prop_name] = {
-                "helpdoc": prop_cls.helpdoc,
-            }
-            t_helpDoc[f"恶赌道具 {prop_name}"] = prop_cls.helpdoc
-            for reply in prop_cls.reply:
-                reply_field, reply_note, reply_msg = reply
-                dictStrCustomTemplate["default"][reply_field] = reply_msg
-                dictStrCustomNote[reply_field] = reply_note
-        dictHelpDocTemplate["default"].update(t_helpDoc)
+            dictPropCustom["default"][prop_name] = {}
+            dictHelpDocTemplate["default"].update(prop_cls.helpDocDefault)
+            for field, (note, msg) in prop_cls.strCustomDefault.items():
+                dictStrCustomNote[field] = note
+                dictStrCustomTemplate["default"][field] = msg
         return
 
     @classmethod
