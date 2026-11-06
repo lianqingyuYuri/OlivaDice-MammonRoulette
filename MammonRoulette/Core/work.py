@@ -338,6 +338,7 @@ class GameWork:
         self.shooter = self.order[0]
         self.players[self.shooter]["actions"] = 1
         self.mode.start(self.msg_manager)
+        # 清空初始信息 构建对局时发送局势信息, 初始信息不需要
         self.reply.update({"info": [], "note": {"flag_ammo": False, "flag_shooter": False}, "only": ""})
         if self.flag_bot:
             MR.Core.comp.BotComp.action(self.msg_manager)
