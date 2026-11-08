@@ -171,7 +171,13 @@ def unity_enabled(switchKey, bot_hash="unity"):
     return unity_switchValue and bot_switchValue
 
 
-def unity_state(msg_manager):
+def unity_reply(plugin_event, Proc, msg_manager):
+    if not msg_manager.allow_reply:
+        return
+    if MR.console.debug:
+        global game_data
+        with open(MR.console.tmpGameDataPath, "r", encoding="utf-8") as f:
+            game_data = json.load(f)
     if msg_manager.group_id:
         game = game_data.setdefault(msg_manager.group_id, {})
         if msg_manager.user_id in game.get("data", {}).get("order", []):
@@ -183,18 +189,6 @@ def unity_state(msg_manager):
         state = "priv"
     msg_manager.val["game"] = game
     msg_manager.val["state"] = state
-
-
-def unity_reply(plugin_event, Proc, msg_manager):
-    if not msg_manager.allow_reply:
-        return
-    if MR.console.debug:
-        global game_data
-        with open(MR.console.tmpGameDataPath, "r", encoding="utf-8") as f:
-            game_data = json.load(f)
-    unity_state(msg_manager)
-    game = msg_manager.val["game"]
-    state = msg_manager.val["state"]
     # region poke操作
     msg = ""
     if not plugin_event.plugin_info["func_type"] == "poke":
