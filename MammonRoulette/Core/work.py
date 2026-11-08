@@ -138,7 +138,7 @@ class GameWork:
                     actions=pl["actions"],
                     is_self=(uid == shooter),
                     is_shooter=(uid == self.shooter),
-                    is_alive=(uid in self.order),
+                    is_dead=(uid not in self.order),
                 )
             )
 

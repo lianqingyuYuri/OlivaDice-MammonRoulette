@@ -149,7 +149,7 @@ class PlayerView:
     actions: int = 0
     is_self: bool = False
     is_shooter: bool = False
-    is_alive: bool = True
+    is_dead: bool = False
 
 
 @dataclass
@@ -162,7 +162,7 @@ class BotGameState:
     players: tuple = ()
 
     bullet: int = -1
-    bullet_visible: bool = False
+    bullet_visible: bool = True
 
     ammo_live: int = -1
     ammo_blank: int = -1
@@ -175,8 +175,6 @@ class BotGameState:
 
     def to_vector(self) -> tuple:
         vec = [
-            self.my_hp,
-            self.my_actions,
             self.bullet,
             int(self.bullet_visible),
             self.ammo_live,
@@ -185,12 +183,24 @@ class BotGameState:
             int(self.ammo_visible),
             self.player_count,
             self.alive_count,
+            hash(self.mode_name) % 1000,
         ]
         for pl in self.players:
-            vec.extend([pl.hp, int(pl.is_self), int(pl.is_shooter), int(pl.is_alive)])
-        vec.append(len(self.my_props))
-        for prop in self.my_props:
-            vec.append(hash(prop) % 1000)
+            vec.extend(
+                [
+                    pl.hp,
+                    pl.actions,
+                    len(pl.props),
+                    len(pl.effects),
+                    int(pl.is_self),
+                    int(pl.is_shooter),
+                    int(pl.is_dead),
+                ]
+            )
+            for prop in pl.props:
+                vec.append(hash(prop) % 1000)
+            for effect in pl.effects:
+                vec.extend([hash(effect[0]) % 1000, effect[1]])
         return tuple(vec)
 
 
@@ -203,7 +213,6 @@ class BotAction:
     SHOOT_SELF = "shoot_self"
     SHOOT_OTHER = "shoot_other"
     USE_PROP = "use_prop"
-    SKIP = "skip"
 
     @classmethod
     def shoot_self(cls):
@@ -216,10 +225,6 @@ class BotAction:
     @classmethod
     def use_prop(cls, prop: str, target: str = ""):
         return cls(type=cls.USE_PROP, prop=prop, target=target)
-
-    @classmethod
-    def skip(cls):
-        return cls(type=cls.SKIP)
 
 
 class BaseBot:
