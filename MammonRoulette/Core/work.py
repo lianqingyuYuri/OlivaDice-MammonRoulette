@@ -73,8 +73,8 @@ class GameWork:
     bullet = data_mirror("bullet")  # 当前子弹
     shooter = data_mirror("shooter")  # 枪手
     dmg = modify_mirror("dmg")  # 伤害
-    flag_ammo_show = modify_mirror("flag_ammo_show")  # 显示弹药
-    flag_bullet_show = modify_mirror("flag_bullet_show")  # 显示子弹
+    ammo_visible = modify_mirror("ammo_visible")  # 显示弹药
+    bullet_visible = modify_mirror("bullet_visible")  # 显示子弹
 
     @property
     def flag_bot(self) -> bool:  # 是否为AI玩家
@@ -148,12 +148,12 @@ class GameWork:
             my_props=tuple(pl_shooter["props"]),
             my_effects=tuple((name, data["stacks"]) for name, data in pl_shooter["effects_event"].items()),
             players=tuple(players),
-            bullet=(1 if self.bullet else 0) if self.flag_bullet_show else -1,
-            bullet_visible=self.flag_bullet_show,
-            ammo_live=self.ammo_live if self.flag_ammo_show else -1,
-            ammo_blank=self.ammo_blank if self.flag_ammo_show else -1,
-            ammo_total=(self.ammo_live + self.ammo_blank) if self.flag_ammo_show else -1,
-            ammo_visible=self.flag_ammo_show,
+            bullet=(1 if self.bullet else 0) if self.bullet_visible else -1,
+            bullet_visible=self.bullet_visible,
+            ammo_live=self.ammo_live if self.ammo_visible else -1,
+            ammo_blank=self.ammo_blank if self.ammo_visible else -1,
+            ammo_total=(self.ammo_live + self.ammo_blank) if self.ammo_visible else -1,
+            ammo_visible=self.ammo_visible,
             mode_name=self.game["mode"]["name"],
             player_count=len(self.players),
             alive_count=len(self.order),
@@ -195,7 +195,7 @@ class GameWork:
                     {
                         "tGameNowBullet": (
                             self.msg_manager.msg_format("strMrGameNowBulletShow", t_value)
-                            if self.flag_bullet_show
+                            if self.bullet_visible
                             else self.msg_manager.msg_format("strMrGameNowBulletHide", t_value)
                         )
                     }
@@ -212,7 +212,7 @@ class GameWork:
                     {
                         "tGameAmmo": (
                             self.msg_manager.msg_format("strMrGameAmmoShow", t_value)
-                            if self.flag_ammo_show
+                            if self.ammo_visible
                             else self.msg_manager.msg_format("strMrGameAmmoHide", t_value)
                         )
                     }
@@ -236,7 +236,7 @@ class GameWork:
         else:
             msg_reply = self.reply["only"]
         self.reply.update(
-            {"info": [], "note": {"flag_ammo": self.flag_ammo_show or self.flag_bullet_show, "flag_shooter": False}, "only": ""}
+            {"info": [], "note": {"flag_ammo": self.ammo_visible or self.bullet_visible, "flag_shooter": False}, "only": ""}
         )
         self.tmp.clear()
         return msg_reply

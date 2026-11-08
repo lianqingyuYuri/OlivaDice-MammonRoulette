@@ -30,8 +30,8 @@ class BaseMode:
 
     class modify:
         dmg: int = 1
-        flag_ammo_show: bool = True
-        flag_bullet_show: bool = False
+        ammo_visible: bool = True
+        bullet_visible: bool = False
 
     @classmethod
     def init(cls):

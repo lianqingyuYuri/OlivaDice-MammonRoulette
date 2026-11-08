@@ -46,8 +46,8 @@ class ModeComp(Registerable):
                 },
                 "modify": {
                     "dmg": mode_cls.modify.dmg,
-                    "flag_ammo_show": mode_cls.modify.flag_ammo_show,
-                    "flag_bullet_show": mode_cls.modify.flag_bullet_show,
+                    "ammo_visible": mode_cls.modify.ammo_visible,
+                    "bullet_visible": mode_cls.modify.bullet_visible,
                 },
             }
             dictHelpDocTemplate["default"].update(mode_cls.helpDocDefault)
