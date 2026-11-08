@@ -136,6 +136,64 @@ class BaseEffect:
         pass
 
 
+# region bot
+
+
+@dataclass
+class PlayerView:
+    index: int = 0
+    name: str = ""
+    hp: int = 0
+    props: tuple = ()
+    effects: tuple = ()
+    actions: int = 0
+    is_self: bool = False
+    is_shooter: bool = False
+    is_alive: bool = True
+
+
+@dataclass
+class BotGameState:
+    my_hp: int = 0
+    my_actions: int = 0
+    my_props: tuple = ()
+    my_effects: tuple = ()
+
+    players: tuple = ()
+
+    bullet: int = -1
+    bullet_visible: bool = False
+
+    ammo_live: int = -1
+    ammo_blank: int = -1
+    ammo_total: int = -1
+    ammo_visible: bool = False
+
+    mode_name: str = ""
+    player_count: int = 0
+    alive_count: int = 0
+
+    def to_vector(self) -> tuple:
+        vec = [
+            self.my_hp,
+            self.my_actions,
+            self.bullet,
+            int(self.bullet_visible),
+            self.ammo_live,
+            self.ammo_blank,
+            self.ammo_total,
+            int(self.ammo_visible),
+            self.player_count,
+            self.alive_count,
+        ]
+        for pl in self.players:
+            vec.extend([pl.hp, int(pl.is_self), int(pl.is_shooter), int(pl.is_alive)])
+        vec.append(len(self.my_props))
+        for prop in self.my_props:
+            vec.append(hash(prop) % 1000)
+        return tuple(vec)
+
+
 @dataclass
 class BotAction:
     type: str = ""
@@ -168,7 +226,7 @@ class BaseBot:
     name: str = ""
 
     @classmethod
-    def decide(cls, game_work) -> BotAction:
+    def decide(cls, state: BotGameState) -> BotAction:
         raise NotImplementedError
 
     @classmethod
@@ -178,3 +236,6 @@ class BaseBot:
     @classmethod
     def save(cls):
         pass
+
+
+# endregion

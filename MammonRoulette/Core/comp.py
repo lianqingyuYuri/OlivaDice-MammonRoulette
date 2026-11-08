@@ -140,12 +140,12 @@ class BotComp(Registerable):
         game_work = MR.Core.work.GameWork.from_manager(msg_manager)
         shooter = game_work.shooter
         bot_model = game_work.players[shooter].get("bot_model")
-        if bot_model is None:
-            return
+
         bot_cls = cls.get(bot_model)
         if bot_cls is None:
             return
-        action = bot_cls.decide(game_work)
+        state = game_work.get_bot_state(shooter)
+        action = bot_cls.decide(state)
         if action is None:
             return
         if action.type == action.SHOOT_SELF:

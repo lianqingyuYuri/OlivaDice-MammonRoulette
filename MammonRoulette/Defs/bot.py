@@ -8,6 +8,6 @@
 @Desc      :    Bot 定义 - 在此注册所有 Bot 子类
 """
 
-from ..Core.base import BaseBot, BotAction
+from ..Core.base import BaseBot, PlayerView, BotGameState, BotAction
 from ..Core.comp import BotComp
 from ..Core.work import GameWork

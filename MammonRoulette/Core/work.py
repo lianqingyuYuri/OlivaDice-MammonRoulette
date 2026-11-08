@@ -16,7 +16,7 @@ from dataclasses import dataclass
 
 from AmorLib import DataBase, MsgManager
 
-from .base import BaseMode
+from .base import BaseMode, BotGameState, PlayerView
 from .. import console
 
 
@@ -120,6 +120,49 @@ class GameWork:
                 return
             target = self.order[target - 1]
         return target
+
+    def get_bot_state(self, shooter: str = ""):
+        if not shooter:
+            shooter = self.shooter
+        pl_shooter = self.players[shooter]
+        players = []
+        for idx, uid in enumerate(self.players):
+            pl = self.players[uid]
+            players.append(
+                PlayerView(
+                    index=idx + 1,
+                    name=pl["name"],
+                    hp=pl["hp"],
+                    props=tuple(pl["props"]),
+                    effects=tuple((name, data["stacks"]) for name, data in pl["effects_event"].items()),
+                    actions=pl["actions"],
+                    is_self=(uid == shooter),
+                    is_shooter=(uid == self.shooter),
+                    is_alive=(uid in self.order),
+                )
+            )
+
+        return BotGameState(
+            my_hp=pl_shooter["hp"],
+            my_actions=pl_shooter["actions"],
+            my_props=tuple(pl_shooter["props"]),
+            my_effects=tuple((name, data["stacks"]) for name, data in pl_shooter["effects_event"].items()),
+            players=tuple(players),
+            bullet=(1 if self.bullet else 0) if self.flag_bullet_show else -1,
+            bullet_visible=self.flag_bullet_show,
+            ammo_live=self.ammo_live if self.flag_ammo_show else -1,
+            ammo_blank=self.ammo_blank if self.flag_ammo_show else -1,
+            ammo_total=(self.ammo_live + self.ammo_blank) if self.flag_ammo_show else -1,
+            ammo_visible=self.flag_ammo_show,
+            mode_name=self.game["mode"]["name"],
+            player_count=len(self.players),
+            alive_count=len(self.order),
+        )
+
+    def get_other_players(self, shooter: str = "") -> list:
+        if not shooter:
+            shooter = self.shooter
+        return [uid for uid in self.order if uid != shooter]
 
     # endregion
     # region reply
