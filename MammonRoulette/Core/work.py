@@ -216,7 +216,11 @@ class GameWork:
         return self.players[target]["effects_event"].get(effect_name)
 
     def create_props_event(self, prop_data):
-        prop_data["id"] = id(prop_data)
+        if self.props_event:
+            prop_id = max(item["id"] for item in self.props_event) + 1
+        else:
+            prop_id = 1
+        prop_data["id"] = prop_id
         self.props_event.append(prop_data)
         return
 
