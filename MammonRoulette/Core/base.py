@@ -8,6 +8,8 @@
 @Desc      :    None
 """
 
+from dataclasses import dataclass
+
 
 class BaseMode:
     name: str = ""
@@ -131,4 +133,48 @@ class BaseEffect:
     # 卸载
     @classmethod
     def unapply(cls, msg_manager) -> bool | None:
+        pass
+
+
+@dataclass
+class BotAction:
+    type: str = ""
+    target: str = ""
+    prop: str = ""
+
+    SHOOT_SELF = "shoot_self"
+    SHOOT_OTHER = "shoot_other"
+    USE_PROP = "use_prop"
+    SKIP = "skip"
+
+    @classmethod
+    def shoot_self(cls):
+        return cls(type=cls.SHOOT_SELF)
+
+    @classmethod
+    def shoot_other(cls, target: str):
+        return cls(type=cls.SHOOT_OTHER, target=target)
+
+    @classmethod
+    def use_prop(cls, prop: str, target: str = ""):
+        return cls(type=cls.USE_PROP, prop=prop, target=target)
+
+    @classmethod
+    def skip(cls):
+        return cls(type=cls.SKIP)
+
+
+class BaseBot:
+    name: str = ""
+
+    @classmethod
+    def decide(cls, game_work) -> BotAction:
+        raise NotImplementedError
+
+    @classmethod
+    def load(cls):
+        pass
+
+    @classmethod
+    def save(cls):
         pass

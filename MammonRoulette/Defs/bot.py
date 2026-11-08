@@ -5,5 +5,9 @@
 @Contact   :    xinghu2408@foxmail.com
 @License   :    AGPLv3
 @Copyright :    (C) 2026 MammonRoulette
-@Desc      :    None
+@Desc      :    Bot 定义 - 在此注册所有 Bot 子类
 """
+
+from ..Core.base import BaseBot, BotAction
+from ..Core.comp import BotComp
+from ..Core.work import GameWork
