@@ -270,10 +270,10 @@ def match_game(plugin_event, Proc, msg_manager, groups):
     # endregion
 
 
-# commands_helpdoc.append("召唤(BOT名)//对局添加一名BOT.")
+commands_helpdoc.append("[召唤,添加,加入](BOT名)//对局添加一名BOT.")
 
 
-# @commands.route("prep", f"^(?:召唤|添加|加入)({'|'.join(BotComp.list())})$")
+@commands.route("prep", f"^(?:召唤|添加|加入)({'|'.join(BotComp.list())})$")
 def join_bot(plugin_event, Proc, msg_manager, groups):
     game = msg_manager.val["game"]
     if not game or game["start"]:
@@ -396,9 +396,8 @@ def surrender(plugin_event, Proc, msg_manager, groups):
     game_work = GameWork.from_manager(msg_manager)
     game_work.players[user_id]["surrender"] = True
     game_work.dead(user_id, user_id)
-    if not game_work.flag_over:
-        if not game_work.flag_bot:
-            BotComp.action(msg_manager)
+    if not game_work.flag_over and game_work.flag_bot:
+        BotComp.action(msg_manager)
     msg_reply = game_work.format_reply()
     plugin_event.reply(msg_reply)
     return

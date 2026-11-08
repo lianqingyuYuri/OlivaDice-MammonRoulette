@@ -138,16 +138,14 @@ class BotComp(Registerable):
     @classmethod
     def action(cls, msg_manager):
         game_work = MR.Core.work.GameWork.from_manager(msg_manager)
+        if game_work.flag_over:
+            return
         shooter = game_work.shooter
         bot_model = game_work.players[shooter].get("bot_model")
 
-        bot_cls = cls.get(bot_model)
-        if bot_cls is None:
-            return
         state = game_work.get_bot_state(shooter)
-        action = bot_cls.decide(state)
-        if action is None:
-            return
+        action = cls.get(bot_model).decide(state)
+
         if action.type == action.SHOOT_SELF:
             game_work.shoot(shooter)
         elif action.type == action.SHOOT_OTHER:
@@ -155,6 +153,9 @@ class BotComp(Registerable):
             if target:
                 game_work.shoot(target)
         elif action.type == action.USE_PROP:
-            target = game_work.get_target(action.target) if action.target else shooter
+            target = game_work.get_target(action.target)
             if target and action.prop and action.prop in game_work.players[shooter].get("props", []):
                 PropComp.use(msg_manager, action.prop, shooter, target)
+        if game_work.flag_bot:
+            cls.action(msg_manager)
+        return
