@@ -113,7 +113,7 @@ class GameWork:
 
     def get_target(self, target=None):
         if not target:
-            target = self.order[(self.order.index(self.shooter) + 1) % len(self.order)]
+            target = self.shooter
         elif target not in self.order:
             target = int(target)
             if target > len(self.order) or target < 1:
