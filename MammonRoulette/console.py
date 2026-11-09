@@ -23,12 +23,12 @@ MammonRoulette_ver_short = "%s(%s)" % (str(MammonRoulette_ver), str(MammonRoulet
 
 debug = 0
 
-dataDirRoot = "plugin/data/MammonRoulette"
+dataDirRoot = "plugin/data/MammonRoulette/data"
 configPath = "plugin/data/MammonRoulette/config.ini"
 
 dbPath = "plugin/data/MammonRoulette/Roulette.db"
 tmpGameDataPath = "plugin/tmp/MammonRoulette_data.json"
-botModelDir = "plugin/data/MammonRoulette/data/botModel"
+botModelDir = "plugin/data/MammonRoulette/botModel"
 
 
 def initConfig(Proc):
@@ -40,7 +40,7 @@ def initConfig(Proc):
     with IniConfig(configPath) as cfg:
         dbPath = cfg.get("path", "dbPath", "plugin/data/MammonRoulette/Roulette.db")
         tmpGameDataPath = cfg.get("path", "tmpGameDataPath", "plugin/tmp/MammonRoulette_data.json")
-        botModelDir = cfg.get("dir", "botModelDir", "plugin/data/MammonRoulette/data/botModel")
+        botModelDir = cfg.get("dir", "botModelDir", "plugin/data/MammonRoulette/botModel")
     releaseDir(botModelDir)
     for hash_this in Proc.Proc_data["bot_info_dict"]:
         releaseDir(dataDirRoot + "/" + hash_this)
@@ -51,7 +51,7 @@ def readConfig(Proc):
     with IniConfig(configPath) as cfg:
         dbPath = cfg.get("path", "dbPath", "plugin/data/MammonRoulette/Roulette.db")
         tmpGameDataPath = cfg.get("path", "tmpGameDataPath", "plugin/tmp/MammonRoulette_data.json")
-        botModelDir = cfg.get("dir", "botModelDir", "plugin/data/MammonRoulette/data/botModel")
+        botModelDir = cfg.get("dir", "botModelDir", "plugin/data/MammonRoulette/botModel")
     for hash_this in Proc.Proc_data["bot_info_dict"]:
         custom_path = dataDirRoot + "/" + hash_this
         releaseDir(custom_path)
