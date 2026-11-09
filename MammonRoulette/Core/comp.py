@@ -148,6 +148,7 @@ class BotComp(Registerable):
         while not game_work.flag_over:
             if game_work.shooter != shooter:
                 return
+            game_work.tmp.clear()
             action = bot_cls.decide(msg_manager, state)
             memory.update(action.memory)
 

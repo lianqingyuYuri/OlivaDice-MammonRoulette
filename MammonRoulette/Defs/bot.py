@@ -26,10 +26,10 @@ class 达尔文(BotComp, BaseBot):
         enemies = [pl for pl in state.players if not pl.is_self and not pl.is_dead]
         if not enemies:
             return BotAction.skip()
-        target = min(enemies, key=lambda p: p.hp)
+        pv_target = min(enemies, key=lambda p: p.hp)
 
-        if "手铐" in me.props and prop_can_use(msg_manager, "手铐", target):
-            return BotAction.use_prop("手铐", target.index)
+        if "手铐" in me.props and prop_can_use(msg_manager, "手铐", pv_target.index):
+            return BotAction.use_prop("手铐", pv_target.index)
         if "红牛" in me.props and prop_can_use(msg_manager, "红牛"):
             return BotAction.use_prop("红牛")
         if "牛奶" in me.props and prop_can_use(msg_manager, "牛奶"):
@@ -44,7 +44,7 @@ class 达尔文(BotComp, BaseBot):
                 return BotAction.use_prop("口红", str(prop_enemy.index))
         if "放大镜" in me.props and state.bullet == -1 and prop_can_use(msg_manager, "放大镜"):
             return BotAction.use_prop("放大镜")
-        if "烟花" in me.props and target.hp < 2 and me.hp >= 2 and prop_can_use(msg_manager, "烟花", target):
+        if "烟花" in me.props and pv_target.hp < 2 and me.hp >= 2 and prop_can_use(msg_manager, "烟花", pv_target):
             return BotAction.use_prop("烟花")
 
         if state.bullet_visible:
@@ -59,4 +59,4 @@ class 达尔文(BotComp, BaseBot):
                         return BotAction.use_prop(prop)
                 return BotAction.shoot_self()
 
-        return BotAction.shoot_other(str(target.index))
+        return BotAction.shoot_other(pv_target.index)
