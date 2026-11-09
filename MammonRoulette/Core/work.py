@@ -126,21 +126,23 @@ class GameWork:
         players = []
         for idx, user_id in enumerate(self.players):
             pl = self.players[user_id]
-            players.append(
-                PlayerView(
-                    index=idx + 1,
-                    name=pl["name"],
-                    hp=pl["hp"],
-                    props=tuple(pl["props"]),
-                    effects=tuple((name, data["stacks"]) for name, data in pl["effects_event"].items()),
-                    actions=pl["actions"],
-                    is_self=(user_id == shooter),
-                    is_shooter=(user_id == shooter),
-                    is_dead=(user_id not in self.order),
-                )
+            pv = PlayerView(
+                index=idx + 1,
+                name=pl["name"],
+                hp=pl["hp"],
+                props=tuple(pl["props"]),
+                effects=tuple((name, data["stacks"]) for name, data in pl["effects_event"].items()),
+                actions=pl["actions"],
+                is_self=(user_id == shooter),
+                is_shooter=(user_id == shooter),
+                is_dead=(user_id not in self.order),
             )
+            players.append(pv)
+            if user_id == shooter:
+                pl_self = pv
         return BotGameState(
             players=tuple(players),
+            pl_self=pl_self,
             dmg=self.dmg,
             bullet=(1 if self.bullet else 0) if self.bullet_visible else -1,
             bullet_visible=self.bullet_visible,

@@ -8,7 +8,7 @@
 @Desc      :    None
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 class BaseMode:
@@ -153,6 +153,7 @@ class PlayerView:
 @dataclass
 class BotGameState:
     players: tuple = ()
+    pl_self: PlayerView = field(default_factory=PlayerView)
 
     dmg: int = 1
 
