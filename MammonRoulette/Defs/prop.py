@@ -406,7 +406,7 @@ class 转盘(PropComp, BaseProp):
             prop_data = game_work.get_prop_data(prop_name=clear_prop)
             if prop_data:
                 game_work.remove_props_event(prop_data[0]["id"])
-        game_work.reply["note"]["flag_ammo"] = True
+        game_work.reply["below"]["show_ammo"] = True
         return True
 
 

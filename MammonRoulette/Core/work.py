@@ -182,11 +182,11 @@ class GameWork:
         return info_id
 
     def format_reply(self) -> str:  # 格式化回复消息
-        if not self.reply["only"]:
-            info, note = self.reply["info"], self.reply["note"]
+        if not self.reply["override"]:
+            info, below = self.reply["info"], self.reply["below"]
             t_value = {}
             t_value.update({"tInfo": "\n".join([item["data"] for item in info if item["data"]])})
-            if note["flag_ammo"]:
+            if below["show_ammo"]:
                 # 子弹
                 t_value.update(
                     {"tNowBulletType": self.msg_manager.msg_format("strMrAmmoLive" if self.bullet else "strMrAmmoBlank")}
@@ -217,7 +217,7 @@ class GameWork:
                         )
                     }
                 )
-            if note["flag_shooter"]:
+            if below["show_shooter"]:
                 # 枪手
                 t_value.update(
                     {
@@ -231,12 +231,12 @@ class GameWork:
                     }
                 )
             msg_reply = self.msg_manager.msg_format("strGameReplyInfo", t_value)
-            if not self.flag_over and (note["flag_ammo"] or note["flag_shooter"]):
-                msg_reply += "\n" + self.msg_manager.msg_format("strGameReplyNote", t_value)
+            if not self.flag_over and (below["show_ammo"] or below["show_shooter"]):
+                msg_reply += "\n" + self.msg_manager.msg_format("strGameReplyBelow", t_value)
         else:
-            msg_reply = self.reply["only"]
+            msg_reply = self.reply["override"]
         self.reply.update(
-            {"info": [], "note": {"flag_ammo": self.ammo_visible or self.bullet_visible, "flag_shooter": False}, "only": ""}
+            {"info": [], "below": {"show_ammo": self.ammo_visible or self.bullet_visible, "show_shooter": False}, "override": ""}
         )
         self.tmp.clear()
         return msg_reply
@@ -386,7 +386,7 @@ class GameWork:
         self.players[self.shooter]["actions"] = 1
         self.mode.start(self.msg_manager)
         # 清空初始信息 构建对局时发送局势信息, 初始信息不需要
-        self.reply.update({"info": [], "note": {"flag_ammo": False, "flag_shooter": False}, "only": ""})
+        self.reply.update({"info": [], "below": {"show_ammo": False, "show_shooter": False}, "override": ""})
         if self.flag_bot:
             MR.Core.comp.BotComp.action(self.msg_manager)
         return
@@ -399,7 +399,7 @@ class GameWork:
         else:
             ammo_live, ammo_blank = self.ammo_live, self.ammo_blank
         self.bullet = random.randint(1, ammo_live + ammo_blank) > ammo_blank
-        self.reply["note"]["flag_ammo"] = True
+        self.reply["below"]["show_ammo"] = True
         return
 
     def reload(self):
@@ -409,7 +409,7 @@ class GameWork:
         self.data["ammo_live"], self.data["ammo_blank"] = ammo_live, ammo_blank
         self.upsert_info(self.msg_manager.msg_format("strMrGameAmmoRanOut"))
         self.handle_event("reload")
-        self.reply["note"]["flag_ammo"] = True
+        self.reply["below"]["show_ammo"] = True
         return ammo_live, ammo_blank
 
     def shoot(self, target):
@@ -558,7 +558,7 @@ class GameWork:
                 break
         if self.shooter != shooter:
             self.shooter = shooter
-            self.reply["note"]["flag_shooter"] = True
+            self.reply["below"]["show_shooter"] = True
             self.handle_event("switch", shooter=shooter)
         return
 

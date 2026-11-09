@@ -44,11 +44,11 @@ game = {
     },
     "reply": {
         "info": [],  # 常规信息
-        "note": {
-            "flag_ammo": bool,  # 弹药消息
-            "flag_shooter": bool,  # 枪手信息
+        "below": {
+            "show_ammo": bool,  # 弹药消息显示
+            "show_shooter": bool,  # 枪手信息
         },  # 分割线以下的消息
-        "only": "",  # 会覆盖其他消息
+        "override": "",  # 会覆盖其他消息
     },
     "tmp": {
         "target": str,  # 目标玩家ID

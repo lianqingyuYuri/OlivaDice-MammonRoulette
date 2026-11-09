@@ -232,11 +232,11 @@ def match_game(plugin_event, Proc, msg_manager, groups):
                 },
                 "reply": {
                     "info": [],
-                    "note": {
-                        "flag_ammo": False,
-                        "flag_shooter": False,
+                    "below": {
+                        "show_ammo": False,
+                        "show_shooter": False,
                     },
-                    "only": "",
+                    "override": "",
                 },
                 "tmp": {},
             }
