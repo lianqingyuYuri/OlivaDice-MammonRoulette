@@ -140,12 +140,13 @@ class GameWork:
             players.append(pv)
             if user_id == shooter:
                 pl_self = pv
+        bullet_visible = self.bullet_visible or self.ammo_visible and self.ammo_blank == 0
         return BotGameState(
             players=tuple(players),
             pl_self=pl_self,
             dmg=self.dmg,
-            bullet=(1 if self.bullet else 0) if self.bullet_visible else -1,
-            bullet_visible=self.bullet_visible,
+            bullet=(1 if self.bullet else 0) if bullet_visible else -1,
+            bullet_visible=bullet_visible,
             ammo_live=self.ammo_live if self.ammo_visible else -1,
             ammo_blank=self.ammo_blank if self.ammo_visible else -1,
             ammo_total=(self.ammo_live + self.ammo_blank) if self.ammo_visible else -1,
