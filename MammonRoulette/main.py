@@ -47,6 +47,19 @@ class Event(object):
                 },
                 primary_key="user_id",
             )
+            db.create(
+                "bot",
+                {
+                    "bot_model": str,  # bot
+                    "points": int,  # 积分
+                    "kills": int,  # 击杀
+                    "suicide": int,  # 自杀
+                    "surrender": int,  # 投降
+                    "wins": int,  # 胜局
+                    "losses": int,  # 败局
+                },
+                primary_key="bot_model",
+            )
         # endregion
         # region 加载对局数据
         try:

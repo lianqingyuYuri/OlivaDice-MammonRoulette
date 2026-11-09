@@ -578,8 +578,6 @@ class GameWork:
         self.game["over"] = True
         with DataBase(console.dbPath) as db:
             for pl in self.players.keys():
-                if self.players[pl]["bot_model"] is None:
-                    continue
                 pl_target = self.players[pl]
                 mult = pl_target["points_mult"] + pl_target["kills"]
                 if pl not in self.order:
@@ -588,19 +586,34 @@ class GameWork:
                 else:
                     mult += 1
                     wl = "wins"
-                db.update(
-                    "gambler",
-                    {
-                        "points": self.game["mode"]["points"] * mult,
-                        "kills": pl_target["kills"],
-                        "suicide": 1 if pl_target["suicide"] else 0,
-                        "surrender": 1 if pl_target["surrender"] else 0,
-                        wl: 1,
-                    },
-                    "user_id = ?",
-                    pl,
-                    increment=("points", "kills", "suicide", "surrender", wl),
-                )
+                if pl_target["bot_model"] is None:
+                    db.update(
+                        "gambler",
+                        {
+                            "points": self.game["mode"]["points"] * mult,
+                            "kills": pl_target["kills"],
+                            "suicide": 1 if pl_target["suicide"] else 0,
+                            "surrender": 1 if pl_target["surrender"] else 0,
+                            wl: 1,
+                        },
+                        "user_id = ?",
+                        pl,
+                        increment=("points", "kills", "suicide", "surrender", wl),
+                    )
+                else:
+                    db.update(
+                        "bot",
+                        {
+                            "points": self.game["mode"]["points"] * mult,
+                            "kills": pl_target["kills"],
+                            "suicide": 1 if pl_target["suicide"] else 0,
+                            "surrender": 1 if pl_target["surrender"] else 0,
+                            wl: 1,
+                        },
+                        "bot_model = ?",
+                        pl_target["bot_model"],
+                        increment=("points", "kills", "suicide", "surrender", wl),
+                    )
         return
 
     # endregion
