@@ -242,7 +242,7 @@ class BaseBot:
     modes_allowed: tuple = ()
 
     @classmethod
-    def decide(cls, state: BotGameState) -> BotAction:
+    def decide(cls, msg_manager, state: BotGameState) -> BotAction:
         raise NotImplementedError
 
     @classmethod

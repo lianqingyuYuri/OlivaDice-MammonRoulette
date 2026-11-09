@@ -148,7 +148,7 @@ class BotComp(Registerable):
         while not game_work.flag_over:
             if game_work.shooter != shooter:
                 return
-            action = bot_cls.decide(state)
+            action = bot_cls.decide(msg_manager, state)
             memory.update(action.memory)
 
             if action.type == action.SHOOT_SELF:
@@ -161,17 +161,11 @@ class BotComp(Registerable):
                 return
             elif action.type == action.USE_PROP:
                 target = game_work.get_target(action.target)
-                if (
-                    target
-                    and action.prop
-                    and action.prop in game_work.players[shooter]["props"]
-                    and PropComp.get(action.prop).can_use(msg_manager, target)
-                ):
-                    PropComp.use(msg_manager, action.prop, shooter, target)
-                    state = game_work.get_bot_state()
-                    for f, v in memory.items():
-                        if getattr(state, f) == -1 and v != -1:
-                            setattr(state, f, v)
+                PropComp.use(msg_manager, action.prop, shooter, target)
+                state = game_work.get_bot_state()
+                for f, v in memory.items():
+                    if getattr(state, f) == -1 and v != -1:
+                        setattr(state, f, v)
                 else:
                     break
             else:
