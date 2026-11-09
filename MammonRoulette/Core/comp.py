@@ -161,7 +161,12 @@ class BotComp(Registerable):
                 return
             elif action.type == action.USE_PROP:
                 target = game_work.get_target(action.target)
-                if target and action.prop and action.prop in game_work.players[shooter]["props"]:
+                if (
+                    target
+                    and action.prop
+                    and action.prop in game_work.players[shooter]["props"]
+                    and PropComp.get(action.prop).can_use(msg_manager, target)
+                ):
                     PropComp.use(msg_manager, action.prop, shooter, target)
                     state = game_work.get_bot_state()
                     for f, v in memory.items():

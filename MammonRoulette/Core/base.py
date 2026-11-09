@@ -90,6 +90,10 @@ class BaseProp:
     def init(cls):
         pass
 
+    @classmethod
+    def can_use(cls, msg_manager, target) -> bool:
+        return True
+
     # 使用
     @classmethod
     def apply(cls, msg_manager, target) -> bool | None:

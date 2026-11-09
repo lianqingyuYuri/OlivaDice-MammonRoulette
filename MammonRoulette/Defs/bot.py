@@ -11,3 +11,54 @@
 from ..Core.base import BaseBot, PlayerView, BotGameState, BotAction
 from ..Core.comp import BotComp
 from ..Core.work import GameWork
+
+
+class 达尔文(BotComp, BaseBot):
+    name = "达尔文"
+
+    @classmethod
+    def decide(cls, state):
+        me = state.pl_self
+        enemies = [pl for pl in state.players if not pl.is_self and not pl.is_dead]
+        if not enemies:
+            return BotAction.skip()
+        target = min(enemies, key=lambda p: p.hp)
+
+        if "手铐" in me.props:
+            return BotAction.use_prop("手铐", str(target.index))
+        if "红牛" in me.props:
+            return BotAction.use_prop("红牛")
+        if "牛奶" in me.props:
+            return BotAction.use_prop("牛奶")
+        if "止疼药" in me.props:
+            return BotAction.use_prop("止疼药")
+
+        if "口红" in me.props:
+            prop_enemies = [e for e in enemies if e.props]
+            if prop_enemies:
+                prop_enemy = min(prop_enemies, key=lambda p: p.hp)
+                return BotAction.use_prop("口红", str(prop_enemy.index))
+
+        if state.bullet == -1 and "放大镜" in me.props:
+            return BotAction.use_prop("放大镜")
+
+        if state.bullet_visible and state.bullet == 0 and "扑克" in me.props:
+            return BotAction.use_prop("扑克", memory={"bullet": 1})
+
+        if state.bullet_visible and state.bullet == 1 and "锯子" in me.props:
+            return BotAction.use_prop("锯子")
+
+        if state.bullet_visible and state.bullet == 0:
+            for prop in ("巧克力", "花生", "香烟", "转盘"):
+                if prop in me.props:
+                    return BotAction.use_prop(prop)
+
+        if target.hp < 2 and me.hp >= 2 and "烟花" in me.props:
+            return BotAction.use_prop("烟花")
+
+        if state.bullet_visible and state.bullet == 0:
+            changers = {"巧克力", "花生", "香烟", "转盘", "扑克"}
+            if not any(p in me.props for p in changers):
+                return BotAction.shoot_self()
+
+        return BotAction.shoot_other(str(target.index))

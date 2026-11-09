@@ -29,6 +29,13 @@ class 手铐(PropComp, BaseProp):
     }
 
     @classmethod
+    def can_use(cls, msg_manager, target):
+        game_work = GameWork.from_manager(msg_manager)
+        if game_work.get_effect_data(target, "束缚"):
+            return False
+        return True
+
+    @classmethod
     def apply(cls, msg_manager, target):
         game_work = GameWork.from_manager(msg_manager)
         # 默认目标为下一个玩家
@@ -59,6 +66,13 @@ class 锯子(PropComp, BaseProp):
         "strMrPropSaw_1": ("锯子道具 使用成功", "槍管被鋸斷."),
         "strMrPropSaw_2": ("锯子道具 使用失败", "槍管早已被鋸斷."),
     }
+
+    @classmethod
+    def can_use(cls, msg_manager, target):
+        game_work = GameWork.from_manager(msg_manager)
+        if game_work.get_prop_data(prop_name=cls.name):
+            return False
+        return True
 
     @classmethod
     def apply(cls, msg_manager, target):
@@ -227,6 +241,13 @@ class 放大镜(PropComp, BaseProp):
         "strMrPropMagnifier_1": ("放大镜道具 使用成功", "{tGamblerName}砸碎放大鏡, 發現槍膛裏是{tNowBulletType}."),
         "strMrPropMagnifier_2": ("放大镜道具 使用失败", "已用放大镜, 开枪前可查看子弹虚实."),
     }
+
+    @classmethod
+    def can_use(cls, msg_manager, target):
+        game_work = GameWork.from_manager(msg_manager)
+        if game_work.get_prop_data(prop_name=cls.name):
+            return False
+        return True
 
     @classmethod
     def apply(cls, msg_manager, target):
@@ -514,6 +535,13 @@ class 止疼药(PropComp, BaseProp):
         "strMrPropPain_2": ("止疼药道具 对目标使用", "{tSourceName}喂{tTargetName}服用止疼药."),
         "strMrPropPain_3": ("止疼药道具 使用失败", "{tGamblerName}已服用止疼药."),
     }
+
+    @classmethod
+    def can_use(cls, msg_manager, target):
+        game_work = GameWork.from_manager(msg_manager)
+        if game_work.get_effect_data(target, "神经麻痹"):
+            return False
+        return True
 
     @classmethod
     def apply(cls, msg_manager, target):

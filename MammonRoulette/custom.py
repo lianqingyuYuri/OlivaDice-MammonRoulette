@@ -231,7 +231,7 @@ dictDefsNote = {
     "strModePropsPool": "道具池",
     "strModePropsLimit": "道具上限",
     "strModePropsAllow": "许可列表",
-    "strModePropsBan": "禁用列表",
+    "strModePropsBanned": "禁用列表",
     "strModeModifyDmg": "伤害修改",
     "strModeModifyAmmoShow": "弹药显示",
     "strModeModifyBulletShow": "子弹显示",

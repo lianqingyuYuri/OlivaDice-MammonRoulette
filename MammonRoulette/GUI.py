@@ -578,7 +578,7 @@ class ConfigUI(object):
             ("seats_max", "strModeSeatsMax"),
             ("props_pool", "strModePropsPool"),
             ("props_limit", "strModePropsLimit"),
-            ("props_banned", "strModePropsBan"),
+            ("props_banned", "strModePropsBanned"),
             ("modify_dmg", "strModeModifyDmg"),
             ("modify_ammo_visible", "strModeModifyAmmoShow"),
             ("modify_bullet_visible", "strModeModifyBulletShow"),
