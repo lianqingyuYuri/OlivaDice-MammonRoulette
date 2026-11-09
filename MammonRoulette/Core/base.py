@@ -152,11 +152,6 @@ class PlayerView:
 
 @dataclass
 class BotGameState:
-    my_hp: int = 0
-    my_actions: int = 0
-    my_props: tuple = ()
-    my_effects: tuple = ()
-
     players: tuple = ()
 
     bullet: int = -1
@@ -211,6 +206,7 @@ class BotAction:
     SHOOT_SELF = "shoot_self"
     SHOOT_OTHER = "shoot_other"
     USE_PROP = "use_prop"
+    SKIP = "skip"
 
     @classmethod
     def shoot_self(cls):
@@ -224,15 +220,20 @@ class BotAction:
     def use_prop(cls, prop: str, target: str = ""):
         return cls(type=cls.USE_PROP, prop=prop, target=target)
 
+    @classmethod
+    def skip(cls):
+        return cls(type=cls.SKIP)
+
 
 class BaseBot:
     name: str = ""
     strCustomDefault: dict = {}
     helpDocDefault: dict = {}
     allowed: bool = True
+    modes_allowed: tuple = ()
 
     @classmethod
-    def decide(cls, state: BotGameState) -> BotAction:
+    def decide(cls, state: BotGameState, memory: dict) -> BotAction:
         raise NotImplementedError
 
     @classmethod

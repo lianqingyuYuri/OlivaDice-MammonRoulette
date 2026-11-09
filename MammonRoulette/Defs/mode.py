@@ -22,7 +22,7 @@ def generate_helpdoc(
     props_limit: int | str = 0,
     props_pool: tuple = (),
     props_allowed: tuple = (),
-    props_ban: tuple = (),
+    props_banned: tuple = (),
     mechanisms: tuple = (),
 ) -> str:
     lines = []
@@ -36,8 +36,8 @@ def generate_helpdoc(
         lines.append(f"  {', '.join(props_pool)}")
     if props_allowed:
         lines.append(f"-特殊道具-\n  {', '.join(props_allowed)}")
-    if props_ban:
-        lines.append(f"-禁用道具-\n  {', '.join(props_ban)}")
+    if props_banned:
+        lines.append(f"-禁用道具-\n  {', '.join(props_banned)}")
     if mechanisms:
         lines.append("〔机制〕")
         lines.extend(f"{i}. {m}{'.' if i == len(mechanisms) else ';'}" for i, m in enumerate(mechanisms, 1))
@@ -340,7 +340,7 @@ class 大富翁(ModeComp, BaseMode):
             props_limit="∞",
             props_pool=("锯子", "邀请函", "花生", "巧克力", "香烟", "放大镜", "扑克", "转盘", "牛奶"),
             props_allowed=("和你爆了",),
-            props_ban=("手铐", "口红", "止疼药", "红牛"),
+            props_banned=("手铐", "口红", "止疼药", "红牛"),
             mechanisms=(
                 "游戏开始时, 所有玩家抽取 2 个道具",
                 "贷款: 玩家死亡时复活, 并失去半数金币",

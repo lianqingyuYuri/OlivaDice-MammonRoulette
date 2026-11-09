@@ -65,7 +65,7 @@ class GameWork:
 
     props_pool: list
     props_allowed: list
-    props_ban: list
+    props_banned: list
     props_limit: int
 
     ammo_live = data_mirror("ammo_live")  # 实弹数
@@ -102,7 +102,7 @@ class GameWork:
             props_event=data["props_event"],
             props_pool=props["pool"],
             props_allowed=props["allowed"],
-            props_ban=props["ban"],
+            props_banned=props["ban"],
             props_limit=props["limit"],
         )
 
@@ -121,13 +121,11 @@ class GameWork:
             target = self.order[target - 1]
         return target
 
-    def get_bot_state(self, shooter: str = ""):
-        if not shooter:
-            shooter = self.shooter
-        pl_shooter = self.players[shooter]
+    def get_bot_state(self):
+        shooter = self.shooter
         players = []
-        for idx, uid in enumerate(self.players):
-            pl = self.players[uid]
+        for idx, user_id in enumerate(self.players):
+            pl = self.players[user_id]
             players.append(
                 PlayerView(
                     index=idx + 1,
@@ -136,17 +134,12 @@ class GameWork:
                     props=tuple(pl["props"]),
                     effects=tuple((name, data["stacks"]) for name, data in pl["effects_event"].items()),
                     actions=pl["actions"],
-                    is_self=(uid == shooter),
-                    is_shooter=(uid == self.shooter),
-                    is_dead=(uid not in self.order),
+                    is_self=(user_id == shooter),
+                    is_shooter=(user_id == shooter),
+                    is_dead=(user_id not in self.order),
                 )
             )
-
         return BotGameState(
-            my_hp=pl_shooter["hp"],
-            my_actions=pl_shooter["actions"],
-            my_props=tuple(pl_shooter["props"]),
-            my_effects=tuple((name, data["stacks"]) for name, data in pl_shooter["effects_event"].items()),
             players=tuple(players),
             bullet=(1 if self.bullet else 0) if self.bullet_visible else -1,
             bullet_visible=self.bullet_visible,
@@ -317,7 +310,7 @@ class GameWork:
         pl_props = self.players[user_id]["props"]
         if self.props_limit > 0 and len(pl_props) >= self.props_limit:
             return None
-        elif prop in self.props_ban:
+        elif prop in self.props_banned:
             prop = random.choice(self.props_pool)
         elif not MR.Core.comp.PropComp.get(prop).allowed and prop not in self.props_allowed:
             prop = random.choice(self.props_pool)

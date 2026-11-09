@@ -578,7 +578,7 @@ class ConfigUI(object):
             ("seats_max", "strModeSeatsMax"),
             ("props_pool", "strModePropsPool"),
             ("props_limit", "strModePropsLimit"),
-            ("props_ban", "strModePropsBan"),
+            ("props_banned", "strModePropsBan"),
             ("modify_dmg", "strModeModifyDmg"),
             ("modify_ammo_visible", "strModeModifyAmmoShow"),
             ("modify_bullet_visible", "strModeModifyBulletShow"),
@@ -604,7 +604,7 @@ class ConfigUI(object):
                 if field_key == "props_pool":
                     lst = props.get("pool", [])
                     value = ", ".join(lst) if lst else "（空）"
-                elif field_key == "props_ban":
+                elif field_key == "props_banned":
                     lst = props.get("ban", [])
                     value = ", ".join(lst) if lst else "（空）"
                 elif field_key == "props_limit":
@@ -814,12 +814,12 @@ class ConfigUI(object):
             }
             field_key = key_map[field_key]
             current_data["seats"][field_key] = default_modes["seats"][field_key]
-        elif field_key in ("props_pool", "props_limit", "props_ban"):
+        elif field_key in ("props_pool", "props_limit", "props_banned"):
             if field_key == "props_pool":
                 current_data["props"]["pool"] = default_modes["props"]["pool"]
             elif field_key == "props_limit":
                 current_data["props"]["limit"] = default_modes["props"]["limit"]
-            elif field_key == "props_ban":
+            elif field_key == "props_banned":
                 current_data["props"]["ban"] = default_modes["props"]["ban"]
         elif field_key in ("modify_dmg", "modify_ammo_visible", "modify_bullet_visible"):
             key_map = {
@@ -876,7 +876,7 @@ class ConfigUI(object):
             if field_key == "props_pool":
                 lst = props.get("pool", [])
                 current_value = ", ".join(lst) if lst else ""
-            elif field_key == "props_ban":
+            elif field_key == "props_banned":
                 lst = props.get("ban", [])
                 current_value = ", ".join(lst) if lst else ""
             elif field_key == "props_limit":
@@ -1003,7 +1003,7 @@ class ConfigUI(object):
                 elif field_key == "props_pool":
                     lst = [item.strip() for item in new_value.split(",") if item.strip()]
                     props["pool"] = lst
-                elif field_key == "props_ban":
+                elif field_key == "props_banned":
                     lst = [item.strip() for item in new_value.split(",") if item.strip()]
                     props["ban"] = lst
             elif field_key.startswith("modify_"):
