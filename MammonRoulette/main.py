@@ -227,11 +227,12 @@ def unity_reply(plugin_event, Proc, msg_manager):
         handler(plugin_event, Proc, msg_manager, groups)
         if game.get("over", False):
             game.clear()
-        game_work = MR.Core.work.GameWork.from_manager(msg_manager)
-        if game_work.flag_bot:
-            MR.Core.comp.BotComp.action(msg_manager)
-            msg_reply = game_work.format_reply()
-            plugin_event.reply(msg_reply)
+        if game.get("start"):
+            game_work = MR.Core.work.GameWork.from_manager(msg_manager)
+            if game_work.flag_bot:
+                MR.Core.comp.BotComp.action(msg_manager)
+                msg_reply = game_work.format_reply()
+                plugin_event.reply(msg_reply)
     if MR.console.debug:
         with open(MR.console.tmpGameDataPath, "w", encoding="utf-8") as f:
             json.dump(game_data, f, ensure_ascii=False, indent=4)
