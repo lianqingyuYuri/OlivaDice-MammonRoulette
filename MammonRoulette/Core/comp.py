@@ -141,21 +141,37 @@ class BotComp(Registerable):
         if game_work.flag_over:
             return
         shooter = game_work.shooter
-        bot_model = game_work.players[shooter].get("bot_model")
+        bot_cls = cls.get(game_work.players[shooter]["bot_model"])
 
-        state = game_work.get_bot_state(shooter)
-        action = cls.get(bot_model).decide(state)
+        state = game_work.get_bot_state()
+        memory = {}
+        while not game_work.flag_over:
+            if game_work.shooter != shooter:
+                return
+            action, _mem = bot_cls.decide(state)
+            memory.update(_mem)
 
-        if action.type == action.SHOOT_SELF:
-            game_work.shoot(shooter)
-        elif action.type == action.SHOOT_OTHER:
-            target = game_work.get_target(action.target)
-            if target:
-                game_work.shoot(target)
-        elif action.type == action.USE_PROP:
-            target = game_work.get_target(action.target)
-            if target and action.prop and action.prop in game_work.players[shooter].get("props", []):
-                PropComp.use(msg_manager, action.prop, shooter, target)
+            if action.type == action.SHOOT_SELF:
+                game_work.shoot(shooter)
+                return
+            elif action.type == action.SHOOT_OTHER:
+                target = game_work.get_target(action.target)
+                if target:
+                    game_work.shoot(target)
+                return
+            elif action.type == action.USE_PROP:
+                target = game_work.get_target(action.target)
+                if target and action.prop and action.prop in game_work.players[shooter]["props"]:
+                    PropComp.use(msg_manager, action.prop, shooter, target)
+                    state = game_work.get_bot_state()
+                    for f, v in memory.items():
+                        if getattr(state, f) == -1 and v != -1:
+                            setattr(state, f, v)
+                else:
+                    break
+            else:
+                break
+
         if game_work.flag_bot:
             cls.action(msg_manager)
         return

@@ -154,6 +154,8 @@ class PlayerView:
 class BotGameState:
     players: tuple = ()
 
+    dmg: int = 1
+
     bullet: int = -1
     bullet_visible: bool = True
 
@@ -168,6 +170,7 @@ class BotGameState:
 
     def to_vector(self) -> tuple:
         vec = [
+            self.dmg,
             self.bullet,
             int(self.bullet_visible),
             self.ammo_live,
@@ -233,7 +236,7 @@ class BaseBot:
     modes_allowed: tuple = ()
 
     @classmethod
-    def decide(cls, state: BotGameState, memory: dict) -> BotAction:
+    def decide(cls, state: BotGameState) -> tuple[BotAction, dict]:
         raise NotImplementedError
 
     @classmethod

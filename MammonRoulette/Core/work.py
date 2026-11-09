@@ -141,6 +141,7 @@ class GameWork:
             )
         return BotGameState(
             players=tuple(players),
+            dmg=self.dmg,
             bullet=(1 if self.bullet else 0) if self.bullet_visible else -1,
             bullet_visible=self.bullet_visible,
             ammo_live=self.ammo_live if self.ammo_visible else -1,
