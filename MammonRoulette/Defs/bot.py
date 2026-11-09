@@ -14,6 +14,10 @@ from ..Core.work import GameWork
 
 
 def prop_can_use(msg_manager, prop_name, target=None):
+    game_work = GameWork.from_manager(msg_manager)
+    if target is None:
+        target = game_work.shooter
+    target = game_work.get_target(target)
     return PropComp.get(prop_name).can_use(msg_manager, target)
 
 
@@ -28,20 +32,20 @@ class 达尔文(BotComp, BaseBot):
             return BotAction.skip()
         pv_target = min(enemies, key=lambda p: p.hp)
 
-        if "手铐" in me.props and prop_can_use(msg_manager, "手铐", pv_target.index):
-            return BotAction.use_prop("手铐", pv_target.index)
-        if "红牛" in me.props and prop_can_use(msg_manager, "红牛"):
-            return BotAction.use_prop("红牛")
-        if "牛奶" in me.props and prop_can_use(msg_manager, "牛奶"):
-            return BotAction.use_prop("牛奶")
-        if "止疼药" in me.props and prop_can_use(msg_manager, "止疼药"):
-            return BotAction.use_prop("止疼药")
+        if "手铐" in me.props and prop_can_use(msg_manager, "手铐", pv_target.id):
+            return BotAction.use_prop("手铐", pv_target.id)
+        if "红牛" in me.props and prop_can_use(msg_manager, "红牛", me.id):
+            return BotAction.use_prop("红牛", me.id)
+        if "牛奶" in me.props and prop_can_use(msg_manager, "牛奶", me.id):
+            return BotAction.use_prop("牛奶", me.id)
+        if "止疼药" in me.props and prop_can_use(msg_manager, "止疼药", me.id):
+            return BotAction.use_prop("止疼药", me.id)
 
         if "口红" in me.props and prop_can_use(msg_manager, "口红"):
             prop_enemies = [e for e in enemies if e.props]
             if prop_enemies:
                 prop_enemy = min(prop_enemies, key=lambda p: p.hp)
-                return BotAction.use_prop("口红", str(prop_enemy.index))
+                return BotAction.use_prop("口红", str(prop_enemy.id))
         if "放大镜" in me.props and state.bullet == -1 and prop_can_use(msg_manager, "放大镜"):
             return BotAction.use_prop("放大镜")
         if "烟花" in me.props and pv_target.hp < 2 and me.hp >= 2 and prop_can_use(msg_manager, "烟花", pv_target):
@@ -59,4 +63,4 @@ class 达尔文(BotComp, BaseBot):
                         return BotAction.use_prop(prop)
                 return BotAction.shoot_self()
 
-        return BotAction.shoot_other(pv_target.index)
+        return BotAction.shoot_other(pv_target.id)

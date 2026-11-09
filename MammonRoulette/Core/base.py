@@ -143,7 +143,7 @@ class BaseEffect:
 # region bot
 @dataclass
 class PlayerView:
-    index: int = 0
+    id: str = ""
     name: str = ""
     hp: int = 0
     props: tuple = ()
@@ -222,12 +222,12 @@ class BotAction:
         return cls(type=cls.SHOOT_SELF, memory=memory or {})
 
     @classmethod
-    def shoot_other(cls, target: str, memory: dict | None = None):
-        return cls(type=cls.SHOOT_OTHER, target=target, memory=memory or {})
+    def shoot_other(cls, target: str | int = "", memory: dict | None = None):
+        return cls(type=cls.SHOOT_OTHER, target=str(target), memory=memory or {})
 
     @classmethod
-    def use_prop(cls, prop: str, target: str = "", memory: dict | None = None):
-        return cls(type=cls.USE_PROP, prop=prop, target=target, memory=memory or {})
+    def use_prop(cls, prop: str, target: str | int = "", memory: dict | None = None):
+        return cls(type=cls.USE_PROP, prop=prop, target=str(target), memory=memory or {})
 
     @classmethod
     def skip(cls, memory: dict | None = None):

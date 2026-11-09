@@ -85,7 +85,7 @@ class GameWork:
         return self.game["over"]
 
     @classmethod
-    def from_manager(cls, msg_manager):
+    def from_manager(cls, msg_manager) -> "GameWork":
         game = msg_manager.val["game"]
         data = game["data"]
         props = game["mode"]["props"]
@@ -113,7 +113,7 @@ class GameWork:
 
     def get_target(self, target=None):
         if not target:
-            target = self.shooter
+            target = self.order[(self.order.index(self.shooter) + 1) % len(self.order)]
         elif target not in self.order:
             target = int(target)
             if target > len(self.order) or target < 1:
@@ -124,10 +124,9 @@ class GameWork:
     def get_bot_state(self):
         shooter = self.shooter
         players = []
-        for idx, user_id in enumerate(self.players):
-            pl = self.players[user_id]
+        for user_id, pl in self.players.items():
             pv = PlayerView(
-                index=idx + 1,
+                id=user_id,
                 name=pl["name"],
                 hp=pl["hp"],
                 props=tuple(pl["props"]),
@@ -541,8 +540,6 @@ class GameWork:
         pl_shooter["actions"] -= consume_action
         if pl_shooter["actions"] < 1:
             self.switch()
-        if self.flag_bot:
-            MR.Core.comp.BotComp.action(self.msg_manager)
         return
 
     def switch(self):

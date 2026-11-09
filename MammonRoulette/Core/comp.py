@@ -138,40 +138,32 @@ class BotComp(Registerable):
     @classmethod
     def action(cls, msg_manager):
         game_work = MR.Core.work.GameWork.from_manager(msg_manager)
-        if game_work.flag_over:
-            return
-        shooter = game_work.shooter
-        bot_cls = cls.get(game_work.players[shooter]["bot_model"])
+        while not game_work.flag_over and game_work.flag_bot:
+            shooter = game_work.shooter
+            bot_cls = cls.get(game_work.players[shooter]["bot_model"])
 
-        state = game_work.get_bot_state()
-        memory = {}
-        while not game_work.flag_over:
-            if game_work.shooter != shooter:
-                return
-            game_work.tmp.clear()
-            action = bot_cls.decide(msg_manager, state)
-            memory.update(action.memory)
+            state = game_work.get_bot_state()
+            memory = {}
+            while not game_work.flag_over and game_work.shooter == shooter:
+                game_work.tmp.clear()
+                action = bot_cls.decide(msg_manager, state)
+                memory.update(action.memory)
 
-            if action.type == action.SHOOT_SELF:
-                game_work.shoot(shooter)
-                return
-            elif action.type == action.SHOOT_OTHER:
-                target = game_work.get_target(action.target)
-                if target:
-                    game_work.shoot(target)
-                return
-            elif action.type == action.USE_PROP:
-                target = game_work.get_target(action.target)
-                PropComp.use(msg_manager, action.prop, shooter, target)
-                state = game_work.get_bot_state()
-                for f, v in memory.items():
-                    if getattr(state, f) == -1 and v != -1:
-                        setattr(state, f, v)
+                if action.type == action.SHOOT_SELF:
+                    game_work.shoot(shooter)
+                    state = game_work.get_bot_state()
+                elif action.type == action.SHOOT_OTHER:
+                    target = game_work.get_target(action.target)
+                    if target:
+                        game_work.shoot(target)
+                    state = game_work.get_bot_state()
+                elif action.type == action.USE_PROP:
+                    target = game_work.get_target(action.target)
+                    PropComp.use(msg_manager, action.prop, shooter, target)
+                    state = game_work.get_bot_state()
+                    for f, v in memory.items():
+                        if getattr(state, f) == -1 and v != -1:
+                            setattr(state, f, v)
                 else:
                     break
-            else:
-                break
-
-        if game_work.flag_bot:
-            cls.action(msg_manager)
         return
