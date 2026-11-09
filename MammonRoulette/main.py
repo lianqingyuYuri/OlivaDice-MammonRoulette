@@ -29,8 +29,6 @@ class Event(object):
 
     def init_after(plugin_event, Proc):  # type: ignore
         MR.console.initConfig(Proc)
-        MR.console.readConfig(Proc)
-        MR.console.saveConfig(Proc)
         # region 初始化数据库
         with DataBase(MR.console.dbPath) as db:
             db.create(
@@ -84,7 +82,8 @@ class Event(object):
         PropComp.init_after()
         EffectComp.init_after()
         BotComp.load_all()
-
+        MR.console.readConfig(Proc)
+        MR.console.saveConfig(Proc)
         initCustom(MR, Proc)
         readCustom(MR, Proc)
         saveCustom(MR, Proc)
