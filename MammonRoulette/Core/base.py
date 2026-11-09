@@ -206,6 +206,7 @@ class BotAction:
     type: str = ""
     target: str = ""
     prop: str = ""
+    memory: dict = field(default_factory=dict)
 
     SHOOT_SELF = "shoot_self"
     SHOOT_OTHER = "shoot_other"
@@ -213,20 +214,20 @@ class BotAction:
     SKIP = "skip"
 
     @classmethod
-    def shoot_self(cls):
-        return cls(type=cls.SHOOT_SELF)
+    def shoot_self(cls, memory: dict | None = None):
+        return cls(type=cls.SHOOT_SELF, memory=memory or {})
 
     @classmethod
-    def shoot_other(cls, target: str):
-        return cls(type=cls.SHOOT_OTHER, target=target)
+    def shoot_other(cls, target: str, memory: dict | None = None):
+        return cls(type=cls.SHOOT_OTHER, target=target, memory=memory or {})
 
     @classmethod
-    def use_prop(cls, prop: str, target: str = ""):
-        return cls(type=cls.USE_PROP, prop=prop, target=target)
+    def use_prop(cls, prop: str, target: str = "", memory: dict | None = None):
+        return cls(type=cls.USE_PROP, prop=prop, target=target, memory=memory or {})
 
     @classmethod
-    def skip(cls):
-        return cls(type=cls.SKIP)
+    def skip(cls, memory: dict | None = None):
+        return cls(type=cls.SKIP, memory=memory or {})
 
 
 class BaseBot:
@@ -237,7 +238,7 @@ class BaseBot:
     modes_allowed: tuple = ()
 
     @classmethod
-    def decide(cls, state: BotGameState) -> tuple[BotAction, dict]:
+    def decide(cls, state: BotGameState) -> BotAction:
         raise NotImplementedError
 
     @classmethod

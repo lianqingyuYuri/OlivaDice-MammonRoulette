@@ -148,8 +148,8 @@ class BotComp(Registerable):
         while not game_work.flag_over:
             if game_work.shooter != shooter:
                 return
-            action, _mem = bot_cls.decide(state)
-            memory.update(_mem)
+            action = bot_cls.decide(state)
+            memory.update(action.memory)
 
             if action.type == action.SHOOT_SELF:
                 game_work.shoot(shooter)
