@@ -210,7 +210,7 @@ def match_game(plugin_event, Proc, msg_manager, groups):
                     "points": mode_cfg["points"],
                     "props": {
                         "pool": mode_cfg["props"]["pool"],
-                        "allow": mode_cfg["props"]["allow"],
+                        "allowed": mode_cfg["props"]["allowed"],
                         "ban": mode_cfg["props"]["ban"],
                         "limit": mode_cfg["props"]["limit"],
                     },

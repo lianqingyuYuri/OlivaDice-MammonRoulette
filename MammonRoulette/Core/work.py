@@ -64,7 +64,7 @@ class GameWork:
     props_event: list
 
     props_pool: list
-    props_allow: list
+    props_allowed: list
     props_ban: list
     props_limit: int
 
@@ -101,7 +101,7 @@ class GameWork:
             order=data["order"],
             props_event=data["props_event"],
             props_pool=props["pool"],
-            props_allow=props["allow"],
+            props_allowed=props["allowed"],
             props_ban=props["ban"],
             props_limit=props["limit"],
         )
@@ -319,7 +319,7 @@ class GameWork:
             return None
         elif prop in self.props_ban:
             prop = random.choice(self.props_pool)
-        elif not MR.Core.comp.PropComp.get(prop).allow_flag and prop not in self.props_allow:
+        elif not MR.Core.comp.PropComp.get(prop).allowed and prop not in self.props_allowed:
             prop = random.choice(self.props_pool)
         pl_props.append(prop)
         return prop

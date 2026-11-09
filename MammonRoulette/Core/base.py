@@ -24,7 +24,7 @@ class BaseMode:
 
     class props:
         pool: tuple = ()
-        allow: tuple = ()
+        allowed: tuple = ()
         ban: tuple = ()
         limit: int = 0
 
@@ -84,7 +84,7 @@ class BaseProp:
     name: str = ""
     strCustomDefault: dict = {}
     helpDocDefault: dict = {}
-    allow_flag: bool = True
+    allowed: bool = True
 
     @classmethod
     def init(cls):
@@ -137,8 +137,6 @@ class BaseEffect:
 
 
 # region bot
-
-
 @dataclass
 class PlayerView:
     index: int = 0
@@ -229,6 +227,9 @@ class BotAction:
 
 class BaseBot:
     name: str = ""
+    strCustomDefault: dict = {}
+    helpDocDefault: dict = {}
+    allowed: bool = True
 
     @classmethod
     def decide(cls, state: BotGameState) -> BotAction:

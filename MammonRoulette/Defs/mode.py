@@ -21,7 +21,7 @@ def generate_helpdoc(
     hp_str: str = "",
     props_limit: int | str = 0,
     props_pool: tuple = (),
-    props_allow: tuple = (),
+    props_allowed: tuple = (),
     props_ban: tuple = (),
     mechanisms: tuple = (),
 ) -> str:
@@ -34,8 +34,8 @@ def generate_helpdoc(
         lines.append(f"〈道具池〉(上限{props_limit})")
     if props_pool:
         lines.append(f"  {', '.join(props_pool)}")
-    if props_allow:
-        lines.append(f"-特殊道具-\n  {', '.join(props_allow)}")
+    if props_allowed:
+        lines.append(f"-特殊道具-\n  {', '.join(props_allowed)}")
     if props_ban:
         lines.append(f"-禁用道具-\n  {', '.join(props_ban)}")
     if mechanisms:
@@ -339,7 +339,7 @@ class 大富翁(ModeComp, BaseMode):
             hp_str="每名玩家 2hp.",
             props_limit="∞",
             props_pool=("锯子", "邀请函", "花生", "巧克力", "香烟", "放大镜", "扑克", "转盘", "牛奶"),
-            props_allow=("和你爆了",),
+            props_allowed=("和你爆了",),
             props_ban=("手铐", "口红", "止疼药", "红牛"),
             mechanisms=(
                 "游戏开始时, 所有玩家抽取 2 个道具",
@@ -361,7 +361,7 @@ class 大富翁(ModeComp, BaseMode):
 
     class props(BaseMode.props):
         pool = ("锯子", "邀请函", "花生", "巧克力", "香烟", "放大镜", "扑克", "转盘", "牛奶")
-        allow = ("和你爆了",)
+        allowed = ("和你爆了",)
         ban = ("手铐", "口红", "止疼药", "红牛")
         limit = 0
 

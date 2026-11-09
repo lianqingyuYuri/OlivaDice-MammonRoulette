@@ -608,7 +608,7 @@ class 和你爆了(PropComp, BaseProp):
         "strMrPropBoom_Dice": ("和你爆了道具 骰子点数", "{tGamblerName}擲出[{tDice}]."),
         "strMrPropBoom_1": ("和你爆了道具 使用成功", "骰聲迴響, {tAllGamblerDice}\n{tAllMaxDiceGambler}被炸飛了."),
     }
-    allow_flag = False
+    allowed = False
 
     @classmethod
     def apply(cls, msg_manager, target):
