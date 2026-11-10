@@ -141,7 +141,7 @@ class BotComp(Registerable):
         while not game_work.flag_over and game_work.flag_bot:
             shooter = game_work.shooter
             bot_cls = cls.get(game_work.players[shooter]["bot_model"])
-
+            bot_name = game_work.get_name(shooter)
             state = game_work.get_bot_state()
             memory = {}
             while not game_work.flag_over and game_work.shooter == shooter:
@@ -151,19 +151,30 @@ class BotComp(Registerable):
                 target = game_work.get_target(action.target)
 
                 if action.type == action.SHOOT_SELF:
-                    game_work.upsert_info(msg_manager.msg_format("strMrBotShootSelf", {"tBotName": bot_cls.name}))
+                    game_work.upsert_info(msg_manager.msg_format("strMrBotShootSelf", {"tBotName": bot_name}))
                     game_work.shoot(shooter)
                 elif action.type == action.SHOOT_OTHER:
                     game_work.upsert_info(
                         msg_manager.msg_format(
-                            "strMrBotShootOther", {"tBotName": bot_cls.name, "tTargetName": game_work.get_name(target)}
+                            "strMrBotShootOther", {"tBotName": bot_name, "tTargetName": game_work.get_name(target)}
                         )
                     )
                     game_work.shoot(target)
                 elif action.type == action.USE_PROP:
-                    game_work.upsert_info(
-                        msg_manager.msg_format("strMrBotUseProp", {"tBotName": bot_cls.name, "tPropName": action.prop})
-                    )
+                    if target == shooter:
+                        game_work.upsert_info(
+                            msg_manager.msg_format(
+                                "strMrBotUsePropToSelf",
+                                {"tBotName": bot_name, "tPropName": action.prop},
+                            )
+                        )
+                    else:
+                        game_work.upsert_info(
+                            msg_manager.msg_format(
+                                "strMrBotUsePropToOther",
+                                {"tBotName": bot_name, "tPropName": action.prop, "tTargetName": game_work.get_name(target)},
+                            )
+                        )
                     PropComp.use(msg_manager, action.prop, shooter, target)
                 else:
                     break

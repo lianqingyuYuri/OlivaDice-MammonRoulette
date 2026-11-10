@@ -121,10 +121,12 @@ dictStrCustomNote = {
     "strGameReplyInfo": "回复 显示游戏常规信息.",
     "strGameReplyBelow": "回复 显示游戏局势信息.",
     "strMrSituationResult": "【局势】指令 显示当前游戏局势.\n包括玩家数据、枪手、当前子弹、弹药、死亡玩家.",
+    "strMrBotMark": "BOT标记.",
     "strMrBotJoin": "【加入BOT】指令 BOT加入匹配对局时的显示.",
     "strMrBotShootSelf": "【BOT开枪】指令 BOT开枪时的显示.",
     "strMrBotShootOther": "【BOT受伤】指令 BOT受伤时的显示.",
-    "strMrBotUseProp": "【BOT使用道具】指令 BOT使用道具时的显示.",
+    "strMrBotUsePropToSelf": "【BOT使用道具】指令 BOT对自己使用道具时的显示.",
+    "strMrBotUsePropToOther": "【BOT使用道具】指令 BOT对目标使用道具时的显示.",
 }
 # 默认回复词
 dictStrCustomTemplate = {
@@ -187,10 +189,12 @@ dictStrCustomTemplate = {
         "strGameReplyInfo": "{tInfo}",
         "strGameReplyBelow": "▁▁▁▁▁▁▁▁▁▁▁▁▁▁{tShooter}{tGameAmmo}{tGameNowBullet}",
         "strMrSituationResult": "{tGamblerData}▁▁▁▁▁▁▁▁▁▁▁▁▁▁{tShooter}{tGameAmmo}{tGameNowBullet}{tGameDeadList}",
+        "strMrBotMark": "[BOT]",
         "strMrBotJoin": "{tBotName}降臨{tGameMode}对局[{tSeatsHas}/{tSeatsMax}].",
         "strMrBotShootSelf": "{tBotName}吞槍.",
         "strMrBotShootOther": "{tBotName}向{tTargetName}開槍.",
-        "strMrBotUseProp": "{tBotName}使用{tPropName}.",
+        "strMrBotUsePropToSelf": "{tBotName}使用{tPropName}.",
+        "strMrBotUsePropToOther": "{tBotName}对{tTargetName}使用{tPropName}.",
     }
 }
 
