@@ -227,7 +227,7 @@ class GameWork:
                         )
                     }
                 )
-            msg_reply = self.msg_manager.msg_format("strGameReplyInfo", t_value)
+            msg_reply = self.msg_manager.msg_format("strGameReplyInfo", t_value) if info else ""
             if not self.flag_over and (below["show_ammo"] or below["show_shooter"]):
                 msg_reply += "\n" + self.msg_manager.msg_format("strGameReplyBelow", t_value)
         else:
@@ -374,7 +374,7 @@ class GameWork:
         self.mode.join(self.msg_manager, user_id)
         return
 
-    def start(self):
+    def start(self, plungin_event):
         self.game["start"] = True
         self.game["expireTime"] = int(time.time()) // 60 + 120
         self.chamber()
@@ -386,6 +386,8 @@ class GameWork:
         self.reply.update({"info": [], "below": {"show_ammo": False, "show_shooter": False}, "override": ""})
         if self.flag_bot:
             MR.Core.comp.BotComp.action(self.msg_manager)
+            msg_reply = self.format_reply()
+            plungin_event.reply(msg_reply)
         return
 
     def chamber(self):

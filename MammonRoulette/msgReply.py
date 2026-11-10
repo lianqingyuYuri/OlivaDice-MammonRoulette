@@ -260,7 +260,7 @@ def match_game(plugin_event, Proc, msg_manager, groups):
     # region 检查人数
     seats = game["seats"]
     if len(order) >= seats:
-        game_work.start()
+        game_work.start(plugin_event)
         situation(plugin_event, Proc, msg_manager, None)
         msg_reply = game_work.format_reply()
     else:
@@ -291,7 +291,7 @@ def join_bot(plugin_event, Proc, msg_manager, groups):
     # endregion
     # region 检查人数
     if len(game_work.order) >= seats:
-        game_work.start()
+        game_work.start(plugin_event)
         situation(plugin_event, Proc, msg_manager, None)
     else:
         msg_reply = msg_manager.msg_format(
