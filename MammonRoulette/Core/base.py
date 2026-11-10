@@ -156,8 +156,10 @@ class PlayerView:
 
 @dataclass
 class BotGameState:
-    players: tuple = ()
     pl_self: PlayerView = field(default_factory=PlayerView)
+
+    players: tuple = ()
+    props_event: tuple = ()
 
     dmg: int = 1
 
@@ -169,9 +171,9 @@ class BotGameState:
     ammo_total: int = -1
     ammo_visible: bool = False
 
-    mode_name: str = ""
     player_count: int = 0
     alive_count: int = 0
+    mode_name: str = ""
 
     def to_vector(self) -> tuple:
         vec = [
@@ -202,6 +204,8 @@ class BotGameState:
                 vec.append(hash(prop) % 1000)
             for effect in pl.effects:
                 vec.extend([hash(effect[0]) % 1000, effect[1]])
+        for prop in self.props_event:
+            vec.extend([hash(prop.get("name", "")) % 1000, prop.get("stacks", 0), prop.get("user_id", "")])
         return tuple(vec)
 
 
