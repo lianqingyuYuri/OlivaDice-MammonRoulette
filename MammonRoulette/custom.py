@@ -41,8 +41,6 @@ dictTValue = {
     "tSeatsMax": "N/A",  # 最大座位数
     "tSeatsMin": "N/A",  # 最小座位数
     "tSeatsDef": "N/A",  # 默认座位数
-    # BOT相关
-    "tBotName": "N/A",  # BOT名称
     # 道具相关
     "tPropName": "",  # 道具名称
     "tPropCount": "N/A",  # 道具数量
@@ -69,6 +67,8 @@ dictTValue = {
     "tOldHp": "N/A",  # 玩家血量-受伤前
     "tNewHp": "N/A",  # 玩家血量-受伤后
     "tWinnerName": "",  # 胜利者名称
+    # BOT相关
+    "tBotName": "N/A",  # BOT名称
 }
 
 
@@ -93,7 +93,6 @@ dictStrCustomNote = {
     "strMrGameDismiss": "【退出】指令 退出游戏后, 对局解散.",
     "strMrGameRemain": "【退出】指令 退出游戏后的剩余人数显示.",
     "strMrGameExpired": "对局过期时的显示.",
-    "strMrBotJoin": "【加入AI】指令 AI加入匹配对局时的显示.",
     "strMrGameAmmoRanOut": "实弹耗尽, 重新装弹时的显示.",
     "strMrGameOver": "游戏结束时的显示.",
     "strMrGameTied": "游戏平局时的显示.",
@@ -122,6 +121,10 @@ dictStrCustomNote = {
     "strGameReplyInfo": "回复 显示游戏常规信息.",
     "strGameReplyBelow": "回复 显示游戏局势信息.",
     "strMrSituationResult": "【局势】指令 显示当前游戏局势.\n包括玩家数据、枪手、当前子弹、弹药、死亡玩家.",
+    "strMrBotJoin": "【加入BOT】指令 BOT加入匹配对局时的显示.",
+    "strMrBotShootSelf": "【BOT开枪】指令 BOT开枪时的显示.",
+    "strMrBotShootOther": "【BOT受伤】指令 BOT受伤时的显示.",
+    "strMrBotUseProp": "【BOT使用道具】指令 BOT使用道具时的显示.",
 }
 # 默认回复词
 dictStrCustomTemplate = {
@@ -156,7 +159,6 @@ dictStrCustomTemplate = {
         "strMrGameDismiss": "你已退出，对局解散.",
         "strMrGameRemain": "你已退出，剩余：{tSeatsHas}人.",
         "strMrGameExpired": "原{tGameMode}對局已過期, 自動解散.",
-        "strMrBotJoin": "{tBotName}降臨{tGameMode}对局[{tSeatsHas}/{tSeatsMax}].",
         "strMrGameAmmoRanOut": "彈藥耗盡，重新裝填中……",
         "strMrGameOver": "{tWinnerName}用鮮血爲這場生死對局畫上句號.",
         "strMrGameTied": "這場對局沒有贏家.",
@@ -185,6 +187,10 @@ dictStrCustomTemplate = {
         "strGameReplyInfo": "{tInfo}",
         "strGameReplyBelow": "▁▁▁▁▁▁▁▁▁▁▁▁▁▁{tShooter}{tGameAmmo}{tGameNowBullet}",
         "strMrSituationResult": "{tGamblerData}▁▁▁▁▁▁▁▁▁▁▁▁▁▁{tShooter}{tGameAmmo}{tGameNowBullet}{tGameDeadList}",
+        "strMrBotJoin": "{tBotName}降臨{tGameMode}对局[{tSeatsHas}/{tSeatsMax}].",
+        "strMrBotShootSelf": "{tBotName}吞槍.",
+        "strMrBotShootOther": "{tBotName}向{tTargetName}開槍.",
+        "strMrBotUseProp": "{tBotName}使用{tPropName}.",
     }
 }
 

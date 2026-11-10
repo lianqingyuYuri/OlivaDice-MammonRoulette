@@ -25,7 +25,7 @@ class 达尔文(BotComp, BaseBot):
     name = "达尔文"
 
     @classmethod
-    def decide(cls, msg_manager, state):
+    def decide(cls, msg_manager, state, memory):
         me = state.pl_self
         enemies = [pl for pl in state.players if not pl.is_self and not pl.is_dead]
         if not enemies:
@@ -45,7 +45,7 @@ class 达尔文(BotComp, BaseBot):
             prop_enemies = [e for e in enemies if e.props]
             if prop_enemies:
                 prop_enemy = min(prop_enemies, key=lambda p: p.hp)
-                return BotAction.use_prop("口红", str(prop_enemy.id))
+                return BotAction.use_prop("口红", prop_enemy.id)
         if "放大镜" in me.props and state.bullet == -1 and prop_can_use(msg_manager, "放大镜"):
             return BotAction.use_prop("放大镜")
         if "烟花" in me.props and pv_target.hp < 2 and me.hp >= 2 and prop_can_use(msg_manager, "烟花", pv_target):
@@ -54,7 +54,7 @@ class 达尔文(BotComp, BaseBot):
         if state.bullet_visible:
             if state.bullet == 1:
                 if "锯子" in me.props and prop_can_use(msg_manager, "锯子"):
-                    return BotAction.use_prop("锯子")
+                    return BotAction.use_prop("锯子", memory=memory)
             if state.bullet == 0:
                 if "扑克" in me.props and prop_can_use(msg_manager, "扑克"):
                     return BotAction.use_prop("扑克", memory={"bullet": 1, "bullet_visible": True})

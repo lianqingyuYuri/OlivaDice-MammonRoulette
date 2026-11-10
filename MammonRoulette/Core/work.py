@@ -357,7 +357,7 @@ class GameWork:
             with DataBase(console.dbPath) as db:
                 name = db.select("gambler", "name", "user_id = ?", user_id)[0][0]
         else:
-            name = bot_model
+            name = bot_model + str(random.randint(0, 9999))
         self.order.append(user_id)
         self.players[user_id] = {
             "name": name,

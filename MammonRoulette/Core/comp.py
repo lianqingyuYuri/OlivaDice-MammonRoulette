@@ -146,24 +146,28 @@ class BotComp(Registerable):
             memory = {}
             while not game_work.flag_over and game_work.shooter == shooter:
                 game_work.tmp.clear()
-                action = bot_cls.decide(msg_manager, state)
-                memory.update(action.memory)
+                action = bot_cls.decide(msg_manager, state, memory)
+                memory = action.memory
+                target = game_work.get_target(action.target)
 
                 if action.type == action.SHOOT_SELF:
+                    game_work.upsert_info(msg_manager.msg_format("strMrBotShootSelf", {"tBotName": bot_cls.name}))
                     game_work.shoot(shooter)
-                    state = game_work.get_bot_state()
                 elif action.type == action.SHOOT_OTHER:
-                    target = game_work.get_target(action.target)
-                    if target:
-                        game_work.shoot(target)
-                    state = game_work.get_bot_state()
+                    game_work.upsert_info(
+                        msg_manager.msg_format(
+                            "strMrBotShootOther", {"tBotName": bot_cls.name, "tTargetName": game_work.get_name(target)}
+                        )
+                    )
+                    game_work.shoot(target)
                 elif action.type == action.USE_PROP:
-                    target = game_work.get_target(action.target)
+                    game_work.upsert_info(
+                        msg_manager.msg_format("strMrBotUseProp", {"tBotName": bot_cls.name, "tPropName": action.prop})
+                    )
                     PropComp.use(msg_manager, action.prop, shooter, target)
-                    state = game_work.get_bot_state()
-                    for f, v in memory.items():
-                        if getattr(state, f) == -1 and v != -1:
-                            setattr(state, f, v)
                 else:
                     break
+                state = game_work.get_bot_state()
+                for f, v in memory.items():
+                    setattr(state, f, v)
         return
