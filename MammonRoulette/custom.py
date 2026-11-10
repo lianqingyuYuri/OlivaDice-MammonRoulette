@@ -191,10 +191,10 @@ dictStrCustomTemplate = {
         "strMrSituationResult": "{tGamblerData}▁▁▁▁▁▁▁▁▁▁▁▁▁▁{tShooter}{tGameAmmo}{tGameNowBullet}{tGameDeadList}",
         "strMrBotMark": "[BOT]",
         "strMrBotJoin": "{tBotName}降臨{tGameMode}对局[{tSeatsHas}/{tSeatsMax}].",
-        "strMrBotShootSelf": "{tBotName}吞槍.",
-        "strMrBotShootOther": "{tBotName}向{tTargetName}開槍.",
-        "strMrBotUsePropToSelf": "{tBotName}使用{tPropName}.",
-        "strMrBotUsePropToOther": "{tBotName}对{tTargetName}使用{tPropName}.",
+        "strMrBotShootSelf": "{tBotMark}{tBotName}吞槍.",
+        "strMrBotShootOther": "{tBotMark}{tBotName}向{tTargetName}開槍.",
+        "strMrBotUsePropToSelf": "{tBotMark}{tBotName}使用{tPropName}.",
+        "strMrBotUsePropToOther": "{tBotMark}{tBotName}对{tTargetName}使用{tPropName}.",
     }
 }
 
