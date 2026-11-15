@@ -149,7 +149,7 @@ class BotComp(Registerable):
                 game_work.tmp.clear()
                 action = bot_cls.decide(msg_manager, state, memory)
                 memory = action.memory
-                target = game_work.get_target(action.target)
+                target = game_work.get_target(action.target) if action.target else shooter
 
                 if action.type == action.SHOOT_SELF:
                     game_work.upsert_info(

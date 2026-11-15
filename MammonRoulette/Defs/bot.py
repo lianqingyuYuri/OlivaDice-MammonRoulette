@@ -47,20 +47,20 @@ class 达尔文(BotComp, BaseBot):
                 prop_enemy = min(prop_enemies, key=lambda p: p.hp)
                 return BotAction.use_prop("口红", prop_enemy.id)
         if "放大镜" in me.props and state.bullet == -1 and prop_can_use(msg_manager, "放大镜"):
-            return BotAction.use_prop("放大镜")
+            return BotAction.use_prop("放大镜", me.id)
         if "烟花" in me.props and pv_target.hp < 2 and me.hp >= 2 and prop_can_use(msg_manager, "烟花", pv_target):
-            return BotAction.use_prop("烟花")
+            return BotAction.use_prop("烟花", me.id)
 
         if state.bullet_visible:
             if state.bullet == 1:
                 if "锯子" in me.props and prop_can_use(msg_manager, "锯子"):
-                    return BotAction.use_prop("锯子", memory=memory)
+                    return BotAction.use_prop("锯子", me.id, memory=memory)
             if state.bullet == 0:
                 if "扑克" in me.props and prop_can_use(msg_manager, "扑克"):
-                    return BotAction.use_prop("扑克", memory={"bullet": 1, "bullet_visible": True})
+                    return BotAction.use_prop("扑克", me.id, memory={"bullet": 1, "bullet_visible": True})
                 for prop in ("巧克力", "花生", "香烟", "转盘"):
                     if prop in me.props and prop_can_use(msg_manager, prop):
-                        return BotAction.use_prop(prop)
+                        return BotAction.use_prop(prop, me.id)
                 return BotAction.shoot_self()
 
         return BotAction.shoot_other(pv_target.id)
