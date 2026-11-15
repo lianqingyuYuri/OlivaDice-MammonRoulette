@@ -211,7 +211,7 @@ def match_game(plugin_event, Proc, msg_manager, groups):
                     "props": {
                         "pool": mode_cfg["props"]["pool"],
                         "allowed": mode_cfg["props"]["allowed"],
-                        "ban": mode_cfg["props"]["ban"],
+                        "banned": mode_cfg["props"]["banned"],
                         "limit": mode_cfg["props"]["limit"],
                     },
                 },
@@ -226,7 +226,6 @@ def match_game(plugin_event, Proc, msg_manager, groups):
                         "dmg": mode_cfg["modify"]["dmg"],
                         "ammo_visible": bool(mode_cfg["modify"]["ammo_visible"]),
                         "bullet_visible": bool(mode_cfg["modify"]["bullet_visible"]),
-                        "flag_bot": False,
                     },
                     "props_event": [],
                 },

@@ -41,7 +41,7 @@ class ModeComp(Registerable):
                 "props": {
                     "pool": mode_cls.props.pool,
                     "allowed": mode_cls.props.allowed,
-                    "ban": mode_cls.props.ban,
+                    "banned": mode_cls.props.banned,
                     "limit": mode_cls.props.limit,
                 },
                 "modify": {
@@ -143,7 +143,7 @@ class BotComp(Registerable):
             shooter = game_work.shooter
             bot_cls = cls.get(game_work.players[shooter]["bot_model"])
             bot_name = game_work.get_name(shooter)
-            state = game_work.get_bot_state()
+            state = game_work.get_state()
             memory = {}
             while not game_work.flag_over and game_work.shooter == shooter:
                 game_work.tmp.clear()
@@ -187,7 +187,7 @@ class BotComp(Registerable):
                     PropComp.use(msg_manager, action.prop, shooter, target)
                 else:
                     break
-                state = game_work.get_bot_state()
+                state = game_work.get_state()
                 for f, v in memory.items():
                     setattr(state, f, v)
         return

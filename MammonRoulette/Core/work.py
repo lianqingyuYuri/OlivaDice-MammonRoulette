@@ -16,7 +16,7 @@ from dataclasses import dataclass
 
 from AmorLib import DataBase, MsgManager
 
-from .base import BaseMode, BotGameState, PlayerView
+from .base import BaseMode, GameState, PlayerView
 from .. import console
 
 
@@ -53,6 +53,11 @@ class GameWork:
     # region index
     msg_manager: MsgManager
     mode: BaseMode
+    props_pool: list
+    props_allowed: list
+    props_banned: list
+    props_limit: int
+
     game: dict
     data: dict
     reply: dict
@@ -63,25 +68,27 @@ class GameWork:
     order: list
     props_event: list
 
-    props_pool: list
-    props_allowed: list
-    props_banned: list
-    props_limit: int
+    shooter = data_mirror("shooter")  # 枪手
 
     ammo_live = data_mirror("ammo_live")  # 实弹数
     ammo_blank = data_mirror("ammo_blank")  # 空弹数
-    bullet = data_mirror("bullet")  # 当前子弹
-    shooter = data_mirror("shooter")  # 枪手
-    dmg = modify_mirror("dmg")  # 伤害
     ammo_visible = modify_mirror("ammo_visible")  # 显示弹药
+
+    bullet = data_mirror("bullet")  # 当前子弹
     bullet_visible = modify_mirror("bullet_visible")  # 显示子弹
 
+    dmg = modify_mirror("dmg")  # 伤害
+
     @property
-    def flag_bot(self) -> bool:  # 是否为AI玩家
+    def ammo_total(self) -> int:  # 总弹药数
+        return self.ammo_live + self.ammo_blank
+
+    @property
+    def flag_bot(self) -> bool:  # BOT标识
         return self.players[self.shooter]["bot_model"] is not None
 
     @property
-    def flag_over(self) -> bool:
+    def flag_over(self) -> bool:  # 游戏结束标识
         return self.game["over"]
 
     @classmethod
@@ -92,6 +99,10 @@ class GameWork:
         return cls(
             msg_manager=msg_manager,
             mode=MR.Core.comp.ModeComp.get(game["mode"]["name"]),
+            props_pool=props["pool"],
+            props_allowed=props["allowed"],
+            props_banned=props["banned"],
+            props_limit=props["limit"],
             game=game,
             data=data,
             reply=game["reply"],
@@ -100,10 +111,6 @@ class GameWork:
             players=data["players"],
             order=data["order"],
             props_event=data["props_event"],
-            props_pool=props["pool"],
-            props_allowed=props["allowed"],
-            props_banned=props["ban"],
-            props_limit=props["limit"],
         )
 
     def get_name(self, user_id: str | None = None) -> str:  # 获取玩家昵称
@@ -111,7 +118,7 @@ class GameWork:
             user_id = self.shooter
         return self.players[user_id]["name"]
 
-    def get_target(self, target=None):
+    def get_target(self, target=None):  # 获取目标ID
         if not target:
             target = self.order[(self.order.index(self.shooter) + 1) % len(self.order)]
         elif target not in self.order:
@@ -121,45 +128,46 @@ class GameWork:
             target = self.order[target - 1]
         return target
 
-    def get_bot_state(self):
-        shooter = self.shooter
-        players = []
+    def get_state(self):  # 获取状态切片
+        t_players = []
         for user_id, pl in self.players.items():
             pv = PlayerView(
                 id=user_id,
                 name=pl["name"],
                 hp=pl["hp"],
+                actions=pl["actions"],
                 props=tuple(pl["props"]),
                 effects=tuple((name, data["stacks"]) for name, data in pl["effects_event"].items()),
-                actions=pl["actions"],
-                is_self=(user_id == shooter),
-                is_shooter=(user_id == shooter),
+                is_shooter=(user_id == self.shooter),
                 is_dead=(user_id not in self.order),
             )
-            players.append(pv)
-            if user_id == shooter:
+            t_players.append(pv)
+            if user_id == self.shooter:
                 pl_self = pv
         bullet_visible = self.bullet_visible or self.ammo_visible and self.ammo_blank == 0
-        return BotGameState(
+        return GameState(
             pl_self=pl_self,
-            players=tuple(players),
+            # 模式参数
+            mode_name=self.mode.name,
+            props_pool=tuple(self.props_pool),
+            props_allowed=tuple(self.props_allowed),
+            props_banned=tuple(self.props_banned),
+            props_limit=self.props_limit,
+            players=tuple(t_players),
             props_event=tuple(self.props_event),
-            dmg=self.dmg,
-            bullet=(1 if self.bullet else 0) if bullet_visible else -1,
-            bullet_visible=bullet_visible,
+            # 状态参数
+            shooter=self.shooter,
+            order=tuple(self.order),
+            player_count=len(self.players),
+            alive_count=len(self.order),
             ammo_live=self.ammo_live if self.ammo_visible else -1,
             ammo_blank=self.ammo_blank if self.ammo_visible else -1,
             ammo_total=(self.ammo_live + self.ammo_blank) if self.ammo_visible else -1,
             ammo_visible=self.ammo_visible,
-            player_count=len(self.players),
-            alive_count=len(self.order),
-            mode_name=self.game["mode"]["name"],
+            bullet=(1 if self.bullet else 0) if bullet_visible else -1,
+            bullet_visible=bullet_visible,
+            dmg=self.dmg,
         )
-
-    def get_other_players(self, shooter: str = "") -> list:
-        if not shooter:
-            shooter = self.shooter
-        return [uid for uid in self.order if uid != shooter]
 
     # endregion
     # region reply

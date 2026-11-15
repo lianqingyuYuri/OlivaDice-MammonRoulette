@@ -25,7 +25,7 @@ class BaseMode:
     class props:
         pool: tuple = ()
         allowed: tuple = ()
-        ban: tuple = ()
+        banned: tuple = ()
         limit: int = 0
 
     class modify:
@@ -146,34 +146,42 @@ class PlayerView:
     id: str = ""
     name: str = ""
     hp: int = 0
+    actions: int = 0
+
     props: tuple = ()
     effects: tuple = ()
-    actions: int = 0
-    is_self: bool = False
+
     is_shooter: bool = False
     is_dead: bool = False
 
 
 @dataclass
-class BotGameState:
+class GameState:
     pl_self: PlayerView = field(default_factory=PlayerView)
+
+    # 模式参数
+    mode_name: str = ""
+    props_pool: tuple = ()
+    props_allowed: tuple = ()
+    props_banned: tuple = ()
+    props_limit: int = 0
 
     players: tuple = ()
     props_event: tuple = ()
 
-    dmg: int = 1
-
-    bullet: int = -1
-    bullet_visible: bool = True
+    # 状态参数
+    shooter: str = ""
+    order: tuple = ()
+    player_count: int = 0
+    alive_count: int = 0
 
     ammo_live: int = -1
     ammo_blank: int = -1
     ammo_total: int = -1
     ammo_visible: bool = False
-
-    player_count: int = 0
-    alive_count: int = 0
-    mode_name: str = ""
+    bullet: int = -1
+    bullet_visible: bool = True
+    dmg: int = 1
 
     def to_vector(self) -> tuple:
         vec = [
@@ -246,7 +254,7 @@ class BaseBot:
     modes_allowed: tuple = ()
 
     @classmethod
-    def decide(cls, msg_manager, state: BotGameState, memory: dict) -> BotAction:
+    def decide(cls, msg_manager, state: GameState, memory: dict) -> BotAction:
         raise NotImplementedError
 
     @classmethod

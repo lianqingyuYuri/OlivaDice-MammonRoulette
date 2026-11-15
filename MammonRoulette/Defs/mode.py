@@ -362,7 +362,7 @@ class 大富翁(ModeComp, BaseMode):
     class props(BaseMode.props):
         pool = ("锯子", "邀请函", "花生", "巧克力", "香烟", "放大镜", "扑克", "转盘", "牛奶")
         allowed = ("和你爆了",)
-        ban = ("手铐", "口红", "止疼药", "红牛")
+        banned = ("手铐", "口红", "止疼药", "红牛")
         limit = 0
 
     @classmethod

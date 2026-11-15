@@ -10,7 +10,7 @@ game = {
         "props": {
             "pool": [],  # 道具池
             "allowed": [],  # 道具白名单
-            "ban": [],  # 道具黑名单
+            "banned": [],  # 道具黑名单
             "limit": int,  # 持有道具上限
         },
     },
@@ -38,7 +38,6 @@ game = {
             "dmg": int,  # 伤害
             "ammo_visible": bool,  # 显示弹药
             "bullet_visible": bool,  # 显示子弹
-            "flag_bot": bool,  # AI旗帜
         },
         "props_event": [],  # 道具事件
     },
