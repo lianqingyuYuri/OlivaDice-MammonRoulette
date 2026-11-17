@@ -13,7 +13,7 @@ from ..Core.comp import BotComp, PropComp
 from ..Core.work import GameWork
 
 
-def prop_can_use(msg_manager, prop_name, target=None):
+def prop_can_use(msg_manager, prop_name, target: str | None = None):
     game_work = GameWork.from_manager(msg_manager)
     if target is None:
         target = game_work.shooter
@@ -26,7 +26,7 @@ class 达尔文(BotComp, BaseBot):
 
     @classmethod
     def decide(cls, msg_manager, state, memory):
-        me = state.pl_self
+        me: PlayerView = state.pl_self
         enemies = [pl for pl in state.players if not pl.is_self and not pl.is_dead]
         if not enemies:
             return BotAction.skip()
@@ -34,24 +34,19 @@ class 达尔文(BotComp, BaseBot):
 
         if "手铐" in me.props and prop_can_use(msg_manager, "手铐", pv_target.id):
             return BotAction.use_prop("手铐", pv_target.id)
-        if "红牛" in me.props and prop_can_use(msg_manager, "红牛", me.id):
-            return BotAction.use_prop("红牛", me.id)
-        if "牛奶" in me.props and prop_can_use(msg_manager, "牛奶", me.id):
-            return BotAction.use_prop("牛奶", me.id)
-        if "止疼药" in me.props and prop_can_use(msg_manager, "止疼药", me.id):
-            return BotAction.use_prop("止疼药", me.id)
+        for prop in ("红牛", "牛奶", "止疼药"):
+            if prop in me.props and prop_can_use(msg_manager, prop):
+                return BotAction.use_prop(prop, me.id)
 
-        if "口红" in me.props and prop_can_use(msg_manager, "口红"):
+        if "口红" in me.props and prop_can_use(msg_manager, "口红", pv_target.id):
             prop_enemies = [e for e in enemies if e.props]
             if prop_enemies:
                 prop_enemy = min(prop_enemies, key=lambda p: p.hp)
                 return BotAction.use_prop("口红", prop_enemy.id)
-        if "放大镜" in me.props and state.bullet == -1 and prop_can_use(msg_manager, "放大镜"):
-            return BotAction.use_prop("放大镜", me.id)
-        if "烟花" in me.props and pv_target.hp < 2 and me.hp >= 2 and prop_can_use(msg_manager, "烟花", pv_target):
+        if "烟花" in me.props and me.hp >= 2 and prop_can_use(msg_manager, "烟花", pv_target.id):
             return BotAction.use_prop("烟花", me.id)
 
-        if state.bullet_visible:
+        if state.bullet_visible:  # 子弹可见
             if state.bullet == 1:
                 if "锯子" in me.props and prop_can_use(msg_manager, "锯子"):
                     return BotAction.use_prop("锯子", me.id, memory=memory)
@@ -62,5 +57,17 @@ class 达尔文(BotComp, BaseBot):
                     if prop in me.props and prop_can_use(msg_manager, prop):
                         return BotAction.use_prop(prop, me.id)
                 return BotAction.shoot_self()
+        else:  # 子弹不可见
+            if "放大镜" in me.props and prop_can_use(msg_manager, "放大镜"):
+                return BotAction.use_prop("放大镜", me.id)
+            if (
+                "邀请函" in me.props and prop_can_use(msg_manager, "邀请函") and len(me.props) + 2 <= state.props_limit
+            ):  # 道具栏未满
+                return BotAction.use_prop("邀请函", me.id)
+
+        if len(me.props) + 2 >= state.props_limit:  # 道具栏快满
+            for prop in ("巧克力", "花生", "香烟", "转盘"):
+                if prop in me.props and prop_can_use(msg_manager, prop):
+                    return BotAction.use_prop(prop, me.id)
 
         return BotAction.shoot_other(pv_target.id)
