@@ -16,14 +16,9 @@ from AmorLib import IniConfig, releaseDir
 
 from .custom import dictModeCustom, dictPropCustom, dictEffectCustom
 
-MammonRoulette_name = "恶魔轮盘"
-MammonRoulette_ver = "2.18.0-alpha"
-MammonRoulette_svn = 58
-MammonRoulette_ver_short = "%s(%s)" % (str(MammonRoulette_ver), str(MammonRoulette_svn))
-
 debug = 0
 
-dataDirRoot = "plugin/data/MammonRoulette/data"
+dataDirRoot = "plugin/data/MammonRoulette"
 configPath = "plugin/data/MammonRoulette/config.ini"
 
 dbPath = "plugin/data/MammonRoulette/Roulette.db"

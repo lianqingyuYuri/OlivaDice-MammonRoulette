@@ -8,12 +8,17 @@
 @Desc      :    None
 """
 
+MammonRoulette_name = "恶魔轮盘"
+MammonRoulette_ver = "2.18.1"
+MammonRoulette_svn = 58
+MammonRoulette_ver_short = "%s(%s)" % (str(MammonRoulette_ver), str(MammonRoulette_svn))
+
 from . import Core
 from . import Defs
 
 from . import main
 from . import custom
-from . import console
+from . import config
 from . import msgReply
 
 from AmorLib import has_NativeGUI
