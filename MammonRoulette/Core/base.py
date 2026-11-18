@@ -9,6 +9,16 @@
 """
 
 from dataclasses import dataclass, field
+from enum import Enum
+
+
+class Moment(str, Enum):
+    RELOAD = "reload"
+    SHOOT = "shoot"
+    DAMAGE = "damage"
+    DEAD = "dead"
+    DONE = "done"
+    SWITCH = "switch"
 
 
 class BaseMode:
@@ -101,17 +111,17 @@ class BaseProp:
 
     # 回调
     @classmethod
-    def callback(cls, msg_manager, moment, prop_data=None) -> bool | None:
+    def on_moment(cls, msg_manager, moment, prop_data=None):
         pass
 
     # 卸载
     @classmethod
-    def unapply(cls, msg_manager, prop_data=None) -> bool | None:
+    def on_unregister(cls, msg_manager, prop_data=None):
         pass
 
     # 持久化
     @classmethod
-    def persist(cls, msg_manager, prop_data=None) -> bool | None:
+    def sustain(cls, msg_manager, prop_data=None):
         pass
 
 
@@ -126,17 +136,17 @@ class BaseEffect:
 
     # 应用
     @classmethod
-    def apply(cls, msg_manager, target, stacks) -> bool | None:
+    def apply(cls, msg_manager, target, stacks):
         return False
 
     # 回调
     @classmethod
-    def callback(cls, msg_manager, moment, target, effect_data) -> bool | None:
+    def on_moment(cls, msg_manager, moment, target, effect_data):
         pass
 
     # 卸载
     @classmethod
-    def unapply(cls, msg_manager) -> bool | None:
+    def on_unregister(cls, msg_manager):
         pass
 
 

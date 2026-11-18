@@ -9,8 +9,8 @@
 """
 
 MammonRoulette_name = "恶魔轮盘"
-MammonRoulette_ver = "2.18.1"
-MammonRoulette_svn = 58
+MammonRoulette_ver = "2.18.2"
+MammonRoulette_svn = 60
 MammonRoulette_ver_short = "%s(%s)" % (str(MammonRoulette_ver), str(MammonRoulette_svn))
 
 from . import Core

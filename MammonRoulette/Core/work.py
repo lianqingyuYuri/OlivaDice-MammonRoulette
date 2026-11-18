@@ -16,7 +16,7 @@ from dataclasses import dataclass
 
 from AmorLib import DataBase, MsgManager
 
-from .base import BaseMode, GameState, PlayerView
+from .base import BaseMode, GameState, PlayerView, Moment
 from .. import config
 
 
@@ -263,20 +263,22 @@ class GameWork:
     def get_effect_data(self, target: str, effect_name: str):
         return self.players[target]["effects_event"].get(effect_name)
 
-    def create_props_event(self, prop_data):
+    def register_prop_event(self, prop_data: dict):
         if self.props_event:
             prop_id = max(item["id"] for item in self.props_event) + 1
         else:
             prop_id = 1
         prop_data["id"] = prop_id
+        prop_data.setdefault("expired", False)
         self.props_event.append(prop_data)
         return
 
-    def create_effects_event(self, target: str, effect_name: str, effect_data: dict):
+    def register_effect_event(self, target: str, effect_name: str, effect_data: dict):
+        effect_data.setdefault("expired", False)
         self.players[target]["effects_event"][effect_name] = effect_data
         return
 
-    def remove_props_event(self, prop_id: int | None = None, prop_name: str | None = None):
+    def unregister_prop_event(self, prop_id: int | None = None, prop_name: str | None = None):
         if not prop_id and not prop_name:
             return
         if prop_id:
@@ -287,32 +289,37 @@ class GameWork:
             search_key = "name"
         for prop_data in reversed(self.props_event):
             if prop_data[search_key] == search:
-                MR.Core.comp.PropComp.uninstall(self.msg_manager, prop_data["name"], prop_data)
+                MR.Core.comp.PropComp.get(prop_data["name"]).on_unregister(self.msg_manager, prop_data)
                 self.props_event.remove(prop_data)
         return
 
-    def remove_effects_event(self, effect_name, target, stacks: int = 0):
+    def unregister_effect_event(self, effect_name, target, stacks: int = 0):
         effects_event = self.players[target]["effects_event"]
         if effect_name in effects_event:
             effect_data = effects_event[effect_name]
             effect_data["stacks"] -= stacks
             if effect_data["stacks"] <= 0 or stacks == 0:
-                MR.Core.comp.EffectComp.uninstall(self.msg_manager, effect_name)
+                MR.Core.comp.EffectComp.get(effect_name).on_unregister(self.msg_manager)
                 del effects_event[effect_name]
         return
 
-    def handle_event(self, moment, **kwargs):
+    def handle_event(self, moment: Moment, **kwargs):
         self.tmp.update(kwargs)
-        for prop_data in reversed(self.props_event):
-            if MR.Core.comp.PropComp.trigger(self.msg_manager, prop_data["name"], moment, prop_data):
-                self.remove_props_event(prop_data["id"])
         for prop_data in self.props_event:
-            MR.Core.comp.PropComp.sustain(self.msg_manager, prop_data["name"], prop_data)
+            MR.Core.comp.PropComp.get(prop_data["name"]).on_moment(self.msg_manager, moment, prop_data)
+        for prop_data in self.props_event:
+            MR.Core.comp.PropComp.get(prop_data["name"]).sustain(self.msg_manager, prop_data)
+        for prop_data in list(self.props_event):
+            if prop_data.get("expired", False):
+                self.unregister_prop_event(prop_data["id"])
         for target in self.players:
             effects_event = self.players[target]["effects_event"]
-            for effect in list(effects_event.keys()):
-                if MR.Core.comp.EffectComp.trigger(self.msg_manager, effect, moment, target, effects_event[effect]):
-                    self.remove_effects_event(effect, target, 0)
+            effects_event_list = list(effects_event.keys())
+            for effect_name in effects_event_list:
+                MR.Core.comp.EffectComp.get(effect_name).on_moment(self.msg_manager, moment, target, effects_event[effect_name])
+            for effect_name in effects_event_list:
+                if effects_event[effect_name].get("expired", False):
+                    self.unregister_effect_event(effect_name, target, 0)
         MR.Core.comp.ModeComp.trigger(self.msg_manager, moment)
         return
 
@@ -415,14 +422,14 @@ class GameWork:
         ammo_live, ammo_blank = random.randint(1, 4), random.randint(1, 4)
         self.data["ammo_live"], self.data["ammo_blank"] = ammo_live, ammo_blank
         self.upsert_info(self.msg_manager.msg_format("strMrGameAmmoRanOut"))
-        self.handle_event("reload")
+        self.handle_event(Moment.RELOAD)
         self.reply["below"]["show_ammo"] = True
         return ammo_live, ammo_blank
 
     def shoot(self, target):
         source = self.shooter
         self.handle_event(
-            "shoot",
+            Moment.SHOOT,
             target=target,
             source=self.tmp.get("source", source),
             is_shoot_me=self.tmp.get("is_shoot_me", target == source),
@@ -483,7 +490,7 @@ class GameWork:
         if self.flag_over:
             return
         self.handle_event(
-            "damage",
+            Moment.DAMAGE,
             target=target,
             source=source,
             is_attack_me=self.tmp.get("is_attack_me", target == source),
@@ -535,7 +542,11 @@ class GameWork:
             self.switch()
         self.order.remove(target)
         self.handle_event(
-            "dead", target=target, source=source, is_attack_me=is_attack_me, is_check_over=self.tmp.get("is_check_over", True)
+            Moment.DEAD,
+            target=target,
+            source=source,
+            is_attack_me=is_attack_me,
+            is_check_over=self.tmp.get("is_check_over", True),
         )
         is_check_over = self.tmp["is_check_over"]
         if is_check_over:
@@ -545,7 +556,7 @@ class GameWork:
     def done(self):
         if self.flag_over:
             return
-        self.handle_event("done", consume_action=self.tmp.get("consume_action", 0))
+        self.handle_event(Moment.DONE, consume_action=self.tmp.get("consume_action", 0))
         consume_action = self.tmp["consume_action"]
         pl_shooter = self.players[self.shooter]
         pl_shooter["actions"] -= consume_action
@@ -564,7 +575,7 @@ class GameWork:
         if self.shooter != shooter:
             self.shooter = shooter
             self.reply["below"]["show_shooter"] = True
-            self.handle_event("switch", shooter=shooter)
+            self.handle_event(Moment.SWITCH, shooter=shooter)
         return
 
     def try_over(self):

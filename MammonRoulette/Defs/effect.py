@@ -21,15 +21,15 @@ class 束缚(EffectComp, BaseEffect):
     def apply(cls, msg_manager, target, stacks):
         game_work = GameWork.from_manager(msg_manager)
         effect_data = {"stacks": 1}
-        game_work.create_effects_event(target, cls.name, effect_data)
+        game_work.register_effect_event(target, cls.name, effect_data)
         return True
 
     @classmethod
-    def callback(cls, msg_manager, moment, target, effect_data):
+    def on_moment(cls, msg_manager, moment, target, effect_data):
         game_work = GameWork.from_manager(msg_manager)
         if moment != "switch" or target != game_work.shooter:
-            return False
-        return True
+            return
+        effect_data["expired"] = True
 
 
 class 神经麻痹(EffectComp, BaseEffect):
@@ -46,12 +46,8 @@ class 神经麻痹(EffectComp, BaseEffect):
         game_work = GameWork.from_manager(msg_manager)
         pl_target = game_work.players[target]
         if cls.name not in pl_target["effects_event"]:
-            expired = False if target == game_work.shooter else True
-            pl_target["effects_event"][cls.name] = {
-                "stacks": 0,
-                "data": [],
-                "expired": expired,
-            }
+            settle_due = False if target == game_work.shooter else True
+            game_work.register_effect_event(target, cls.name, {"stacks": 0, "data": [], "settle_due": settle_due})
         effect_data = pl_target["effects_event"][cls.name]
         if stacks > 0:
             effect_data["stacks"] += stacks
@@ -59,24 +55,24 @@ class 神经麻痹(EffectComp, BaseEffect):
         return True
 
     @classmethod
-    def callback(cls, msg_manager, moment, target, effect_data):
+    def on_moment(cls, msg_manager, moment, target, effect_data):
         game_work = GameWork.from_manager(msg_manager)
         pl_target = game_work.players[target]
         if moment == "damage" and target == game_work.tmp["target"] and game_work.tmp["dmg_type"] == "":
             old_stacks = effect_data["stacks"]
             dmg, game_work.tmp["dmg"] = game_work.tmp["dmg"], 0
-            EffectComp.give(msg_manager, cls.name, target, dmg)
+            EffectComp.get(cls.name).apply(msg_manager, target, dmg)
             msg_reply = msg_manager.msg_format(
                 "strMrEffectPain_1",
                 {"tGamblerName": game_work.get_name(target), "old_stacks": old_stacks, "new_stacks": old_stacks + dmg},
             )
             game_work.upsert_info(msg_reply)
-            return False
+            return
         elif moment == "done" and target == game_work.shooter:
             effect_data = pl_target["effects_event"][cls.name]
-            if not effect_data["expired"]:
-                effect_data["expired"] = True
-                return False
+            if not effect_data["settle_due"]:
+                effect_data["settle_due"] = True
+                return
             game_work.tmp["dmg_type"] = cls.name
             game_work.tmp["is_check_over"] = False
             old_hp = pl_target["hp"]
@@ -91,4 +87,4 @@ class 神经麻痹(EffectComp, BaseEffect):
                 else:
                     msg_reply = msg_manager.msg_format("strMrEffectPain_3", {"tGamblerName": pl_target["name"]})
                 game_work.upsert_info(msg_reply)
-            return True
+            effect_data["expired"] = True

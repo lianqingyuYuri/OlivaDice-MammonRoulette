@@ -80,7 +80,12 @@ remove_effects_event = "remove"
 prop_data = {
     "id": str,  # 道具id
     "name": str,  # 道具名称
+    "expired": bool,  # 过期
     "data": {},  # 道具数据
 }
 key = "effect"
-effect_data = {"stacks": int, "data": {}}
+effect_data = {
+    "stacks": int,  # 层数
+    "expired": bool,  # 过期
+    "data": {},  # 效果数据
+}

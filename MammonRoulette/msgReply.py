@@ -380,7 +380,7 @@ def use_prop(plugin_event, Proc, msg_manager, groups):
     elif not (target := game_work.get_target(target)):
         return
     # 使用道具
-    PropComp.use(msg_manager, prop, user_id, target)
+    PropComp.apply(msg_manager, prop, user_id, target)
     msg_reply = game_work.format_reply()
     plugin_event.reply(msg_reply)
     return

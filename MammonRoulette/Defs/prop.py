@@ -52,7 +52,7 @@ class 手铐(PropComp, BaseProp):
                 },
             )
             game_work.upsert_info(msg_reply)
-            EffectComp.give(msg_manager, "束缚", target)
+            EffectComp.get("束缚").apply(msg_manager, target, 1)
             return True
         msg_reply = msg_manager.msg_format("strMrPropHandcuffs_2", {"tGamblerName": pl_target["name"]})
         game_work.upsert_info(msg_reply)
@@ -81,19 +81,19 @@ class 锯子(PropComp, BaseProp):
             msg_reply = msg_manager.msg_format("strMrPropSaw_1")
             game_work.upsert_info(msg_reply)
             prop_data = {"name": cls.name}
-            game_work.create_props_event(prop_data)
+            game_work.register_prop_event(prop_data)
             return True
         msg_reply = msg_manager.msg_format("strMrPropSaw_2")
         game_work.upsert_info(msg_reply)
         return False
 
     @classmethod
-    def callback(cls, msg_manager, moment, prop_data):
+    def on_moment(cls, msg_manager, moment, prop_data):
         if moment != "shoot":
-            return False
+            return
         game_work = GameWork.from_manager(msg_manager)
         game_work.tmp["dmg"] += 1
-        return True
+        prop_data["expired"] = True
 
 
 class 邀请函(PropComp, BaseProp):
@@ -260,21 +260,20 @@ class 放大镜(PropComp, BaseProp):
             msg_reply = msg_manager.msg_format("strMrPropMagnifier_1", t_value)
             game_work.upsert_info(msg_reply)
             prop_data = {"name": cls.name}
-            cls.persist(msg_manager, prop_data)
-            game_work.create_props_event(prop_data)
+            cls.sustain(msg_manager, prop_data)
+            game_work.register_prop_event(prop_data)
             return True
         msg_reply = msg_manager.msg_format("strMrPropMagnifier_2")
         game_work.upsert_info(msg_reply)
         return False
 
     @classmethod
-    def callback(cls, msg_manager, moment, prop_data):
+    def on_moment(cls, msg_manager, moment, prop_data):
         if moment == "shoot":
-            return True
-        return False
+            prop_data["expired"] = True
 
     @classmethod
-    def unapply(cls, msg_manager, prop_data):
+    def on_unregister(cls, msg_manager, prop_data):
         game_work = GameWork.from_manager(msg_manager)
         bot_hash = msg_manager.bot_hash
         modf_cfg = dictModeCustom[bot_hash][game_work.game["mode"]["name"]]
@@ -283,11 +282,10 @@ class 放大镜(PropComp, BaseProp):
         return
 
     @classmethod
-    def persist(cls, msg_manager, prop_data):
+    def sustain(cls, msg_manager, prop_data):
         game_work = GameWork.from_manager(msg_manager)
         game_work.ammo_visible = True
         game_work.bullet_visible = True
-        return True
 
 
 class 口红(PropComp, BaseProp):
@@ -361,7 +359,7 @@ class 扑克(PropComp, BaseProp):
         game_work.upsert_info(msg_reply)
         prop_data = {"name": cls.name}
         if not game_work.get_prop_data(prop_name=cls.name):
-            game_work.create_props_event(prop_data)
+            game_work.register_prop_event(prop_data)
         if game_work.bullet:
             game_work.ammo_blank += 1
             game_work.ammo_live -= 1
@@ -369,17 +367,16 @@ class 扑克(PropComp, BaseProp):
             game_work.ammo_blank -= 1
             game_work.ammo_live += 1
         game_work.bullet = not game_work.bullet
-        cls.persist(msg_manager, prop_data)
+        cls.sustain(msg_manager, prop_data)
         return True
 
     @classmethod
-    def callback(cls, msg_manager, moment, prop_data):
+    def on_moment(cls, msg_manager, moment, prop_data):
         if moment in ["shoot", "reload"]:
-            return True
-        return False
+            prop_data["expired"] = True
 
     @classmethod
-    def unapply(cls, msg_manager, prop_data):
+    def on_unregister(cls, msg_manager, prop_data):
         game_work = GameWork.from_manager(msg_manager)
         bot_hash = msg_manager.bot_hash
         modf_cfg = dictModeCustom[bot_hash][game_work.game["mode"]["name"]]
@@ -390,7 +387,7 @@ class 扑克(PropComp, BaseProp):
         return
 
     @classmethod
-    def persist(cls, msg_manager, prop_data):
+    def sustain(cls, msg_manager, prop_data):
         game_work = GameWork.from_manager(msg_manager)
         game_work.ammo_visible = False
         game_work.bullet_visible = False
@@ -426,7 +423,7 @@ class 转盘(PropComp, BaseProp):
         for clear_prop in cls.clear_prop:
             prop_data = game_work.get_prop_data(prop_name=clear_prop)
             if prop_data:
-                game_work.remove_props_event(prop_data[0]["id"])
+                game_work.unregister_prop_event(prop_data[0]["id"])
         game_work.reply["below"]["show_ammo"] = True
         return True
 
@@ -519,7 +516,7 @@ class 金币(PropComp, BaseProp):
                 msg_reply = msg_manager.msg_format("strMrPropGold_2", t_value)
             game_work.upsert_info(msg_reply)
             if prop in cls.direct_use:
-                PropComp.use(msg_manager, prop, user_id, user_id)
+                PropComp.apply(msg_manager, prop, user_id, user_id)
             msg_reply = game_work.format_reply()
             plugin_event.reply(msg_reply)
             return
@@ -561,7 +558,7 @@ class 止疼药(PropComp, BaseProp):
                 },
             )
         game_work.upsert_info(msg_reply)
-        EffectComp.give(msg_manager, "神经麻痹", target, 0)
+        EffectComp.get("神经麻痹").apply(msg_manager, target, 0)
         return True
 
 
@@ -580,7 +577,7 @@ class 烟花(PropComp, BaseProp):
         msg_reply = msg_manager.msg_format("strMrPropFirework_1", {"tGamblerName": game_work.get_name(target)})
         game_work.upsert_info(msg_reply)
         prop_data = {"name": cls.name, "data": {"reactivation": 0, "draws": 1}}
-        game_work.create_props_event(prop_data)
+        game_work.register_prop_event(prop_data)
         game_work.tmp["is_check_over"] = False
         order_before = game_work.order.copy()
         for pl in order_before:
@@ -591,7 +588,7 @@ class 烟花(PropComp, BaseProp):
                 game_work.damage(pl, 1, game_work.shooter)
                 game_work.tmp[f"{pl}_new_hp"] = game_work.tmp["new_hp"]
         cls.explosion(msg_manager, order_before)
-        game_work.remove_props_event(prop_name=cls.name)
+        game_work.unregister_prop_event(prop_name=cls.name)
         situation = [
             f"{game_work.get_name(pl)}[hp {game_work.tmp[f'{pl}_old_hp']}->{game_work.tmp[f'{pl}_new_hp']}]."
             for pl in order_before
@@ -606,14 +603,13 @@ class 烟花(PropComp, BaseProp):
         return True
 
     @classmethod
-    def callback(cls, msg_manager, moment, prop_data):
+    def on_moment(cls, msg_manager, moment, prop_data):
         if moment != "dead":
-            return False
+            return
         game_work = GameWork.from_manager(msg_manager)
         current_data = game_work.get_prop_data(prop_name=cls.name)[0]
         current_data["data"]["reactivation"] += 1
         current_data["data"]["draws"] += 1
-        return False
 
     @classmethod
     def explosion(cls, msg_manager, order_before):

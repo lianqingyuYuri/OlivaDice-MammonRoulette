@@ -77,21 +77,9 @@ class PropComp(Registerable):
         return
 
     @classmethod
-    def use(cls, msg_manager, prop, user_id, target):
+    def apply(cls, msg_manager, prop, user_id, target):
         if cls.get(prop).apply(msg_manager, target):
             MR.Core.work.GameWork.from_manager(msg_manager).remove_prop(user_id, prop)
-
-    @classmethod
-    def trigger(cls, msg_manager, prop, moment, prop_data):
-        return cls.get(prop).callback(msg_manager, moment, prop_data)
-
-    @classmethod
-    def uninstall(cls, msg_manager, prop, prop_data):
-        return cls.get(prop).unapply(msg_manager, prop_data)
-
-    @classmethod
-    def sustain(cls, msg_manager, prop, prop_data):
-        return cls.get(prop).persist(msg_manager, prop_data)
 
 
 class EffectComp(Registerable):
@@ -108,18 +96,6 @@ class EffectComp(Registerable):
                 dictStrCustomNote[field] = note
                 dictStrCustomTemplate["default"][field] = msg
         return
-
-    @classmethod
-    def give(cls, msg_manager, effect, target, stacks: int = 1):
-        return cls.get(effect).apply(msg_manager, target, stacks)
-
-    @classmethod
-    def trigger(cls, msg_manager, effect, moment, target, effect_data):
-        return cls.get(effect).callback(msg_manager, moment, target, effect_data)
-
-    @classmethod
-    def uninstall(cls, msg_manager, effect):
-        return cls.get(effect).unapply(msg_manager)
 
 
 class BotComp(Registerable):
@@ -184,7 +160,7 @@ class BotComp(Registerable):
                                 },
                             )
                         )
-                    PropComp.use(msg_manager, action.prop, shooter, target)
+                    PropComp.apply(msg_manager, action.prop, shooter, target)
                 else:
                     break
                 state = game_work.get_state()
