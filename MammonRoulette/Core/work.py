@@ -8,16 +8,16 @@
 @Desc      :    None
 """
 
-import MammonRoulette as MR
-
-import time
 import random
+import time
 from dataclasses import dataclass
 
 from AmorLib import DataBase, MsgManager
 
-from .base import BaseMode, GameState, PlayerView, Moment
+import MammonRoulette as MR
+
 from .. import config
+from .base import BaseMode, GameState, Moment, PlayerView
 
 
 def data_mirror(key):
@@ -329,9 +329,7 @@ class GameWork:
         pl_props = self.players[user_id]["props"]
         if self.props_limit > 0 and len(pl_props) >= self.props_limit:
             return None
-        elif prop in self.props_banned:
-            prop = random.choice(self.props_pool)
-        elif not MR.Core.comp.PropComp.get(prop).allowed and prop not in self.props_allowed:
+        elif prop in self.props_banned or not MR.Core.comp.PropComp.get(prop).allowed and prop not in self.props_allowed:
             prop = random.choice(self.props_pool)
         pl_props.append(prop)
         return prop
@@ -596,7 +594,7 @@ class GameWork:
     def over(self):
         self.game["over"] = True
         with DataBase(config.dbPath) as db:
-            for pl in self.players.keys():
+            for pl in self.players:
                 pl_target = self.players[pl]
                 mult = pl_target["points_mult"] + pl_target["kills"]
                 if pl not in self.order:

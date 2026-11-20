@@ -8,16 +8,15 @@
 @Desc      :    None
 """
 
-import MammonRoulette as MR
-import OlivaDiceCore
-
-
 import json
 import os
 
-from AmorLib import DataBase, FsmRouter, MsgManager, initCustom, readCustom, saveCustom, loadCustomInto, is_windows, has_NativeGUI
+import OlivaDiceCore
+from AmorLib import DataBase, FsmRouter, MsgManager, has_NativeGUI, initCustom, is_windows, loadCustomInto, readCustom, saveCustom
 
-from .Core.comp import ModeComp, PropComp, EffectComp, BotComp
+import MammonRoulette as MR
+
+from .Core.comp import BotComp, EffectComp, ModeComp, PropComp
 
 COMMON_CMD = ("priv", "ob", "prep", "play")
 game_data = {}
@@ -204,7 +203,7 @@ def unity_reply(plugin_event, Proc, msg_manager):
     msg_manager.val["state"] = state
     # region poke操作
     msg = ""
-    if not plugin_event.plugin_info["func_type"] == "poke":
+    if plugin_event.plugin_info["func_type"] != "poke":
         msg = msg_manager.msg
     else:
         target_id = plugin_event.data.target_id

@@ -14,7 +14,7 @@ import os
 
 from AmorLib import IniConfig, releaseDir
 
-from .custom import dictModeCustom, dictPropCustom, dictEffectCustom
+from .custom import dictEffectCustom, dictModeCustom, dictPropCustom
 
 debug = 0
 

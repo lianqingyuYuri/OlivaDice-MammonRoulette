@@ -8,19 +8,19 @@
 @Desc      :    None
 """
 
+from AmorLib import Registerable
+
 import MammonRoulette as MR
 
-from .base import BaseMode, BaseProp, BaseEffect
 from ..custom import (
-    dictStrCustomNote,
-    dictStrCustomTemplate,
+    dictEffectCustom,
     dictHelpDocTemplate,
     dictModeCustom,
     dictPropCustom,
-    dictEffectCustom,
+    dictStrCustomNote,
+    dictStrCustomTemplate,
 )
-
-from AmorLib import Registerable
+from .base import BaseEffect, BaseMode, BaseProp
 
 
 class ModeComp(Registerable):
@@ -103,12 +103,12 @@ class BotComp(Registerable):
 
     @classmethod
     def load_all(cls):
-        for _name, bot_cls in cls._register.items():
+        for bot_cls in cls._register.values():
             bot_cls.load()
 
     @classmethod
     def save_all(cls):
-        for _name, bot_cls in cls._register.items():
+        for bot_cls in cls._register.values():
             bot_cls.save()
 
     @classmethod

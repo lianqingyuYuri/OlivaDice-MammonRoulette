@@ -15,10 +15,10 @@ from collections import Counter
 from AmorLib import DataBase
 
 from . import config
-from .main import commands, COMMON_CMD
-from .custom import dictHelpDocTemplate, dictModeCustom
-from .Core.comp import ModeComp, PropComp, BotComp
+from .Core.comp import BotComp, ModeComp, PropComp
 from .Core.work import GameWork
+from .custom import dictHelpDocTemplate, dictModeCustom
+from .main import COMMON_CMD, commands
 
 commands_helpdoc = []
 
@@ -77,7 +77,7 @@ def card(plugin_event, Proc, msg_manager, groups):
         gambler_ranking = db.select("gambler", "COUNT(*)", "points > ?", gambler_info["points"])[0][0]
     wins, losses = int(gambler_info["wins"]), int(gambler_info["losses"])
     total = wins + losses
-    win_rate = f"{ round(wins/total*100 ,2) } %" if total > 0 else "未參與過輪盤"
+    win_rate = f"{round(wins / total * 100, 2)} %" if total > 0 else "未參與過輪盤"
     msg_reply = msg_manager.msg_format(
         "strMrCardHas",
         {
@@ -161,7 +161,7 @@ def match_game(plugin_event, Proc, msg_manager, groups):
     with DataBase(config.dbPath) as db:
         gambler_info = db.select("gambler", "user_id", "user_id = ?", user_id)
     if not gambler_info:
-        name = f"{random.choice(poker['suits'])+random.choice(poker['ranks'])}"
+        name = f"{random.choice(poker['suits']) + random.choice(poker['ranks'])}"
         signed(plugin_event, Proc, msg_manager, (name,))
     # endregion
     # region 读取模式数据
@@ -361,7 +361,7 @@ commands_helpdoc.append("[使用,留空](道具名)(目标) //对目标使用道
 
 @commands.route("play", f"^(?:使用|) *({'|'.join(PropComp.list())}) *(\\d*)$")
 def use_prop(plugin_event, Proc, msg_manager, groups):
-    user_id, game = msg_manager.user_id, msg_manager.val["game"]
+    user_id = msg_manager.user_id
     game_work = GameWork.from_manager(msg_manager)
     # 检查是否是玩家回合
     if user_id != game_work.shooter:

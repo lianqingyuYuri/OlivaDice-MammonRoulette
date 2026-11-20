@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+# ruff: isort: skip_file
 """
 @File      :    MammonRoulette/Core/__init__.py
 @Author    :    lianqingyuYuri恋倾雨

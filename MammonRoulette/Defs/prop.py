@@ -11,11 +11,11 @@
 import random
 import string
 
-from ..main import commands
-from ..custom import dictHelpDocTemplate, dictModeCustom
 from ..Core.base import BaseProp
-from ..Core.comp import ModeComp, PropComp, EffectComp
+from ..Core.comp import EffectComp, PropComp
 from ..Core.work import GameWork
+from ..custom import dictHelpDocTemplate, dictModeCustom
+from ..main import commands
 
 
 # region 道具
@@ -31,9 +31,7 @@ class 手铐(PropComp, BaseProp):
     @classmethod
     def can_use(cls, msg_manager, target):
         game_work = GameWork.from_manager(msg_manager)
-        if game_work.get_effect_data(target, "束缚"):
-            return False
-        return True
+        return not game_work.get_effect_data(target, "束缚")
 
     @classmethod
     def apply(cls, msg_manager, target):
@@ -70,9 +68,7 @@ class 锯子(PropComp, BaseProp):
     @classmethod
     def can_use(cls, msg_manager, target):
         game_work = GameWork.from_manager(msg_manager)
-        if game_work.get_prop_data(prop_name=cls.name):
-            return False
-        return True
+        return not game_work.get_prop_data(prop_name=cls.name)
 
     @classmethod
     def apply(cls, msg_manager, target):
@@ -245,9 +241,7 @@ class 放大镜(PropComp, BaseProp):
     @classmethod
     def can_use(cls, msg_manager, target):
         game_work = GameWork.from_manager(msg_manager)
-        if game_work.get_prop_data(prop_name=cls.name):
-            return False
-        return True
+        return not game_work.get_prop_data(prop_name=cls.name)
 
     @classmethod
     def apply(cls, msg_manager, target):

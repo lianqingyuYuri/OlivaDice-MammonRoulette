@@ -8,7 +8,7 @@
 @Desc      :    Bot 定义 - 在此注册所有 Bot 子类
 """
 
-from ..Core.base import BaseBot, PlayerView, GameState, BotAction
+from ..Core.base import BaseBot, BotAction, GameState, PlayerView
 from ..Core.comp import BotComp, PropComp
 from ..Core.work import GameWork
 
@@ -25,7 +25,7 @@ class 达尔文(BotComp, BaseBot):
     name = "达尔文"
 
     @classmethod
-    def decide(cls, msg_manager, state, memory):
+    def decide(cls, msg_manager, state: GameState, memory):
         me: PlayerView = state.pl_self
         enemies = [pl for pl in state.players if not pl.is_self and not pl.is_dead]
         if not enemies:

@@ -46,7 +46,7 @@ class 神经麻痹(EffectComp, BaseEffect):
         game_work = GameWork.from_manager(msg_manager)
         pl_target = game_work.players[target]
         if cls.name not in pl_target["effects_event"]:
-            settle_due = False if target == game_work.shooter else True
+            settle_due = target != game_work.shooter
             game_work.register_effect_event(target, cls.name, {"stacks": 0, "data": [], "settle_due": settle_due})
         effect_data = pl_target["effects_event"][cls.name]
         if stacks > 0:

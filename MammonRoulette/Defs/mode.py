@@ -10,7 +10,6 @@
 
 import random
 
-from ..custom import dictModeCustom, dictDefsNote
 from ..Core.base import BaseMode
 from ..Core.comp import ModeComp
 from ..Core.work import GameWork
