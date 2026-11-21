@@ -48,45 +48,45 @@ class BaseMode:
         pass
 
     @classmethod
-    def start(cls, msg_manager):
+    def start(cls, msg_event):
         pass
 
     @classmethod
-    def join(cls, msg_manager, user_id):
+    def join(cls, msg_event, user_id):
         pass
 
     @classmethod
-    def try_over(cls, msg_manager) -> bool:
+    def try_over(cls, msg_event) -> bool:
         return False
 
     # 装弹
     @classmethod
-    def reload(cls, msg_manager):
+    def reload(cls, msg_event):
         pass
 
     # 开枪
     @classmethod
-    def shoot(cls, msg_manager):
+    def shoot(cls, msg_event):
         pass
 
     # 受伤
     @classmethod
-    def damage(cls, msg_manager):
+    def damage(cls, msg_event):
         pass
 
     # 死亡
     @classmethod
-    def dead(cls, msg_manager):
+    def dead(cls, msg_event):
         pass
 
     # 回合结束
     @classmethod
-    def done(cls, msg_manager):
+    def done(cls, msg_event):
         pass
 
     # 换人
     @classmethod
-    def switch(cls, msg_manager):
+    def switch(cls, msg_event):
         pass
 
 
@@ -101,27 +101,27 @@ class BaseProp:
         pass
 
     @classmethod
-    def can_use(cls, msg_manager, target) -> bool:
+    def can_use(cls, msg_event, target) -> bool:
         return True
 
     # 使用
     @classmethod
-    def apply(cls, msg_manager, target) -> bool | None:
+    def apply(cls, msg_event, target) -> bool | None:
         return False
 
     # 回调
     @classmethod
-    def on_moment(cls, msg_manager, moment, prop_data=None):
+    def on_moment(cls, msg_event, moment, prop_data=None):
         pass
 
     # 卸载
     @classmethod
-    def on_unregister(cls, msg_manager, prop_data=None):
+    def on_unregister(cls, msg_event, prop_data=None):
         pass
 
     # 持久化
     @classmethod
-    def sustain(cls, msg_manager, prop_data=None):
+    def sustain(cls, msg_event, prop_data=None):
         pass
 
 
@@ -136,17 +136,17 @@ class BaseEffect:
 
     # 应用
     @classmethod
-    def apply(cls, msg_manager, target, stacks):
+    def apply(cls, msg_event, target, stacks):
         return False
 
     # 回调
     @classmethod
-    def on_moment(cls, msg_manager, moment, target, effect_data):
+    def on_moment(cls, msg_event, moment, target, effect_data):
         pass
 
     # 卸载
     @classmethod
-    def on_unregister(cls, msg_manager):
+    def on_unregister(cls, msg_event):
         pass
 
 
@@ -264,7 +264,7 @@ class BaseBot:
     modes_allowed: tuple = ()
 
     @classmethod
-    def decide(cls, msg_manager, state: GameState, memory: dict) -> BotAction:
+    def decide(cls, msg_event, state: GameState, memory: dict) -> BotAction:
         raise NotImplementedError
 
     @classmethod

@@ -10,5 +10,6 @@
 """
 
 from . import base
+from . import event
 from . import comp
 from . import work

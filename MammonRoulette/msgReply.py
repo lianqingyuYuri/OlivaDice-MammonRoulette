@@ -14,15 +14,14 @@ from collections import Counter
 
 from AmorLib import DataBase
 
-from . import config
+from . import command, config
 from .Core.comp import BotComp, ModeComp, PropComp
 from .Core.work import GameWork
-from .custom import dictHelpDocTemplate, dictModeCustom
-from .main import COMMON_CMD, commands
-
-commands_helpdoc = []
+from .custom import dictModeCustom
 
 # --------
+
+COMMON_CMD = ("priv", "ob", "prep", "play")
 poker = {
     "suits": ("方片♦️", "梅花♣️", "红桃♥️", "黑桃♠️"),
     "ranks": ("A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"),
@@ -30,13 +29,10 @@ poker = {
 
 
 # region 资料
-commands_helpdoc.append("(名称)签署[生死状,契约] //注册角色或修改名称.")
-
-
-@commands.route(COMMON_CMD, "^(.+)(?:签署|簽署)(?:生死状|契约|生死狀|契約)$")
-def signed(plugin_event, Proc, msg_manager, groups):
+@command(COMMON_CMD, "^(.+)(?:签署|簽署)(?:生死状|契约|生死狀|契約)$", "(名称)签署[生死状,契约] //注册角色或修改名称.")
+def signed(plugin_event, Proc, msg_event, groups):
     name = groups[0]
-    user_id = msg_manager.user_id
+    user_id = msg_event.user_id
     with DataBase(config.dbPath) as db:
         gambler_info = db.select("gambler", "user_id", "user_id = ?", user_id)
         if gambler_info:
@@ -55,22 +51,19 @@ def signed(plugin_event, Proc, msg_manager, groups):
                     "losses": 0,
                 },
             )
-    msg_reply = msg_manager.msg_format("strMrSignedResult", {"tGamblerName": name})
+    msg_reply = msg_event.msg_format("strMrSignedResult", {"tGamblerName": name})
     plugin_event.reply(msg_reply)
     return
 
 
-commands_helpdoc.append("恶魔名片(数值,留空) //查看自己或他人的资料.")
-
-
-@commands.route(COMMON_CMD, "^[惡恶]魔名片(\\d*)$")
-def card(plugin_event, Proc, msg_manager, groups):
-    user_id = msg_manager.user_id
+@command(COMMON_CMD, "^[惡恶]魔名片(\\d*)$", "恶魔名片(数值,留空) //查看自己或他人的资料.")
+def card(plugin_event, Proc, msg_event, groups):
+    user_id = msg_event.user_id
     target = groups[0] if groups[0] != "" else user_id
     with DataBase(config.dbPath) as db:
         gambler_info = db.select("gambler", "*", "user_id = ?", target)
         if not gambler_info:
-            msg_reply = msg_manager.msg_format("strMrCardNone")
+            msg_reply = msg_event.msg_format("strMrCardNone")
             plugin_event.reply(msg_reply)
             return
         gambler_info = gambler_info[0]
@@ -78,7 +71,7 @@ def card(plugin_event, Proc, msg_manager, groups):
     wins, losses = int(gambler_info["wins"]), int(gambler_info["losses"])
     total = wins + losses
     win_rate = f"{round(wins / total * 100, 2)} %" if total > 0 else "未參與過輪盤"
-    msg_reply = msg_manager.msg_format(
+    msg_reply = msg_event.msg_format(
         "strMrCardHas",
         {
             "tGamblerName": gambler_info["name"],
@@ -96,11 +89,12 @@ def card(plugin_event, Proc, msg_manager, groups):
     return
 
 
-commands_helpdoc.append("恶魔(赏金,杀戮,自杀,投降,留空)[排行,榜] //查询排行, 留空默认查询赏金榜单.")
-
-
-@commands.route(COMMON_CMD, "^[恶惡]魔(赏金|杀戮|自杀|投降|)(?:排行|榜)(\\d*)$")
-def leaderboard(plugin_event, Proc, msg_manager, groups):
+@command(
+    COMMON_CMD,
+    "^[恶惡]魔(赏金|杀戮|自杀|投降|)(?:排行|榜)(\\d*)$",
+    "恶魔(赏金,杀戮,自杀,投降,留空)[排行,榜] //查询排行, 留空默认查询赏金榜单.",
+)
+def leaderboard(plugin_event, Proc, msg_event, groups):
     ranking_page = int(groups[1] or 1) * 10 - 10
     ranking_type = groups[0]
     if ranking_type == "赏金":
@@ -125,7 +119,7 @@ def leaderboard(plugin_event, Proc, msg_manager, groups):
             return
         gambler_total = db.select("gambler", "COUNT(*)")
     top_list = "\n".join(
-        msg_manager.msg_format(
+        msg_event.msg_format(
             "strMrGamblerRankNode",
             {
                 "tGamblerRanking": idx + ranking_page + 1,
@@ -135,7 +129,7 @@ def leaderboard(plugin_event, Proc, msg_manager, groups):
         )
         for idx, gambler_info in enumerate(gambler_list)
     )
-    msg_reply = msg_manager.msg_format(
+    msg_reply = msg_event.msg_format(
         "strMrLeaderboardResult",
         {
             "tLeaderboardType": ranking_type,
@@ -151,22 +145,23 @@ def leaderboard(plugin_event, Proc, msg_manager, groups):
 
 # endregion
 # region 房间操作
-commands_helpdoc.append("(模式名)[匹配,对局] //以默认人数匹配对局, 满人自动开启\n(模式名)匹配(数值)p //以自定义人数匹配对局.")
-
-
-@commands.route("ob", f"^({'|'.join(ModeComp.list())})(?:匹配|对局)(?:(\\d+)p)?$")
-def match_game(plugin_event, Proc, msg_manager, groups):
-    user_id, game = msg_manager.user_id, msg_manager.val["game"]
+@command(
+    "ob",
+    f"^({'|'.join(ModeComp.list())})(?:匹配|对局)(?:(\\d+)p)?$",
+    "(模式名)[匹配,对局] //以默认人数匹配对局, 满人自动开启\n(模式名)匹配(数值)p //以自定义人数匹配对局.",
+)
+def match_game(plugin_event, Proc, msg_event, groups):
+    user_id, game = msg_event.user_id, msg_event.val["game"]
     # region 自动注册
     with DataBase(config.dbPath) as db:
         gambler_info = db.select("gambler", "user_id", "user_id = ?", user_id)
     if not gambler_info:
         name = f"{random.choice(poker['suits']) + random.choice(poker['ranks'])}"
-        signed(plugin_event, Proc, msg_manager, (name,))
+        signed(plugin_event, Proc, msg_event, (name,))
     # endregion
     # region 读取模式数据
     mode_name, seats = groups[0], groups[1]
-    bot_hash = msg_manager.bot_hash
+    bot_hash = msg_event.bot_hash
     mode_cfg = dictModeCustom[bot_hash][mode_name]
     seats_min, seats_max, seats_def = (
         mode_cfg["seats"]["min"],
@@ -175,7 +170,7 @@ def match_game(plugin_event, Proc, msg_manager, groups):
     )
     seats = int(seats) if seats else seats_def
     if not (seats_min <= seats <= seats_max):
-        msg_reply = msg_manager.msg_format(
+        msg_reply = msg_event.msg_format(
             "strMrGameSeatsError",
             {
                 "tGameMode": mode_name,
@@ -192,7 +187,7 @@ def match_game(plugin_event, Proc, msg_manager, groups):
     expireTime = int(time.time()) // 60
     if expireTime > game.get("expireTime", 0):
         if game_start:
-            msg_reply = msg_manager.msg_format("strMrGameExpired", {"tGameMode": game["mode"]["name"]})
+            msg_reply = msg_event.msg_format("strMrGameExpired", {"tGameMode": game["mode"]["name"]})
             plugin_event.reply(msg_reply)
         game.clear()
     # endregion
@@ -241,18 +236,18 @@ def match_game(plugin_event, Proc, msg_manager, groups):
             }
         )
     elif game_start:
-        msg_reply = msg_manager.msg_format("strMrGameStarted")
+        msg_reply = msg_event.msg_format("strMrGameStarted")
         plugin_event.reply(msg_reply)
         return
     elif mode_name != game["mode"]["name"]:
-        msg_reply = msg_manager.msg_format("strMrGameModeError", {"tGameMode": game["mode"]["name"]})
+        msg_reply = msg_event.msg_format("strMrGameModeError", {"tGameMode": game["mode"]["name"]})
         plugin_event.reply(msg_reply)
         return
     # endregion
     data = game["data"]
     order = data["order"]
     # region 添加玩家
-    game_work = GameWork.from_manager(msg_manager)
+    game_work = GameWork.from_manager(msg_event)
     if user_id not in order:
         game_work.join(user_id)
     # endregion
@@ -260,24 +255,21 @@ def match_game(plugin_event, Proc, msg_manager, groups):
     seats = game["seats"]
     if len(order) >= seats:
         game_work.start(plugin_event)
-        situation(plugin_event, Proc, msg_manager, None)
+        situation(plugin_event, Proc, msg_event, None)
         msg_reply = game_work.format_reply()
     else:
-        msg_reply = msg_manager.msg_format("strMrGamePrep", {"tGameMode": mode_name, "tSeatsHas": len(order), "tSeatsMax": seats})
+        msg_reply = msg_event.msg_format("strMrGamePrep", {"tGameMode": mode_name, "tSeatsHas": len(order), "tSeatsMax": seats})
     plugin_event.reply(msg_reply)
     return
     # endregion
 
 
-commands_helpdoc.append("[召唤,添加,加入](BOT名)//对局添加一名BOT.")
-
-
-@commands.route("prep", f"^(?:召唤|添加|加入)({'|'.join(BotComp.list())})$")
-def join_bot(plugin_event, Proc, msg_manager, groups):
-    game = msg_manager.val["game"]
+@command("prep", f"^(?:召唤|添加|加入)({'|'.join(BotComp.list())})$", "[召唤,添加,加入](BOT名)//对局添加一名BOT.")
+def join_bot(plugin_event, Proc, msg_event, groups):
+    game = msg_event.val["game"]
     if not game or game["start"]:
         return
-    game_work = GameWork.from_manager(msg_manager)
+    game_work = GameWork.from_manager(msg_event)
     seats = game["seats"]
     mode_name = game["mode"]["name"]
     bot_name = groups[0]
@@ -291,9 +283,9 @@ def join_bot(plugin_event, Proc, msg_manager, groups):
     # region 检查人数
     if len(game_work.order) >= seats:
         game_work.start(plugin_event)
-        situation(plugin_event, Proc, msg_manager, None)
+        situation(plugin_event, Proc, msg_event, None)
     else:
-        msg_reply = msg_manager.msg_format(
+        msg_reply = msg_event.msg_format(
             "strMrBotJoin", {"tBotName": bot_name, "tGameMode": mode_name, "tSeatsHas": len(game_work.order), "tSeatsMax": seats}
         )
         plugin_event.reply(msg_reply)
@@ -301,49 +293,40 @@ def join_bot(plugin_event, Proc, msg_manager, groups):
     # endregion
 
 
-commands_helpdoc.append("[加入,进入] //加入正在匹配的对局.")
-
-
-@commands.route("ob", "^(?:加入|进入)$")
-def join_game(plugin_event, Proc, msg_manager, groups):
-    game = msg_manager.val["game"]
+@command("ob", "^(?:加入|进入)$", "[加入,进入] //加入正在匹配的对局.")
+def join_game(plugin_event, Proc, msg_event, groups):
+    game = msg_event.val["game"]
     if not game or game["start"]:
         return
     mode_name = game["mode"]["name"]
-    match_game(plugin_event, Proc, msg_manager, (mode_name, ""))
+    match_game(plugin_event, Proc, msg_event, (mode_name, ""))
     return
 
 
-commands_helpdoc.append("[退出,离开] //退出匹配.")
-
-
-@commands.route("prep", "^(?:退出|离开)$")
-def exit_game(plugin_event, Proc, msg_manager, groups):
-    user_id, game = msg_manager.user_id, msg_manager.val["game"]
+@command("prep", "^(?:退出|离开)$", "[退出,离开] //退出匹配.")
+def exit_game(plugin_event, Proc, msg_event, groups):
+    user_id, game = msg_event.user_id, msg_event.val["game"]
     data = game["data"]
     order = data["order"]
     order.remove(user_id)
     del data["players"][user_id]
     if not order:
         game.clear()
-        msg_reply = msg_manager.msg_format("strMrGameDismiss")
+        msg_reply = msg_event.msg_format("strMrGameDismiss")
     else:
-        msg_reply = msg_manager.msg_format("strMrGameRemain", {"tSeatsHas": len(order)})
+        msg_reply = msg_event.msg_format("strMrGameRemain", {"tSeatsHas": len(order)})
     plugin_event.reply(msg_reply)
     return
 
 
 # endregion
 # region 对局操作
-commands_helpdoc.append("[吞,开]枪(目标) //对目标射击, 可用qq号或序号指定目标, 留空默认下一顺位.")
-
-
-@commands.route("play", "^(吞|开|開)[槍|枪] *(\\d*)$")
-def shoot(plugin_event, Proc, msg_manager, groups):
-    user_id = msg_manager.user_id
-    game_work = GameWork.from_manager(msg_manager)
+@command("play", "^(吞|开|開)[槍|枪] *(\\d*)$", "[吞,开]枪(目标) //对目标射击, 可用qq号或序号指定目标, 留空默认下一顺位.")
+def shoot(plugin_event, Proc, msg_event, groups):
+    user_id = msg_event.user_id
+    game_work = GameWork.from_manager(msg_event)
     if user_id != game_work.shooter:
-        msg_reply = msg_manager.msg_format("strMrGamblerTurn", {"tGamblerName": game_work.get_name(game_work.shooter)})
+        msg_reply = msg_event.msg_format("strMrGamblerTurn", {"tGamblerName": game_work.get_name(game_work.shooter)})
         plugin_event.reply(msg_reply)
         return
     if groups[0] == "吞":
@@ -356,22 +339,23 @@ def shoot(plugin_event, Proc, msg_manager, groups):
     return
 
 
-commands_helpdoc.append("[使用,留空](道具名)(目标) //对目标使用道具, 可用qq号或序号指定目标.")
-
-
-@commands.route("play", f"^(?:使用|) *({'|'.join(PropComp.list())}) *(\\d*)$")
-def use_prop(plugin_event, Proc, msg_manager, groups):
-    user_id = msg_manager.user_id
-    game_work = GameWork.from_manager(msg_manager)
+@command(
+    "play",
+    f"^(?:使用|) *({'|'.join(PropComp.list())}) *(\\d*)$",
+    "[使用,留空](道具名)(目标) //对目标使用道具, 可用qq号或序号指定目标.",
+)
+def use_prop(plugin_event, Proc, msg_event, groups):
+    user_id = msg_event.user_id
+    game_work = GameWork.from_manager(msg_event)
     # 检查是否是玩家回合
     if user_id != game_work.shooter:
-        msg_reply = msg_manager.msg_format("strMrGamblerTurn", {"tGamblerName": game_work.get_name()})
+        msg_reply = msg_event.msg_format("strMrGamblerTurn", {"tGamblerName": game_work.get_name()})
         plugin_event.reply(msg_reply)
         return
     prop, target = groups[0], groups[1]
     # 检查是否持有道具
     if prop not in game_work.players[user_id]["props"]:
-        msg_reply = msg_manager.msg_format("strMrGamblerPropNone", {"tPropName": prop})
+        msg_reply = msg_event.msg_format("strMrGamblerPropNone", {"tPropName": prop})
         plugin_event.reply(msg_reply)
         return
     # 确认目标
@@ -380,39 +364,33 @@ def use_prop(plugin_event, Proc, msg_manager, groups):
     elif not (target := game_work.get_target(target)):
         return
     # 使用道具
-    PropComp.apply(msg_manager, prop, user_id, target)
+    PropComp.apply(msg_event, prop, user_id, target)
     msg_reply = game_work.format_reply()
     plugin_event.reply(msg_reply)
     return
 
 
-commands_helpdoc.append("投降 //以自杀的形式结束.")
-
-
-@commands.route("play", "^投降$")
-def surrender(plugin_event, Proc, msg_manager, groups):
-    user_id = msg_manager.user_id
-    game_work = GameWork.from_manager(msg_manager)
+@command("play", "^投降$", "投降 //以自杀的形式结束.")
+def surrender(plugin_event, Proc, msg_event, groups):
+    user_id = msg_event.user_id
+    game_work = GameWork.from_manager(msg_event)
     game_work.players[user_id]["surrender"] = True
     game_work.dead(user_id, user_id)
     if not game_work.flag_over and game_work.flag_bot:
-        BotComp.action(msg_manager)
+        BotComp.action(msg_event)
     msg_reply = game_work.format_reply()
     plugin_event.reply(msg_reply)
     return
 
 
-commands_helpdoc.append("局势 //查询当前游戏局势信息.")
-
-
-@commands.route(COMMON_CMD, "^(?:局势|局勢)$")
-def situation(plugin_event, Proc, msg_manager, groups):
-    game = msg_manager.val["game"]
+@command(COMMON_CMD, "^(?:局势|局勢)$", "局势 //查询当前游戏局势信息.")
+def situation(plugin_event, Proc, msg_event, groups):
+    game = msg_event.val["game"]
     if not game.get("start"):
         return
-    game_work = GameWork.from_manager(msg_manager)
+    game_work = GameWork.from_manager(msg_event)
     t_value = {}
-    link = msg_manager.msg_format("strMrLink")
+    link = msg_event.msg_format("strMrLink")
     # 赌徒
     pl_data_list = []
     for idx, user_id in enumerate(game_work.order):
@@ -420,7 +398,7 @@ def situation(plugin_event, Proc, msg_manager, groups):
         props = []
         for prop, count in Counter(pl["props"]).items():
             props.append(
-                msg_manager.msg_format(
+                msg_event.msg_format(
                     "strMrPropOneNode" if count == 1 else "strMrPropManyNode", {"tPropName": prop, "tPropCount": count}
                 )
             )
@@ -428,7 +406,7 @@ def situation(plugin_event, Proc, msg_manager, groups):
         for effect, effect_data in pl["effects_event"].items():
             stacks = effect_data["stacks"]
             effects.append(
-                msg_manager.msg_format(
+                msg_event.msg_format(
                     "strMrEffectOneNode" if stacks == 1 else "strMrEffectManyNode",
                     {"tEffectName": effect, "tEffectStacks": stacks},
                 )
@@ -437,17 +415,17 @@ def situation(plugin_event, Proc, msg_manager, groups):
             "tGamblerIdx": idx + 1,
             "tGamblerName": pl["name"],
             "tGamblerHp": pl["hp"],
-            "tGamblerProps": (link.join(props) if pl["props"] else msg_manager.msg_format("strMrPropNoneNode")),
-            "tGamblerEffect": (link.join(effects) if pl["effects_event"] else msg_manager.msg_format("strMrEffectNoneNode")),
+            "tGamblerProps": (link.join(props) if pl["props"] else msg_event.msg_format("strMrPropNoneNode")),
+            "tGamblerEffect": (link.join(effects) if pl["effects_event"] else msg_event.msg_format("strMrEffectNoneNode")),
             "tGamblerActions": pl["actions"],
             "tGamblerKills": pl["kills"],
         }
-        pl_data_list.append(msg_manager.msg_format("strMrGamblerData", pl_data))
+        pl_data_list.append(msg_event.msg_format("strMrGamblerData", pl_data))
     t_value.update({"tGamblerData": "".join(pl_data_list)})
     # 枪手
     t_value.update(
         {
-            "tShooter": msg_manager.msg_format(
+            "tShooter": msg_event.msg_format(
                 "strMrGameShooter",
                 {
                     "tGamblerIdx": game_work.order.index(game_work.shooter) + 1,
@@ -457,13 +435,13 @@ def situation(plugin_event, Proc, msg_manager, groups):
         }
     )
     # 子弹
-    t_value.update({"tNowBulletType": msg_manager.msg_format("strMrAmmoLive" if game_work.bullet else "strMrAmmoBlank")})
+    t_value.update({"tNowBulletType": msg_event.msg_format("strMrAmmoLive" if game_work.bullet else "strMrAmmoBlank")})
     t_value.update(
         {
             "tGameNowBullet": (
-                msg_manager.msg_format("strMrGameNowBulletShow", t_value)
+                msg_event.msg_format("strMrGameNowBulletShow", t_value)
                 if game_work.bullet_visible
-                else msg_manager.msg_format("strMrGameNowBulletHide", t_value)
+                else msg_event.msg_format("strMrGameNowBulletHide", t_value)
             )
         }
     )
@@ -478,9 +456,9 @@ def situation(plugin_event, Proc, msg_manager, groups):
     t_value.update(
         {
             "tGameAmmo": (
-                msg_manager.msg_format("strMrGameAmmoShow", t_value)
+                msg_event.msg_format("strMrGameAmmoShow", t_value)
                 if game_work.ammo_visible
-                else msg_manager.msg_format("strMrGameAmmoHide", t_value)
+                else msg_event.msg_format("strMrGameAmmoHide", t_value)
             )
         }
     )
@@ -490,19 +468,16 @@ def situation(plugin_event, Proc, msg_manager, groups):
     t_value.update(
         {
             "tGameDeadList": (
-                msg_manager.msg_format("strMrGameDeadList", t_value)
+                msg_event.msg_format("strMrGameDeadList", t_value)
                 if dead_list
-                else msg_manager.msg_format("strMrGameDeadNone", t_value)
+                else msg_event.msg_format("strMrGameDeadNone", t_value)
             )
         }
     )
 
-    msg_reply = msg_manager.msg_format("strMrSituationResult", t_value)
+    msg_reply = msg_event.msg_format("strMrSituationResult", t_value)
     plugin_event.reply(msg_reply)
     return
 
 
 # endregion
-
-
-dictHelpDocTemplate["default"]["恶赌 命令"] = "\n".join(commands_helpdoc)

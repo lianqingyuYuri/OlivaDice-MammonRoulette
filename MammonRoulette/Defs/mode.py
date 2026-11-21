@@ -61,20 +61,20 @@ class 经典(ModeComp, BaseMode):
         limit = 6
 
     @classmethod
-    def start(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def start(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         for pl in game_work.order[1:]:
             game_work.draw_prop(pl, 1)
         game_work.draw_prop(game_work.shooter, 2)
 
     @classmethod
-    def join(cls, msg_manager, user_id):
-        msg_manager.val["game"]["data"]["players"][user_id]["hp"] = 4
+    def join(cls, msg_event, user_id):
+        msg_event.val["game"]["data"]["players"][user_id]["hp"] = 4
 
     # 换人
     @classmethod
-    def switch(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def switch(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         game_work.draw_prop(game_work.shooter, 2)
 
 
@@ -126,14 +126,14 @@ class 道具(ModeComp, BaseMode):
         limit = 16
 
     @classmethod
-    def join(cls, msg_manager, user_id):
-        game_work = GameWork.from_manager(msg_manager)
+    def join(cls, msg_event, user_id):
+        game_work = GameWork.from_manager(msg_event)
         game_work.players[user_id]["hp"] = 5 if len(game_work.order) < 4 else 6
 
     # 装弹
     @classmethod
-    def reload(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def reload(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         for pl in game_work.order:
             game_work.draw_prop(pl, 4)
 
@@ -160,32 +160,32 @@ class 金币(ModeComp, BaseMode):
         limit = 12
 
     @classmethod
-    def start(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def start(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         game_work.draw_prop(game_work.shooter, 1)
 
     @classmethod
-    def join(cls, msg_manager, user_id):
-        msg_manager.val["game"]["data"]["players"][user_id]["hp"] = 5
+    def join(cls, msg_event, user_id):
+        msg_event.val["game"]["data"]["players"][user_id]["hp"] = 5
 
     # 换人
     @classmethod
-    def switch(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def switch(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         game_work.draw_prop(game_work.shooter, 1)
 
     # 受伤
     @classmethod
-    def damage(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def damage(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         target, dmg = game_work.tmp["target"], game_work.modify["dmg"]
         comp = game_work.modify.setdefault("金币", [])
         if target not in comp and game_work.players[target]["hp"] - dmg <= 2:
             t_value = {"tGamblerName": game_work.get_name(target)}
             if game_work.get_prop(target, "金币"):
-                msg_reply = msg_manager.msg_format("strMrModeGold_1", t_value)
+                msg_reply = msg_event.msg_format("strMrModeGold_1", t_value)
             else:
-                msg_reply = msg_manager.msg_format("strMrModeGold_2", t_value)
+                msg_reply = msg_event.msg_format("strMrModeGold_2", t_value)
             game_work.upsert_info(msg_reply)
             comp.append(target)
 
@@ -230,22 +230,22 @@ class 勇者(ModeComp, BaseMode):
         limit = 12
 
     @classmethod
-    def start(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def start(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         for pl in game_work.order:
             game_work.draw_prop(pl, 2 if pl != game_work.shooter else 1)
 
     @classmethod
-    def join(cls, msg_manager, user_id):
-        msg_manager.val["game"]["data"]["players"][user_id]["hp"] = 5
+    def join(cls, msg_event, user_id):
+        msg_event.val["game"]["data"]["players"][user_id]["hp"] = 5
 
     # 开枪
     @classmethod
-    def shoot(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def shoot(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         if game_work.bullet and random.randint(1, 3) == 1:  # 魔弹
             game_work.tmp["dmg"] += 1
-            msg_reply = msg_manager.msg_format("strMrModeHero_1")
+            msg_reply = msg_event.msg_format("strMrModeHero_1")
             game_work.upsert_info(msg_reply)
         target, is_shoot_me = game_work.tmp["target"], game_work.tmp["is_shoot_me"]
         if is_shoot_me and not game_work.bullet:
@@ -292,19 +292,19 @@ class 赌徒(ModeComp, BaseMode):
             return random.choice(["JOKER", "joker"])
 
     @classmethod
-    def start(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def start(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         for pl in game_work.order:
             game_work.draw_prop(pl, 2)
 
     @classmethod
-    def join(cls, msg_manager, user_id):
-        msg_manager.val["game"]["data"]["players"][user_id]["hp"] = 5
+    def join(cls, msg_event, user_id):
+        msg_event.val["game"]["data"]["players"][user_id]["hp"] = 5
 
     # 开枪
     @classmethod
-    def shoot(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def shoot(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         target, is_shoot_me = game_work.tmp["target"], game_work.tmp["is_shoot_me"]
         if is_shoot_me and not game_work.bullet:
             game_work.draw_prop(target, 3)
@@ -316,11 +316,11 @@ class 赌徒(ModeComp, BaseMode):
                 game_work.data["ammo_blank"] -= 1
                 game_work.data["ammo_live"] += 1
             game_work.bullet = not game_work.bullet
-            msg_reply = msg_manager.msg_format("strMrModeGambler_1", {"poker": cls.poker()})
+            msg_reply = msg_event.msg_format("strMrModeGambler_1", {"poker": cls.poker()})
             game_work.upsert_info(msg_reply)
         if game_work.bullet and random.randint(1, 3) == 1:  # 魔弹
             game_work.tmp["dmg"] += 1
-            msg_reply = msg_manager.msg_format("strMrModeGambler_2")
+            msg_reply = msg_event.msg_format("strMrModeGambler_2")
             game_work.upsert_info(msg_reply)
 
 
@@ -365,21 +365,21 @@ class 大富翁(ModeComp, BaseMode):
         limit = 0
 
     @classmethod
-    def start(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def start(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         game_work.modify["order_copy"] = game_work.order.copy()
         game_work.modify["gold"] = 0
         for pl in game_work.order:
             game_work.draw_prop(pl, 2)
 
     @classmethod
-    def join(cls, msg_manager, user_id):
-        game_work = GameWork.from_manager(msg_manager)
+    def join(cls, msg_event, user_id):
+        game_work = GameWork.from_manager(msg_event)
         game_work.players[user_id]["hp"] = 2
 
     @classmethod
-    def try_over(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def try_over(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         wins = []
         for pl in game_work.order:
             gold_count = game_work.players[pl]["props"].count("金币")
@@ -392,15 +392,15 @@ class 大富翁(ModeComp, BaseMode):
         return False
 
     @classmethod
-    def damage(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def damage(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         if not game_work.tmp["is_attack_me"]:
             game_work.draw_prop(game_work.tmp["source"], game_work.tmp["dmg"], ("金币",))
             game_work.try_over()
 
     @classmethod
-    def dead(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def dead(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         target, source = game_work.tmp["target"], game_work.tmp["source"]
         pl_target = game_work.players[target]
         if pl_target["surrender"]:
@@ -418,7 +418,7 @@ class 大富翁(ModeComp, BaseMode):
                     for _ in range(gold_count_half):
                         game_work.get_prop(source, "金币")
                     game_work.upsert_info(
-                        msg_manager.msg_format(
+                        msg_event.msg_format(
                             "strMrModeMonopoly_4", {"tTargetName": target, "tSourceName": source, "tNum": gold_count_half}
                         )
                     )
@@ -427,7 +427,7 @@ class 大富翁(ModeComp, BaseMode):
             old_hp = pl_target["hp"]
             pl_target.update({"hp": 2, "kills": 0, "suicide": False})
             game_work.upsert_info(
-                msg_manager.msg_format("strMrModeMonopoly_1", {"tGamblerName": target, "tOldHp": old_hp, "tNewHp": 2})
+                msg_event.msg_format("strMrModeMonopoly_1", {"tGamblerName": target, "tOldHp": old_hp, "tNewHp": 2})
             )
             # 摇动老虎机
             if random.randint(1, 6) == 1:
@@ -436,13 +436,13 @@ class 大富翁(ModeComp, BaseMode):
                     game_work.get_prop(target, "金币")
                 game_work.modify["gold"] = 0
                 jackpot = str(random.randint(0, 9)) * 3
-                msg_reply = msg_manager.msg_format(
+                msg_reply = msg_event.msg_format(
                     "strMrModeMonopoly_2", {"jackpot": jackpot, "tGamblerName": target, "gold": gold}
                 )
             else:
                 game_work.modify["gold"] += 1
                 choices = [f"{i:03d}" for i in range(1000) if i % 111 != 0]
                 jackpot = random.choice(choices)
-                msg_reply = msg_manager.msg_format("strMrModeMonopoly_3", {"jackpot": jackpot})
+                msg_reply = msg_event.msg_format("strMrModeMonopoly_3", {"jackpot": jackpot})
             game_work.upsert_info(msg_reply)
             game_work.try_over()

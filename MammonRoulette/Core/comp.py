@@ -57,8 +57,8 @@ class ModeComp(Registerable):
         return
 
     @classmethod
-    def trigger(cls, msg_manager, event):
-        return getattr(cls.get(msg_manager.val["game"]["mode"]["name"]), event)(msg_manager)
+    def trigger(cls, msg_event, event):
+        return getattr(cls.get(msg_event.val["game"]["mode"]["name"]), event)(msg_event)
 
 
 class PropComp(Registerable):
@@ -77,9 +77,9 @@ class PropComp(Registerable):
         return
 
     @classmethod
-    def apply(cls, msg_manager, prop, user_id, target):
-        if cls.get(prop).apply(msg_manager, target):
-            MR.Core.work.GameWork.from_manager(msg_manager).remove_prop(user_id, prop)
+    def apply(cls, msg_event, prop, user_id, target):
+        if cls.get(prop).apply(msg_event, target):
+            MR.Core.work.GameWork.from_manager(msg_event).remove_prop(user_id, prop)
 
 
 class EffectComp(Registerable):
@@ -112,9 +112,9 @@ class BotComp(Registerable):
             bot_cls.save()
 
     @classmethod
-    def action(cls, msg_manager):
-        game_work = MR.Core.work.GameWork.from_manager(msg_manager)
-        bot_mark = msg_manager.msg_format("strMrBotMark")
+    def action(cls, msg_event):
+        game_work = MR.Core.work.GameWork.from_manager(msg_event)
+        bot_mark = msg_event.msg_format("strMrBotMark")
         while not game_work.flag_over and game_work.flag_bot:
             shooter = game_work.shooter
             bot_cls = cls.get(game_work.players[shooter]["bot_model"])
@@ -123,18 +123,16 @@ class BotComp(Registerable):
             memory = {}
             while not game_work.flag_over and game_work.shooter == shooter:
                 game_work.tmp.clear()
-                action = bot_cls.decide(msg_manager, state, memory)
+                action = bot_cls.decide(msg_event, state, memory)
                 memory = action.memory
                 target = game_work.get_target(action.target) if action.target else shooter
 
                 if action.type == action.SHOOT_SELF:
-                    game_work.upsert_info(
-                        msg_manager.msg_format("strMrBotShootSelf", {"tBotMark": bot_mark, "tBotName": bot_name})
-                    )
+                    game_work.upsert_info(msg_event.msg_format("strMrBotShootSelf", {"tBotMark": bot_mark, "tBotName": bot_name}))
                     game_work.shoot(shooter)
                 elif action.type == action.SHOOT_OTHER:
                     game_work.upsert_info(
-                        msg_manager.msg_format(
+                        msg_event.msg_format(
                             "strMrBotShootOther",
                             {"tBotMark": bot_mark, "tBotName": bot_name, "tTargetName": game_work.get_name(target)},
                         )
@@ -143,14 +141,14 @@ class BotComp(Registerable):
                 elif action.type == action.USE_PROP:
                     if target == shooter:
                         game_work.upsert_info(
-                            msg_manager.msg_format(
+                            msg_event.msg_format(
                                 "strMrBotUsePropToSelf",
                                 {"tBotMark": bot_mark, "tBotName": bot_name, "tPropName": action.prop},
                             )
                         )
                     else:
                         game_work.upsert_info(
-                            msg_manager.msg_format(
+                            msg_event.msg_format(
                                 "strMrBotUsePropToOther",
                                 {
                                     "tBotMark": bot_mark,
@@ -160,7 +158,7 @@ class BotComp(Registerable):
                                 },
                             )
                         )
-                    PropComp.apply(msg_manager, action.prop, shooter, target)
+                    PropComp.apply(msg_event, action.prop, shooter, target)
                 else:
                     break
                 state = game_work.get_state()

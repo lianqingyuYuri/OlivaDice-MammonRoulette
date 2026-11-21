@@ -12,13 +12,13 @@ import json
 import os
 
 import OlivaDiceCore
-from AmorLib import DataBase, FsmRouter, MsgManager, has_NativeGUI, initCustom, is_windows, loadCustomInto, readCustom, saveCustom
+from AmorLib import DataBase, MsgEvent, has_NativeGUI, initCustom, is_windows, loadCustomInto, readCustom, saveCustom
 
 import MammonRoulette as MR
 
 from .Core.comp import BotComp, EffectComp, ModeComp, PropComp
+from .Core.event import command_reg
 
-COMMON_CMD = ("priv", "ob", "prep", "play")
 game_data = {}
 
 
@@ -147,12 +147,12 @@ class Event(object):
     def group_message(plugin_event, Proc):  # type: ignore
         if not unity_enabled("MrMainEnabled", plugin_event.bot_info.hash):  # type: ignore
             return
-        unity_reply(plugin_event, Proc, MsgManager(plugin_event))
+        unity_reply(plugin_event, Proc, MsgEvent(plugin_event))
 
     def private_message(plugin_event, Proc):  # type: ignore
         if not unity_enabled("MrMainEnabled", plugin_event.bot_info.hash):  # type: ignore
             return
-        unity_reply(plugin_event, Proc, MsgManager(plugin_event))
+        unity_reply(plugin_event, Proc, MsgEvent(plugin_event))
 
     def poke(plugin_event, Proc):  # type: ignore
         if not (
@@ -164,15 +164,12 @@ class Event(object):
         plugin_event.data.message = "poke"  # type: ignore
         plugin_event.data.sender = {}  # type: ignore
         plugin_event.data.extend = {}  # type: ignore
-        msg_manager = MsgManager(plugin_event)
-        msg_manager.group_id = plugin_event.data.group_id  # type: ignore
-        msg_manager.flags["is_group"] = True
-        unity_reply(plugin_event, Proc, msg_manager)
+        msg_event = MsgEvent(plugin_event)
+        msg_event.group_id = plugin_event.data.group_id  # type: ignore
+        msg_event.flags["is_group"] = True
+        unity_reply(plugin_event, Proc, msg_event)
 
     # endregion
-
-
-commands = FsmRouter(COMMON_CMD)
 
 
 def unity_enabled(switchKey, bot_hash="unity"):
@@ -183,28 +180,28 @@ def unity_enabled(switchKey, bot_hash="unity"):
     return unity_switchValue and bot_switchValue
 
 
-def unity_reply(plugin_event, Proc, msg_manager):
-    if not msg_manager.allow_reply:
+def unity_reply(plugin_event, Proc, msg_event):
+    if not msg_event.allow_reply:
         return
     if MR.config.debug:
         global game_data
         with open(MR.config.tmpGameDataPath, "r", encoding="utf-8") as f:
             game_data = json.load(f)
-    if msg_manager.group_id:
-        game = game_data.setdefault(msg_manager.group_id, {})
-        if msg_manager.user_id in game.get("data", {}).get("order", []):
+    if msg_event.group_id:
+        game = game_data.setdefault(msg_event.group_id, {})
+        if msg_event.user_id in game.get("data", {}).get("order", []):
             state = "play" if game["start"] else "prep"
         else:
             state = "ob"
     else:
         game = {}
         state = "priv"
-    msg_manager.val["game"] = game
-    msg_manager.val["state"] = state
+    msg_event.val["game"] = game
+    msg_event.val["state"] = state
     # region poke操作
     msg = ""
     if plugin_event.plugin_info["func_type"] != "poke":
-        msg = msg_manager.msg
+        msg = msg_event.msg
     else:
         target_id = plugin_event.data.target_id
         is_poke_bot = target_id == plugin_event.base_info["self_id"]
@@ -215,21 +212,22 @@ def unity_reply(plugin_event, Proc, msg_manager):
                 msg = "退出"
             elif state == "play":
                 msg = "局势"
-        elif state == "play" and msg_manager.user_id == game["data"]["shooter"] and target_id in game["data"]["order"]:
+        elif state == "play" and msg_event.user_id == game["data"]["shooter"] and target_id in game["data"]["order"]:
             msg = f"开枪{target_id}"
     if not msg:
         return
     # endregion
-    forward = commands.search(state, msg, commands.SearchMode.ANY)
+    msg_event.msg = msg
+    forward = command_reg.search(msg_event)
     if forward:
         handler, groups = forward[0]
-        handler(plugin_event, Proc, msg_manager, groups)
+        handler(plugin_event, Proc, msg_event, groups)
         if game.get("over", False):
             game.clear()
         if game.get("start"):
-            game_work = MR.Core.work.GameWork.from_manager(msg_manager)
+            game_work = MR.Core.work.GameWork.from_manager(msg_event)
             if game_work.flag_bot:
-                MR.Core.comp.BotComp.action(msg_manager)
+                MR.Core.comp.BotComp.action(msg_event)
                 msg_reply = game_work.format_reply()
                 plugin_event.reply(msg_reply)
     if MR.config.debug:
