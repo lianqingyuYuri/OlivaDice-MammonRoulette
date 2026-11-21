@@ -1,0 +1,134 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    tags:
+      - '*.*.*'
+      - '*.*.*-*.*'
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    name: Lint (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install ruff
+      - name: Run Ruff Check
+        run: |
+          ruff check . > ruff_output.log 2>&1
+      - name: Show Ruff Output
+        if: failure()
+        run: |
+          cat ruff_output.log
+      - name: Upload Ruff Output
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ruff_output
+          path: ./ruff_output.log
+
+  test:
+    name: Tests and coverage
+    needs: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      COVERAGE_FILE: test-results/.coverage
+      OLIVOS_SOURCE: ${{ github.workspace }}/.ci/OlivOS
+      PYSTRAY_BACKEND: dummy
+      PYTHONPATH: ${{ github.workspace }}/OlivOS-AmorLib:${{ github.workspace }}/.ci:${{ github.workspace }}/.ci/OlivaDiceCore
+    steps:
+      - name: Checkout plugin
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Checkout OlivOS host
+        uses: actions/checkout@v4
+        with:
+          repository: OlivOS-Team/OlivOS
+          ref: main
+          path: .ci/OlivOS
+      - name: Checkout OlivaDiceCore
+        uses: actions/checkout@v4
+        with:
+          repository: OlivOS-Team/OlivaDiceCore
+          ref: main
+          path: .ci/OlivaDiceCore
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: |
+            pyproject.toml
+            .ci/OlivOS/pyproject.toml
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e "./.ci/OlivOS[test]"
+      - name: Run tests with line and branch coverage
+        run: |
+          mkdir -p test-results
+          python -m pytest tests \
+            --cov=MammonRoulette \
+            --cov-branch \
+            --cov-context=test \
+            --cov-report=term-missing \
+            --cov-report=xml:test-results/coverage.xml \
+            --cov-report=json:test-results/coverage.json \
+            --cov-report=html:test-results/html \
+            --junitxml=test-results/junit.xml
+      - name: Summarize coverage
+        if: always()
+        run: python tests/coverage_summary.py test-results/coverage.json
+      - name: Upload test and coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results/
+          include-hidden-files: true
+
+  build:
+    name: Build OPK
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      PACK_NAME: MammonRoulette
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Pack
+        run: |
+          cd "$PACK_NAME"
+          zip -r "../$PACK_NAME.opk" . -x "*/__pycache__/*" "*.pyc" "*.pyo" "*.bak" "*.opk" "*.zip"
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: Artifacts
+          path: ${{ env.PACK_NAME }}.opk
+      - name: Draft Release
+        if: github.ref_type == 'tag'
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+          draft: true
+          allowUpdates: true
+          removeArtifacts: true
+          artifacts: |
+            ./${{ env.PACK_NAME }}.opk
