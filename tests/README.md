@@ -22,11 +22,6 @@
 ```powershell
 git submodule update --init --recursive
 
-# OlivaDice 与插件仓库平级时（如 ..\OlivaDice\OlivaDiceCore），可自动探测；
-# 否则显式指定父目录：
-$env:OLIVOS_SOURCE = 'D:\MyProject\run\OlivOS-dev'
-$env:OLIVADICECORE_SOURCE = 'D:\MyProject\run\OlivaDice'
-
 python -m pytest tests -q
 ```
 
