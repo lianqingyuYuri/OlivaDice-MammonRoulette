@@ -15,7 +15,7 @@ MammonRoulette_svn = 61
 MammonRoulette_ver_short = f"{str(MammonRoulette_ver)}({str(MammonRoulette_svn)})"
 
 from . import Core
-from .Core.event import command
+from .Core.registry import command
 from . import Defs
 
 from . import main

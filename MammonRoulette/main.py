@@ -17,7 +17,7 @@ from AmorLib import DataBase, MsgEvent, has_NativeGUI, initCustom, is_windows, l
 import MammonRoulette as MR
 
 from .Core.comp import BotComp, EffectComp, ModeComp, PropComp
-from .Core.event import command_reg
+from .Core.registry import command_reg
 
 game_data = {}
 

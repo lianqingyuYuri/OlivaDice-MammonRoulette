@@ -12,7 +12,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import MammonRoulette
-from MammonRoulette.Core.event import command_reg
+from MammonRoulette.Core.registry import command_reg
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PLUGIN_ROOT = REPO_ROOT / "MammonRoulette"
