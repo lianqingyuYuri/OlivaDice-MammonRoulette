@@ -97,7 +97,6 @@ class GameWork:
         data = game["data"]
         props = game["mode"]["props"]
         mode = MR.Core.registry.modeReg.get(game["mode"]["name"])
-        assert mode is not None
         return cls(
             msg_event=msg_event,
             mode=mode,

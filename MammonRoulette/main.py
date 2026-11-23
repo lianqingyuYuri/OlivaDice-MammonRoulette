@@ -16,7 +16,7 @@ from AmorLib import DataBase, MsgEvent, has_NativeGUI, initCustom, is_windows, l
 
 import MammonRoulette as MR
 
-from .Core.registry import command
+from .Core.registry import botReg, command, effectReg, modeReg, propReg
 
 game_data = {}
 
@@ -82,6 +82,10 @@ class Event(object):
         readCustom(MR, Proc)
         saveCustom(MR, Proc)
         loadCustomInto(MR, Proc)
+        modeReg.init_after()
+        propReg.init_after()
+        effectReg.init_after()
+        botReg.init_after()
 
     def save(plugin_event, Proc):  # type: ignore
         with open(MR.config.tmpGameDataPath, "w", encoding="utf-8") as f:
