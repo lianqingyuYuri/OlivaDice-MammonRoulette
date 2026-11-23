@@ -16,8 +16,8 @@ from AmorLib import DataBase, MsgEvent, has_NativeGUI, initCustom, is_windows, l
 
 import MammonRoulette as MR
 
-from .Core.comp import BotComp, EffectComp, ModeComp, PropComp
-from .Core.registry import command_reg
+from .Core.comp import BotComp, EffectComp, PropComp
+from .Core.registry import command
 
 game_data = {}
 
@@ -77,7 +77,6 @@ class Event(object):
                 f"[unity] - [恶魔轮盘] - <game_data> - 本地对局数据存储文件丢失, 对局数据清空!\n{str(e)}",
             )
         # endregion
-        ModeComp.init_after()
         PropComp.init_after()
         EffectComp.init_after()
 
@@ -218,7 +217,7 @@ def unity_reply(plugin_event, Proc, msg_event):
         return
     # endregion
     msg_event.msg = msg
-    forward = command_reg.search(msg_event)
+    forward = command.search(msg_event)
     if forward:
         handler, groups = forward[0]
         handler(plugin_event, Proc, msg_event, groups)

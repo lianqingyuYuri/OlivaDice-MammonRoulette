@@ -473,7 +473,8 @@ class 金币(PropComp, BaseProp):
     def init(cls):
         prop_list = (prop for prop in PropComp.list() if prop != cls.name)
 
-        @command("play", f"^(?:购买|購買) *({'|'.join(prop_list)})$", "[购买,購買](道具名) //使用金币兑换道具.")
+        @command.plState("play")
+        @command.msgRegex(f"^(?:购买|購買) *({'|'.join(prop_list)})$", "[购买,購買](道具名) //使用金币兑换道具.")
         def purchase(plugin_event, Proc, msg_event, groups):
             user_id = msg_event.user_id
             game_work = GameWork.from_manager(msg_event)

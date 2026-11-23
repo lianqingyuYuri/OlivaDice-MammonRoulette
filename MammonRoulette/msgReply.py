@@ -15,13 +15,13 @@ from collections import Counter
 from AmorLib import DataBase
 
 from . import command, config
-from .Core.comp import BotComp, ModeComp, PropComp
+from .Core.comp import BotComp, PropComp
+from .Core.registry import modeReg
 from .Core.work import GameWork
 from .custom import dictModeCustom
 
 # --------
 
-COMMON_CMD = ("priv", "ob", "prep", "play")
 poker = {
     "suits": ("方片♦️", "梅花♣️", "红桃♥️", "黑桃♠️"),
     "ranks": ("A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"),
@@ -29,7 +29,7 @@ poker = {
 
 
 # region 资料
-@command(COMMON_CMD, "^(.+)(?:签署|簽署)(?:生死状|契约|生死狀|契約)$", "(名称)签署[生死状,契约] //注册角色或修改名称.")
+@command.msgRegex("^(.+)(?:签署|簽署)(?:生死状|契约|生死狀|契約)$", "(名称)签署[生死状,契约] //注册角色或修改名称.")
 def signed(plugin_event, Proc, msg_event, groups):
     name = groups[0]
     user_id = msg_event.user_id
@@ -56,7 +56,7 @@ def signed(plugin_event, Proc, msg_event, groups):
     return
 
 
-@command(COMMON_CMD, "^[惡恶]魔名片(\\d*)$", "恶魔名片(数值,留空) //查看自己或他人的资料.")
+@command.msgRegex("^[惡恶]魔名片(\\d*)$", "恶魔名片(数值,留空) //查看自己或他人的资料.")
 def card(plugin_event, Proc, msg_event, groups):
     user_id = msg_event.user_id
     target = groups[0] if groups[0] != "" else user_id
@@ -89,8 +89,7 @@ def card(plugin_event, Proc, msg_event, groups):
     return
 
 
-@command(
-    COMMON_CMD,
+@command.msgRegex(
     "^[恶惡]魔(赏金|杀戮|自杀|投降|)(?:排行|榜)(\\d*)$",
     "恶魔(赏金,杀戮,自杀,投降,留空)[排行,榜] //查询排行, 留空默认查询赏金榜单.",
 )
@@ -145,9 +144,9 @@ def leaderboard(plugin_event, Proc, msg_event, groups):
 
 # endregion
 # region 房间操作
-@command(
-    "ob",
-    f"^({'|'.join(ModeComp.list())})(?:匹配|对局)(?:(\\d+)p)?$",
+@command.plState("ob")
+@command.msgRegex(
+    f"^({'|'.join(modeReg.list())})(?:匹配|对局)(?:(\\d+)p)?$",
     "(模式名)[匹配,对局] //以默认人数匹配对局, 满人自动开启\n(模式名)匹配(数值)p //以自定义人数匹配对局.",
 )
 def match_game(plugin_event, Proc, msg_event, groups):
@@ -264,7 +263,8 @@ def match_game(plugin_event, Proc, msg_event, groups):
     # endregion
 
 
-@command("prep", f"^(?:召唤|添加|加入)({'|'.join(BotComp.list())})$", "[召唤,添加,加入](BOT名)//对局添加一名BOT.")
+@command.plState("prep")
+@command.msgRegex(f"^(?:召唤|添加|加入)({'|'.join(BotComp.list())})$", "[召唤,添加,加入](BOT名)//对局添加一名BOT.")
 def join_bot(plugin_event, Proc, msg_event, groups):
     game = msg_event.val["game"]
     if not game or game["start"]:
@@ -293,7 +293,8 @@ def join_bot(plugin_event, Proc, msg_event, groups):
     # endregion
 
 
-@command("ob", "^(?:加入|进入)$", "[加入,进入] //加入正在匹配的对局.")
+@command.plState("ob")
+@command.msgRegex("^(?:加入|进入)$", "[加入,进入] //加入正在匹配的对局.")
 def join_game(plugin_event, Proc, msg_event, groups):
     game = msg_event.val["game"]
     if not game or game["start"]:
@@ -303,7 +304,8 @@ def join_game(plugin_event, Proc, msg_event, groups):
     return
 
 
-@command("prep", "^(?:退出|离开)$", "[退出,离开] //退出匹配.")
+@command.plState("prep")
+@command.msgRegex("^(?:退出|离开)$", "[退出,离开] //退出匹配.")
 def exit_game(plugin_event, Proc, msg_event, groups):
     user_id, game = msg_event.user_id, msg_event.val["game"]
     data = game["data"]
@@ -321,7 +323,8 @@ def exit_game(plugin_event, Proc, msg_event, groups):
 
 # endregion
 # region 对局操作
-@command("play", "^(吞|开|開)[槍|枪] *(\\d*)$", "[吞,开]枪(目标) //对目标射击, 可用qq号或序号指定目标, 留空默认下一顺位.")
+@command.plState("play")
+@command.msgRegex("^(吞|开|開)[槍|枪] *(\\d*)$", "[吞,开]枪(目标) //对目标射击, 可用qq号或序号指定目标, 留空默认下一顺位.")
 def shoot(plugin_event, Proc, msg_event, groups):
     user_id = msg_event.user_id
     game_work = GameWork.from_manager(msg_event)
@@ -339,8 +342,8 @@ def shoot(plugin_event, Proc, msg_event, groups):
     return
 
 
-@command(
-    "play",
+@command.plState("play")
+@command.msgRegex(
     f"^(?:使用|) *({'|'.join(PropComp.list())}) *(\\d*)$",
     "[使用,留空](道具名)(目标) //对目标使用道具, 可用qq号或序号指定目标.",
 )
@@ -370,7 +373,8 @@ def use_prop(plugin_event, Proc, msg_event, groups):
     return
 
 
-@command("play", "^投降$", "投降 //以自杀的形式结束.")
+@command.plState("play")
+@command.msgRegex("^投降$", "投降 //以自杀的形式结束.")
 def surrender(plugin_event, Proc, msg_event, groups):
     user_id = msg_event.user_id
     game_work = GameWork.from_manager(msg_event)
@@ -383,7 +387,7 @@ def surrender(plugin_event, Proc, msg_event, groups):
     return
 
 
-@command(COMMON_CMD, "^(?:局势|局勢)$", "局势 //查询当前游戏局势信息.")
+@command.msgRegex("^(?:局势|局勢)$", "局势 //查询当前游戏局势信息.")
 def situation(plugin_event, Proc, msg_event, groups):
     game = msg_event.val["game"]
     if not game.get("start"):

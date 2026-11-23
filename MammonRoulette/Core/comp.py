@@ -15,50 +15,11 @@ import MammonRoulette as MR
 from ..custom import (
     dictEffectCustom,
     dictHelpDocTemplate,
-    dictModeCustom,
     dictPropCustom,
     dictStrCustomNote,
     dictStrCustomTemplate,
 )
-from .base import BaseEffect, BaseMode, BaseProp
-
-
-class ModeComp(Registerable):
-    _register = {}
-
-    @classmethod
-    def init_after(cls):
-        for mode_name, mode_cls in cls._register.items():
-            mode_cls: BaseMode
-            mode_cls.init()
-            dictModeCustom["default"][mode_name] = {
-                "points": mode_cls.points,
-                "seats": {
-                    "default": mode_cls.seats.default,
-                    "max": mode_cls.seats.max,
-                    "min": mode_cls.seats.min,
-                },
-                "props": {
-                    "pool": mode_cls.props.pool,
-                    "allowed": mode_cls.props.allowed,
-                    "banned": mode_cls.props.banned,
-                    "limit": mode_cls.props.limit,
-                },
-                "modify": {
-                    "dmg": mode_cls.modify.dmg,
-                    "ammo_visible": mode_cls.modify.ammo_visible,
-                    "bullet_visible": mode_cls.modify.bullet_visible,
-                },
-            }
-            dictHelpDocTemplate["default"].update(mode_cls.helpDocDefault)
-            for field, (note, msg) in mode_cls.strCustomDefault.items():
-                dictStrCustomNote[field] = note
-                dictStrCustomTemplate["default"][field] = msg
-        return
-
-    @classmethod
-    def trigger(cls, msg_event, event):
-        return getattr(cls.get(msg_event.val["game"]["mode"]["name"]), event)(msg_event)
+from .base import BaseEffect, BaseProp
 
 
 class PropComp(Registerable):

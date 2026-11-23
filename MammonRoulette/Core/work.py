@@ -52,7 +52,7 @@ def modify_mirror(key):
 class GameWork:
     # region index
     msg_event: MsgEvent
-    mode: BaseMode
+    mode: type[BaseMode]
     props_pool: list
     props_allowed: list
     props_banned: list
@@ -96,9 +96,11 @@ class GameWork:
         game = msg_event.val["game"]
         data = game["data"]
         props = game["mode"]["props"]
+        mode = MR.Core.registry.modeReg.get(game["mode"]["name"])
+        assert mode is not None
         return cls(
             msg_event=msg_event,
-            mode=MR.Core.comp.ModeComp.get(game["mode"]["name"]),
+            mode=mode,
             props_pool=props["pool"],
             props_allowed=props["allowed"],
             props_banned=props["banned"],
@@ -320,7 +322,7 @@ class GameWork:
             for effect_name in effects_event_list:
                 if effects_event[effect_name].get("expired", False):
                     self.unregister_effect_event(effect_name, target, 0)
-        MR.Core.comp.ModeComp.trigger(self.msg_event, moment)
+        MR.Core.registry.modeReg.trigger(self.msg_event, moment)
         return
 
     # endregion

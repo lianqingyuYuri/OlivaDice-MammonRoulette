@@ -12,7 +12,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import MammonRoulette
-from MammonRoulette.Core.registry import command_reg
+from MammonRoulette.Core.registry import command
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PLUGIN_ROOT = REPO_ROOT / "MammonRoulette"
@@ -59,7 +59,7 @@ def test_event_contract_exposes_common_callbacks():
 
 
 def test_command_registry_registers_commands():
-    entries = command_reg.entries()
+    entries = command.entries()
     assert len(entries) >= 10
     names = {entry.name for entry in entries}
     for expected in ("signed", "card", "surrender", "shoot", "join_game", "exit_game", "situation"):
@@ -68,7 +68,7 @@ def test_command_registry_registers_commands():
 
 def test_command_registry_matches_surrender_by_state():
     event = SimpleNamespace(val={"state": "play"}, msg="投降")
-    results = command_reg.search(event)
+    results = command.search(event)
     assert len(results) == 1
     handler, groups = results[0]
     assert handler.__name__ == "surrender"
@@ -77,7 +77,7 @@ def test_command_registry_matches_surrender_by_state():
 
 def test_command_registry_matches_shoot_with_groups():
     event = SimpleNamespace(val={"state": "play"}, msg="开枪")
-    results = command_reg.search(event)
+    results = command.search(event)
     assert len(results) == 1
     handler, groups = results[0]
     assert handler.__name__ == "shoot"
@@ -86,4 +86,4 @@ def test_command_registry_matches_shoot_with_groups():
 
 def test_command_registry_ignores_wrong_state():
     event = SimpleNamespace(val={"state": "ob"}, msg="投降")
-    assert command_reg.search(event) == []
+    assert command.search(event) == []

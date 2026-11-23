@@ -18,46 +18,62 @@ import MammonRoulette as MR
 
 
 # region 指令注册
-class CommandFilter(HandlerFilter[MsgEvent]):
-    """按对局状态与消息正则过滤。"""
+class PlStateFilter(HandlerFilter[MsgEvent]):
+    """按玩家状态过滤"""
 
-    def __init__(self, states: str | STRING_ROW, pattern: str):
+    def __init__(self, states: str | STRING_ROW):
         self.states = set((states,) if isinstance(states, str) else states)
+
+    def filter(self, msg_event: MsgEvent) -> bool:
+        state = msg_event.val.get("state")
+        return not (state is None or state not in self.states)
+
+
+class MsgRegexFilter(HandlerFilter[MsgEvent]):
+    """按消息正则过滤"""
+
+    def __init__(self, pattern: str):
         self.pattern = re.compile(pattern)
         self.match = None
 
     def filter(self, msg_event: MsgEvent) -> bool:
-        state = msg_event.val.get("state")
-        if state is None or state not in self.states:
-            return False
         self.match = self.pattern.search(msg_event.msg)
         return self.match is not None
 
 
 class CommandRegistry(Registry[MsgEvent]):
-    def command(self, states: str | STRING_ROW, pattern: str, helpdoc: str | None = None):
+    def msgRegex(self, pattern: str, helpdoc: str | None = None):
         def decorator(func):
             if helpdoc is not None:
                 doc = MR.custom.dictHelpDocTemplate["default"]
                 doc["恶赌 命令"] = helpdoc if not doc.get("恶赌 命令") else f"{doc['恶赌 命令']}\n{helpdoc}"
-            self.attach(func, CommandFilter(states, pattern))
+            self.attach(func, MsgRegexFilter(pattern))
+            return func
+
+        return decorator
+
+    def plState(self, states: str | STRING_ROW):
+        def decorator(func):
+            self.attach(func, PlStateFilter(states))
             return func
 
         return decorator
 
     def search(self, msg_event: MsgEvent):
-        """按状态与正则匹配，返回 (handler, groups) 列表。"""
+        """匹配所有过滤器，返回 (handler, groups) 列表。"""
         result = []
         for entry in self.match_handlers(msg_event):
+            regex_filter = None
             for flt in entry.filters:
-                if isinstance(flt, CommandFilter):
-                    result.append((entry.key, flt.match.groups() if flt.match else ()))
+                if isinstance(flt, MsgRegexFilter):
+                    regex_filter = flt
                     break
+            if regex_filter:
+                result.append((entry.key, regex_filter.match.groups() if regex_filter.match else ()))
         return result
 
 
-command_reg = CommandRegistry()
-command = command_reg.command
+command = CommandRegistry()
 # endregion
 
 
@@ -78,18 +94,37 @@ class ModeRegistry(Registry[MsgEvent]):
 
     _entries: dict[str, Entry[MsgEvent]]
 
-    def modeDef(self, helpdoc: dict | None = None, strCustom: dict | None = None):
+    def modeDef(self, helpDocDefault: dict | None = None, strCustomDefault: dict | None = None):
         """注册模式"""
-        helpdoc = helpdoc if helpdoc is not None else {}
-        strCustom = strCustom if strCustom is not None else {}
+        helpDocDefault = helpDocDefault if helpDocDefault is not None else {}
+        strCustomDefault = strCustomDefault if strCustomDefault is not None else {}
 
         def decorator(mode_cls: type[MR.Core.base.BaseMode]):
-            if not mode_cls.name:
-                raise ValueError(f"模式类 {mode_cls.__name__} 未定义 name")
-            MR.custom.dictHelpDocTemplate["default"].update(helpdoc)
-            for field, (note, msg) in strCustom.items():
+            mode_name = mode_cls.name
+            MR.custom.dictHelpDocTemplate["default"].update(helpDocDefault)
+            for field, (note, msg) in strCustomDefault.items():
                 MR.custom.dictStrCustomNote[field] = note
                 MR.custom.dictStrCustomTemplate["default"][field] = msg
+            mode_cls.init()
+            MR.custom.dictModeCustom["default"][mode_name] = {
+                "points": mode_cls.points,
+                "seats": {
+                    "default": mode_cls.seats.default,
+                    "max": mode_cls.seats.max,
+                    "min": mode_cls.seats.min,
+                },
+                "props": {
+                    "pool": mode_cls.props.pool,
+                    "allowed": mode_cls.props.allowed,
+                    "banned": mode_cls.props.banned,
+                    "limit": mode_cls.props.limit,
+                },
+                "modify": {
+                    "dmg": mode_cls.modify.dmg,
+                    "ammo_visible": mode_cls.modify.ammo_visible,
+                    "bullet_visible": mode_cls.modify.bullet_visible,
+                },
+            }
             self.attach(mode_cls.name, ModeFilter(mode_cls))
             return mode_cls
 
@@ -109,7 +144,7 @@ class ModeRegistry(Registry[MsgEvent]):
         return list(self._entries.keys())
 
     def trigger(self, msg_event: MsgEvent, moment: MR.Core.base.Moment) -> None:
-        """按当前对局模式名派发生命周期钩子（等价 ModeComp.trigger）。"""
+        """按当前对局模式名派发生命周期钩子。"""
         mode_name = msg_event.val.get("game", {}).get("mode", {}).get("name")
         mode_cls = self.get(mode_name) if mode_name is not None else None
         if mode_cls is None:
@@ -118,8 +153,8 @@ class ModeRegistry(Registry[MsgEvent]):
         return
 
 
-mode_reg = ModeRegistry()
-modeDef = mode_reg.modeDef
+modeReg = ModeRegistry()
+modeDef = modeReg.modeDef
 # endregion
 
 # region 道具注册

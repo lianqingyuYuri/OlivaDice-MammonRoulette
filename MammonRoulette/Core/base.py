@@ -23,8 +23,6 @@ class Moment(str, Enum):
 
 class BaseMode:
     name: str = ""
-    strCustomDefault: dict = {}
-    helpDocDefault: dict = {}
     points: int = 0
 
     class seats:
@@ -92,8 +90,8 @@ class BaseMode:
 
 class BaseProp:
     name: str = ""
-    strCustomDefault: dict = {}
-    helpDocDefault: dict = {}
+    strCustomDefault: dict = field(default_factory=dict)
+    helpDocDefault: dict = field(default_factory=dict)
     allowed: bool = True
 
     @classmethod
@@ -127,8 +125,8 @@ class BaseProp:
 
 class BaseEffect:
     name: str = ""
-    strCustomDefault: dict = {}
-    helpDocDefault: dict = {}
+    strCustomDefault: dict = field(default_factory=dict)
+    helpDocDefault: dict = field(default_factory=dict)
 
     @classmethod
     def init(cls):
@@ -258,8 +256,8 @@ class BotAction:
 
 class BaseBot:
     name: str = ""
-    strCustomDefault: dict = {}
-    helpDocDefault: dict = {}
+    strCustomDefault: dict = field(default_factory=dict)
+    helpDocDefault: dict = field(default_factory=dict)
     allowed: bool = True
     modes_allowed: tuple = ()
 
