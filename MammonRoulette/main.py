@@ -16,7 +16,6 @@ from AmorLib import DataBase, MsgEvent, has_NativeGUI, initCustom, is_windows, l
 
 import MammonRoulette as MR
 
-from .Core.comp import BotComp, EffectComp, PropComp
 from .Core.registry import command
 
 game_data = {}
@@ -77,9 +76,6 @@ class Event(object):
                 f"[unity] - [恶魔轮盘] - <game_data> - 本地对局数据存储文件丢失, 对局数据清空!\n{str(e)}",
             )
         # endregion
-        PropComp.init_after()
-        EffectComp.init_after()
-
         MR.config.readConfig(Proc)
         MR.config.saveConfig(Proc)
         initCustom(MR, Proc)
@@ -90,7 +86,6 @@ class Event(object):
     def save(plugin_event, Proc):  # type: ignore
         with open(MR.config.tmpGameDataPath, "w", encoding="utf-8") as f:
             json.dump(game_data, f, ensure_ascii=False, indent=4)
-        BotComp.save_all()
 
     def menu(plugin_event, Proc):  # type: ignore
         if plugin_event.data.namespace == "MammonRoulette":  # type: ignore
@@ -217,16 +212,15 @@ def unity_reply(plugin_event, Proc, msg_event):
         return
     # endregion
     msg_event.msg = msg
-    forward = command.search(msg_event)
-    if forward:
-        handler, groups = forward[0]
+    handler, groups = command.search(msg_event)
+    if handler:
         handler(plugin_event, Proc, msg_event, groups)
         if game.get("over", False):
             game.clear()
         if game.get("start"):
             game_work = MR.Core.work.GameWork.from_manager(msg_event)
             if game_work.flag_bot:
-                MR.Core.comp.BotComp.action(msg_event)
+                MR.Core.registry.botReg.action(msg_event)
                 msg_reply = game_work.format_reply()
                 plugin_event.reply(msg_reply)
     if MR.config.debug:

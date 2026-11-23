@@ -9,7 +9,7 @@
 """
 
 from ..Core.base import BaseBot, BotAction, GameState, PlayerView
-from ..Core.comp import BotComp, PropComp
+from ..Core.registry import botDef, propReg
 from ..Core.work import GameWork
 
 
@@ -18,10 +18,11 @@ def prop_can_use(msg_event, prop_name, target: str | None = None):
     if target is None:
         target = game_work.shooter
     target = game_work.get_target(target)
-    return PropComp.get(prop_name).can_use(msg_event, target)
+    return propReg.get(prop_name).can_use(msg_event, target)
 
 
-class 达尔文(BotComp, BaseBot):
+@botDef()
+class 达尔文(BaseBot):
     name = "达尔文"
 
     @classmethod

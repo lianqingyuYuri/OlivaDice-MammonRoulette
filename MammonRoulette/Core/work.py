@@ -291,7 +291,7 @@ class GameWork:
             search_key = "name"
         for prop_data in reversed(self.props_event):
             if prop_data[search_key] == search:
-                MR.Core.comp.PropComp.get(prop_data["name"]).on_unregister(self.msg_event, prop_data)
+                MR.Core.registry.propReg.get(prop_data["name"]).on_unregister(self.msg_event, prop_data)
                 self.props_event.remove(prop_data)
         return
 
@@ -301,16 +301,16 @@ class GameWork:
             effect_data = effects_event[effect_name]
             effect_data["stacks"] -= stacks
             if effect_data["stacks"] <= 0 or stacks == 0:
-                MR.Core.comp.EffectComp.get(effect_name).on_unregister(self.msg_event)
+                MR.Core.registry.effectReg.get(effect_name).on_unregister(self.msg_event)
                 del effects_event[effect_name]
         return
 
     def handle_event(self, moment: Moment, **kwargs):
         self.tmp.update(kwargs)
         for prop_data in self.props_event:
-            MR.Core.comp.PropComp.get(prop_data["name"]).on_moment(self.msg_event, moment, prop_data)
+            MR.Core.registry.propReg.get(prop_data["name"]).on_moment(self.msg_event, moment, prop_data)
         for prop_data in self.props_event:
-            MR.Core.comp.PropComp.get(prop_data["name"]).sustain(self.msg_event, prop_data)
+            MR.Core.registry.propReg.get(prop_data["name"]).sustain(self.msg_event, prop_data)
         for prop_data in list(self.props_event):
             if prop_data.get("expired", False):
                 self.unregister_prop_event(prop_data["id"])
@@ -318,7 +318,7 @@ class GameWork:
             effects_event = self.players[target]["effects_event"]
             effects_event_list = list(effects_event.keys())
             for effect_name in effects_event_list:
-                MR.Core.comp.EffectComp.get(effect_name).on_moment(self.msg_event, moment, target, effects_event[effect_name])
+                MR.Core.registry.effectReg.get(effect_name).on_moment(self.msg_event, moment, target, effects_event[effect_name])
             for effect_name in effects_event_list:
                 if effects_event[effect_name].get("expired", False):
                     self.unregister_effect_event(effect_name, target, 0)
@@ -331,7 +331,7 @@ class GameWork:
         pl_props = self.players[user_id]["props"]
         if self.props_limit > 0 and len(pl_props) >= self.props_limit:
             return None
-        elif prop in self.props_banned or not MR.Core.comp.PropComp.get(prop).allowed and prop not in self.props_allowed:
+        elif prop in self.props_banned or not MR.Core.registry.propReg.get(prop).allowed and prop not in self.props_allowed:
             prop = random.choice(self.props_pool)
         pl_props.append(prop)
         return prop
@@ -400,7 +400,7 @@ class GameWork:
         # 清空初始信息 构建对局时发送局势信息, 初始信息不需要
         self.reply.update({"info": [], "below": {"show_ammo": False, "show_shooter": False}, "override": ""})
         if self.flag_bot:
-            MR.Core.comp.BotComp.action(self.msg_event)
+            MR.Core.registry.botReg.action(self.msg_event)
             msg_reply = self.format_reply()
             plungin_event.reply(msg_reply)
         return

@@ -68,22 +68,20 @@ def test_command_registry_registers_commands():
 
 def test_command_registry_matches_surrender_by_state():
     event = SimpleNamespace(val={"state": "play"}, msg="投降")
-    results = command.search(event)
-    assert len(results) == 1
-    handler, groups = results[0]
+    handler, groups = command.search(event)
+    assert handler is not None
     assert handler.__name__ == "surrender"
     assert groups == ()
 
 
 def test_command_registry_matches_shoot_with_groups():
     event = SimpleNamespace(val={"state": "play"}, msg="开枪")
-    results = command.search(event)
-    assert len(results) == 1
-    handler, groups = results[0]
+    handler, groups = command.search(event)
+    assert handler is not None
     assert handler.__name__ == "shoot"
     assert groups == ("开", "")
 
 
 def test_command_registry_ignores_wrong_state():
     event = SimpleNamespace(val={"state": "ob"}, msg="投降")
-    assert command.search(event) == []
+    assert command.search(event) == (None, None)

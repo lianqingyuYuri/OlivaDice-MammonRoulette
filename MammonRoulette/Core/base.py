@@ -24,6 +24,7 @@ class Moment(str, Enum):
 class BaseMode:
     name: str = ""
     points: int = 0
+    bots_allowed: tuple = ()
 
     class seats:
         default: int = 2
@@ -43,6 +44,10 @@ class BaseMode:
 
     @classmethod
     def init(cls):
+        pass
+
+    @classmethod
+    def init_after(cls):
         pass
 
     @classmethod
@@ -90,12 +95,14 @@ class BaseMode:
 
 class BaseProp:
     name: str = ""
-    strCustomDefault: dict = field(default_factory=dict)
-    helpDocDefault: dict = field(default_factory=dict)
     allowed: bool = True
 
     @classmethod
     def init(cls):
+        pass
+
+    @classmethod
+    def init_after(cls):
         pass
 
     @classmethod
@@ -125,11 +132,13 @@ class BaseProp:
 
 class BaseEffect:
     name: str = ""
-    strCustomDefault: dict = field(default_factory=dict)
-    helpDocDefault: dict = field(default_factory=dict)
 
     @classmethod
     def init(cls):
+        pass
+
+    @classmethod
+    def init_after(cls):
         pass
 
     # 应用
@@ -256,10 +265,16 @@ class BotAction:
 
 class BaseBot:
     name: str = ""
-    strCustomDefault: dict = field(default_factory=dict)
-    helpDocDefault: dict = field(default_factory=dict)
     allowed: bool = True
     modes_allowed: tuple = ()
+
+    @classmethod
+    def init(cls):
+        pass
+
+    @classmethod
+    def init_after(cls):
+        pass
 
     @classmethod
     def decide(cls, msg_event, state: GameState, memory: dict) -> BotAction:

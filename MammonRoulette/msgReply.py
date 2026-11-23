@@ -15,8 +15,7 @@ from collections import Counter
 from AmorLib import DataBase
 
 from . import command, config
-from .Core.comp import BotComp, PropComp
-from .Core.registry import modeReg
+from .Core.registry import botReg, modeReg, propReg
 from .Core.work import GameWork
 from .custom import dictModeCustom
 
@@ -264,7 +263,7 @@ def match_game(plugin_event, Proc, msg_event, groups):
 
 
 @command.plState("prep")
-@command.msgRegex(f"^(?:召唤|添加|加入)({'|'.join(BotComp.list())})$", "[召唤,添加,加入](BOT名)//对局添加一名BOT.")
+@command.msgRegex(f"^(?:召唤|添加|加入)({'|'.join(botReg.list())})$", "[召唤,添加,加入](BOT名)//对局添加一名BOT.")
 def join_bot(plugin_event, Proc, msg_event, groups):
     game = msg_event.val["game"]
     if not game or game["start"]:
@@ -344,7 +343,7 @@ def shoot(plugin_event, Proc, msg_event, groups):
 
 @command.plState("play")
 @command.msgRegex(
-    f"^(?:使用|) *({'|'.join(PropComp.list())}) *(\\d*)$",
+    f"^(?:使用|) *({'|'.join(propReg.list())}) *(\\d*)$",
     "[使用,留空](道具名)(目标) //对目标使用道具, 可用qq号或序号指定目标.",
 )
 def use_prop(plugin_event, Proc, msg_event, groups):
@@ -367,7 +366,7 @@ def use_prop(plugin_event, Proc, msg_event, groups):
     elif not (target := game_work.get_target(target)):
         return
     # 使用道具
-    PropComp.apply(msg_event, prop, user_id, target)
+    propReg.apply(msg_event, prop, user_id, target)
     msg_reply = game_work.format_reply()
     plugin_event.reply(msg_reply)
     return
@@ -381,7 +380,7 @@ def surrender(plugin_event, Proc, msg_event, groups):
     game_work.players[user_id]["surrender"] = True
     game_work.dead(user_id, user_id)
     if not game_work.flag_over and game_work.flag_bot:
-        BotComp.action(msg_event)
+        botReg.action(msg_event)
     msg_reply = game_work.format_reply()
     plugin_event.reply(msg_reply)
     return

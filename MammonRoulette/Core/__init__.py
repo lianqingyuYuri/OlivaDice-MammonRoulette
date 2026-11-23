@@ -11,5 +11,4 @@
 
 from . import base
 from . import registry
-from . import comp
 from . import work

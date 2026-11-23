@@ -9,13 +9,13 @@
 """
 
 from ..Core.base import BaseEffect
-from ..Core.comp import EffectComp
+from ..Core.registry import effectDef, effectReg
 from ..Core.work import GameWork
 
 
-class 束缚(EffectComp, BaseEffect):
+@effectDef(helpDocDefault={"恶赌效果 束缚": "被手链囚禁的标识."})
+class 束缚(BaseEffect):
     name = "束缚"
-    helpDocDefault = {"恶赌效果 束缚": "被手链囚禁的标识."}
 
     @classmethod
     def apply(cls, msg_event, target, stacks):
@@ -32,14 +32,16 @@ class 束缚(EffectComp, BaseEffect):
         effect_data["expired"] = True
 
 
-class 神经麻痹(EffectComp, BaseEffect):
-    name = "神经麻痹"
-    helpDocDefault = {"恶赌效果 神经麻痹": "回合结束时失去所有[神经麻痹], 并失去等值的HP."}
-    strCustomDefault = {
+@effectDef(
+    helpDocDefault={"恶赌效果 神经麻痹": "回合结束时失去所有[神经麻痹], 并失去等值的HP."},
+    strCustomDefault={
         "strMrEffectPain_1": ("神经麻痹效果 层数增加", "{tGamblerName}沒感到疼痛[神经麻痹 {old_stacks}->{new_stacks}]."),
         "strMrEffectPain_2": ("神经麻痹效果 结算1", "{tGamblerName}的神經在悲鳴[hp {old_hp}->{new_hp}]……"),
         "strMrEffectPain_3": ("神经麻痹效果 结算2", "{tGamblerName}的藥效衰減, 不再止疼."),
-    }
+    },
+)
+class 神经麻痹(BaseEffect):
+    name = "神经麻痹"
 
     @classmethod
     def apply(cls, msg_event, target, stacks):
@@ -61,7 +63,7 @@ class 神经麻痹(EffectComp, BaseEffect):
         if moment == "damage" and target == game_work.tmp["target"] and game_work.tmp["dmg_type"] == "":
             old_stacks = effect_data["stacks"]
             dmg, game_work.tmp["dmg"] = game_work.tmp["dmg"], 0
-            EffectComp.get(cls.name).apply(msg_event, target, dmg)
+            effectReg.get(cls.name).apply(msg_event, target, dmg)
             msg_reply = msg_event.msg_format(
                 "strMrEffectPain_1",
                 {"tGamblerName": game_work.get_name(target), "old_stacks": old_stacks, "new_stacks": old_stacks + dmg},
