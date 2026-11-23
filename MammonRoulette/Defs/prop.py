@@ -493,7 +493,7 @@ class 金币(BaseProp):
     direct_use = ["锯子", "花生", "巧克力", "香烟", "放大镜", "扑克", "转盘", "牛奶"]
 
     @classmethod
-    def init(cls):
+    def init_after(cls):
         prop_list = (prop for prop in propReg.list() if prop != cls.name)
 
         @command.plState("play")

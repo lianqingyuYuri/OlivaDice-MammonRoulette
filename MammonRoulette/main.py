@@ -76,16 +76,17 @@ class Event(object):
                 f"[unity] - [恶魔轮盘] - <game_data> - 本地对局数据存储文件丢失, 对局数据清空!\n{str(e)}",
             )
         # endregion
+        modeReg.init_after()
+        propReg.init_after()
+        effectReg.init_after()
+        botReg.init_after()
+
         MR.config.readConfig(Proc)
         MR.config.saveConfig(Proc)
         initCustom(MR, Proc)
         readCustom(MR, Proc)
         saveCustom(MR, Proc)
         loadCustomInto(MR, Proc)
-        modeReg.init_after()
-        propReg.init_after()
-        effectReg.init_after()
-        botReg.init_after()
 
     def save(plugin_event, Proc):  # type: ignore
         with open(MR.config.tmpGameDataPath, "w", encoding="utf-8") as f:
