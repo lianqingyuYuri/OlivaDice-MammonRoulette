@@ -388,7 +388,7 @@ class GameWork:
         self.mode.join(self.msg_event, user_id)
         return
 
-    def start(self, plungin_event):
+    def start(self, plugin_event):
         self.game["start"] = True
         self.game["expireTime"] = int(time.time()) // 60 + 120
         self.chamber()
@@ -401,7 +401,7 @@ class GameWork:
         if self.flag_bot:
             MR.Core.registry.botReg.action(self.msg_event)
             msg_reply = self.format_reply()
-            plungin_event.reply(msg_reply)
+            plugin_event.reply(msg_reply)
         return
 
     def chamber(self):
