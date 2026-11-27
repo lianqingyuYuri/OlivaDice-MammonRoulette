@@ -5,34 +5,23 @@
 @Contact   :    xinghu2408@foxmail.com
 @License   :    AGPLv3
 @Copyright :    (C) 2026 MammonRoulette
-@Desc      :    None
+@Desc      :    未实现设置面板, 请忽略
 """
+
+import copy
+import json
+import os
+import tkinter
+import webbrowser
+from tkinter import filedialog, messagebox, ttk
 
 import OlivaDiceCore
 import OlivaDiceNativeGUI
 
-import copy
-import base64
-import os
-import tkinter
-from tkinter import ttk, filedialog, messagebox
-import webbrowser
-import traceback
-import threading
-import json
-import importlib
-import datetime
-import re
-
-from PIL import Image, ImageTk
-
 from . import config
 from .custom import (
-    dictHelpDoc,
-    dictModeCustom,
-    dictPropCustom,
-    dictEffectCustom,
     dictDefsNote,
+    dictModeCustom,
 )
 
 dictColorContext = {
@@ -634,7 +623,7 @@ class ConfigUI(object):
         """恢复模式默认值"""
         if not messagebox.askyesno(
             "确认恢复",
-            f"确定要恢复当前账号的模式配置为默认值吗？这将覆盖所有自定义修改。",
+            "确定要恢复当前账号的模式配置为默认值吗？这将覆盖所有自定义修改。",
             parent=self.UIObject["root"],
         ):
             return
@@ -668,7 +657,7 @@ class ConfigUI(object):
                 raise ValueError("配置文件格式不正确，必须是一个JSON文件")
             if not messagebox.askyesno(
                 "确认导入",
-                f"确定要导入模式配置吗？这将覆盖当前账号的所有模式配置。",
+                "确定要导入模式配置吗？这将覆盖当前账号的所有模式配置。",
                 parent=self.UIObject["root"],
             ):
                 return
@@ -687,7 +676,7 @@ class ConfigUI(object):
                     json.dump(import_data, f, ensure_ascii=False, indent=4)
                 self.init_data_total()
                 messagebox.showinfo("完成", "模式配置导入成功", parent=self.UIObject["root"])
-            except Exception as e:
+            except Exception:
                 # 回滚
                 dictModeCustom[current_hash] = backup
                 for mode_name, mode_data in backup.items():
@@ -969,8 +958,7 @@ class ConfigUI(object):
 
         def save(self):
             new_value = self.UIObject["text_edit"].get("1.0", tkinter.END)
-            if new_value.endswith("\n"):
-                new_value = new_value[:-1]
+            new_value = new_value.removesuffix("\n")
             self.root_class.save_mode_detail(self.mode_name, self.field_key, new_value)
             self.root_class.init_data_total()
 

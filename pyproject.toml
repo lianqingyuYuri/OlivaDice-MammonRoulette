@@ -39,6 +39,7 @@ addopts = "--strict-markers"
 
 [tool.coverage.run]
 source = ["MammonRoulette"]
+omit = ["MammonRoulette/GUI.py"]
 branch = true
 relative_files = true
 

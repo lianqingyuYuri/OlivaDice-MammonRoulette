@@ -79,6 +79,9 @@ def pytest_configure(config):
         raise pytest.UsageError("未找到 OlivaDiceCore 源码。请设置 OLIVADICECORE_SOURCE，或 checkout 到 .ci/OlivaDiceCore。")
     if not (AMORLIB_SOURCE / "AmorLib" / "__init__.py").is_file():
         raise pytest.UsageError("未找到 AmorLib 子模块。请运行 git submodule update --init --recursive。")
+    import MammonRoulette
+
+    MammonRoulette.Core.registry.init_after()
 
 
 def pytest_sessionstart(session):
@@ -103,3 +106,42 @@ def isolated_installation(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     for name in ("OLIVOS_WEBUI_HOST", "OLIVOS_WEBUI_PORT"):
         monkeypatch.delenv(name, raising=False)
+
+
+@pytest.fixture
+def roulette_db(tmp_path, monkeypatch):
+    """构造一个带 gambler / bot 表的临时数据库，并把 config.dbPath 指向它。"""
+    import MammonRoulette
+    from AmorLib import DataBase
+
+    db_path = tmp_path / "Roulette.db"
+    monkeypatch.setattr(MammonRoulette.config, "dbPath", str(db_path))
+    with DataBase(str(db_path)) as db:
+        db.create(
+            "gambler",
+            {
+                "user_id": str,
+                "name": str,
+                "points": int,
+                "kills": int,
+                "suicide": int,
+                "surrender": int,
+                "wins": int,
+                "losses": int,
+            },
+            primary_key="user_id",
+        )
+        db.create(
+            "bot",
+            {
+                "bot_model": str,
+                "points": int,
+                "kills": int,
+                "suicide": int,
+                "surrender": int,
+                "wins": int,
+                "losses": int,
+            },
+            primary_key="bot_model",
+        )
+    return str(db_path)
