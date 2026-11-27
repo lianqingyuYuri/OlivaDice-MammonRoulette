@@ -463,7 +463,7 @@ def test_event_menu_manage(monkeypatch):
         def start(self):
             FakeConfigUI.started.append(self.Model_name)
 
-    monkeypatch.setattr(MammonRoulette, "GUI", SimpleNamespace(ConfigUI=FakeConfigUI))
+    monkeypatch.setattr(MammonRoulette, "GUI", SimpleNamespace(ConfigUI=FakeConfigUI), raising=False)
     proc = SimpleNamespace(Proc_info=SimpleNamespace(logger_proc=SimpleNamespace(log=lambda msg: None)))
     event = SimpleNamespace(data=SimpleNamespace(namespace="MammonRoulette", event="MammonRoulette_Menu_manage"))
     main.Event.menu(event, proc)
