@@ -338,18 +338,7 @@ class BotRegistry(Registry[str]):
                 target = game_work.get_target(action.target) if action.target else shooter
                 assert target is not None
 
-                if action.type == action.SHOOT_SELF:
-                    game_work.upsert_info(msg_event.msg_format("strMrBotShootSelf", {"tBotMark": bot_mark, "tBotName": bot_name}))
-                    game_work.shoot(shooter)
-                elif action.type == action.SHOOT_OTHER:
-                    game_work.upsert_info(
-                        msg_event.msg_format(
-                            "strMrBotShootOther",
-                            {"tBotMark": bot_mark, "tBotName": bot_name, "tTargetName": game_work.get_name(target)},
-                        )
-                    )
-                    game_work.shoot(target)
-                elif action.type == action.USE_PROP:
+                if action.type == action.USE_PROP:
                     if target == shooter:
                         game_work.upsert_info(
                             msg_event.msg_format(
@@ -370,8 +359,17 @@ class BotRegistry(Registry[str]):
                             )
                         )
                     MR.Core.registry.propReg.apply(msg_event, action.prop, shooter, target)
+                elif action.type == action.SHOOT_SELF:
+                    game_work.upsert_info(msg_event.msg_format("strMrBotShootSelf", {"tBotMark": bot_mark, "tBotName": bot_name}))
+                    game_work.shoot(shooter)
                 else:
-                    break
+                    game_work.upsert_info(
+                        msg_event.msg_format(
+                            "strMrBotShootOther",
+                            {"tBotMark": bot_mark, "tBotName": bot_name, "tTargetName": game_work.get_name(target)},
+                        )
+                    )
+                    game_work.shoot(target)
                 state = game_work.get_state()
                 for f, v in memory.items():
                     setattr(state, f, v)

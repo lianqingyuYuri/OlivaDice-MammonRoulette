@@ -29,8 +29,6 @@ class 达尔文(BaseBot):
     def decide(cls, msg_event, state: GameState, memory):
         me: PlayerView = state.pl_self
         enemies = [pl for pl in state.players if pl.id != state.shooter and not pl.is_dead]
-        if not enemies:
-            return BotAction.skip()
         pv_target = min(enemies, key=lambda p: p.hp)
 
         if "手铐" in me.props and prop_can_use(msg_event, "手铐", pv_target.id):

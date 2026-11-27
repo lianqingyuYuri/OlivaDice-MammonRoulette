@@ -243,7 +243,6 @@ class BotAction:
     SHOOT_SELF = "shoot_self"
     SHOOT_OTHER = "shoot_other"
     USE_PROP = "use_prop"
-    SKIP = "skip"
 
     @classmethod
     def shoot_self(cls, memory: dict | None = None):
@@ -256,10 +255,6 @@ class BotAction:
     @classmethod
     def use_prop(cls, prop: str, target: str | int = "", memory: dict | None = None):
         return cls(type=cls.USE_PROP, prop=prop, target=str(target), memory=memory or {})
-
-    @classmethod
-    def skip(cls, memory: dict | None = None):
-        return cls(type=cls.SKIP, memory=memory or {})
 
 
 class BaseBot:
