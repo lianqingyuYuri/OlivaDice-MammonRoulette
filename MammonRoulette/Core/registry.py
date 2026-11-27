@@ -74,7 +74,6 @@ class CommandRegistry(Registry[MsgEvent]):
         return None, None
 
 
-command = CommandRegistry()
 # endregion
 
 
@@ -166,8 +165,6 @@ class ModeRegistry(Registry[str]):
         return
 
 
-modeReg = ModeRegistry()
-modeDef = modeReg.modeDef
 # endregion
 
 
@@ -225,8 +222,6 @@ class PropRegistry(Registry[str]):
         return
 
 
-propReg = PropRegistry()
-propDef = propReg.propDef
 # endregion
 
 
@@ -277,8 +272,6 @@ class EffectRegistry(Registry[str]):
         return list(self._entries.keys())
 
 
-effectReg = EffectRegistry()
-effectDef = effectReg.effectDef
 # endregion
 
 
@@ -385,6 +378,23 @@ class BotRegistry(Registry[str]):
         return
 
 
-botReg = BotRegistry()
-botDef = botReg.botDef
 # endregion
+
+command = CommandRegistry()
+
+modeReg = ModeRegistry()
+propReg = PropRegistry()
+effectReg = EffectRegistry()
+botReg = BotRegistry()
+
+modeDef = modeReg.modeDef
+propDef = propReg.propDef
+effectDef = effectReg.effectDef
+botDef = botReg.botDef
+
+
+def init_after():
+    modeReg.init_after()
+    propReg.init_after()
+    effectReg.init_after()
+    botReg.init_after()
