@@ -9,8 +9,8 @@ game = {
         "points": int,  # 积分
         "props": {
             "pool": [],  # 道具池
-            "allow": [],  # 道具白名单
-            "ban": [],  # 道具黑名单
+            "allowed": [],  # 道具白名单
+            "banned": [],  # 道具黑名单
             "limit": int,  # 持有道具上限
         },
     },
@@ -36,19 +36,18 @@ game = {
         },
         "modify": {
             "dmg": int,  # 伤害
-            "flag_ammo_show": bool,  # 显示弹药
-            "flag_bullet_show": bool,  # 显示子弹
-            "flag_bot": bool,  # AI旗帜
+            "ammo_visible": bool,  # 显示弹药
+            "bullet_visible": bool,  # 显示子弹
         },
         "props_event": [],  # 道具事件
     },
     "reply": {
         "info": [],  # 常规信息
-        "note": {
-            "flag_ammo": bool,  # 弹药消息
-            "flag_shooter": bool,  # 枪手信息
+        "below": {
+            "show_ammo": bool,  # 弹药消息显示
+            "show_shooter": bool,  # 枪手信息
         },  # 分割线以下的消息
-        "only": "",  # 会覆盖其他消息
+        "override": "",  # 会覆盖其他消息
     },
     "tmp": {
         "target": str,  # 目标玩家ID
@@ -64,6 +63,7 @@ game = {
         "is_check_dead": bool,  # 是否检查死亡
         "is_check_over": bool,  # 是否检查游戏结束
     },
+    "IdStore": int,  # ID存储
 }
 
 moment = [
@@ -79,9 +79,14 @@ remove_props_event = "remove"
 remove_effects_event = "remove"
 
 prop_data = {
-    "id": str,  # 道具id
+    "id": int,  # 道具id
     "name": str,  # 道具名称
+    "expired": bool,  # 过期
     "data": {},  # 道具数据
 }
 key = "effect"
-effect_data = {"stacks": int, "data": {}}
+effect_data = {
+    "stacks": int,  # 层数
+    "expired": bool,  # 过期
+    "data": {},  # 效果数据
+}

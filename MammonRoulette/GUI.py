@@ -5,34 +5,23 @@
 @Contact   :    xinghu2408@foxmail.com
 @License   :    AGPLv3
 @Copyright :    (C) 2026 MammonRoulette
-@Desc      :    None
+@Desc      :    未实现设置面板, 请忽略
 """
+
+import copy
+import json
+import os
+import tkinter
+import webbrowser
+from tkinter import filedialog, messagebox, ttk
 
 import OlivaDiceCore
 import OlivaDiceNativeGUI
 
-import copy
-import base64
-import os
-import tkinter
-from tkinter import ttk, filedialog, messagebox
-import webbrowser
-import traceback
-import threading
-import json
-import importlib
-import datetime
-import re
-
-from PIL import Image, ImageTk
-
 from . import config
-from .msgCustom import (
-    dictHelpDoc,
-    dictModeCustom,
-    dictPropCustom,
-    dictEffectCustom,
+from .custom import (
     dictDefsNote,
+    dictModeCustom,
 )
 
 dictColorContext = {
@@ -578,10 +567,10 @@ class ConfigUI(object):
             ("seats_max", "strModeSeatsMax"),
             ("props_pool", "strModePropsPool"),
             ("props_limit", "strModePropsLimit"),
-            ("props_ban", "strModePropsBan"),
+            ("props_banned", "strModePropsBanned"),
             ("modify_dmg", "strModeModifyDmg"),
-            ("modify_flag_ammo_show", "strModeModifyAmmoShow"),
-            ("modify_flag_bullet_show", "strModeModifyBulletShow"),
+            ("modify_ammo_visible", "strModeModifyAmmoShow"),
+            ("modify_bullet_visible", "strModeModifyBulletShow"),
         ]
 
         for field_key, note_key in field_configs:
@@ -604,8 +593,8 @@ class ConfigUI(object):
                 if field_key == "props_pool":
                     lst = props.get("pool", [])
                     value = ", ".join(lst) if lst else "（空）"
-                elif field_key == "props_ban":
-                    lst = props.get("ban", [])
+                elif field_key == "props_banned":
+                    lst = props.get("banned", [])
                     value = ", ".join(lst) if lst else "（空）"
                 elif field_key == "props_limit":
                     value = str(props.get("limit", 0))
@@ -613,10 +602,10 @@ class ConfigUI(object):
                 modify = mode_data.get("modify", {})
                 if field_key == "modify_dmg":
                     value = str(modify.get("dmg", 1))
-                elif field_key == "modify_flag_ammo_show":
-                    value = str(int(modify.get("flag_ammo_show", 1)))
-                elif field_key == "modify_flag_bullet_show":
-                    value = str(int(modify.get("flag_bullet_show", 0)))
+                elif field_key == "modify_ammo_visible":
+                    value = str(int(modify.get("ammo_visible", 1)))
+                elif field_key == "modify_bullet_visible":
+                    value = str(int(modify.get("bullet_visible", 0)))
             self.UIObject["tree_mode_detail"].insert(
                 "",
                 "end",
@@ -634,7 +623,7 @@ class ConfigUI(object):
         """恢复模式默认值"""
         if not messagebox.askyesno(
             "确认恢复",
-            f"确定要恢复当前账号的模式配置为默认值吗？这将覆盖所有自定义修改。",
+            "确定要恢复当前账号的模式配置为默认值吗？这将覆盖所有自定义修改。",
             parent=self.UIObject["root"],
         ):
             return
@@ -668,7 +657,7 @@ class ConfigUI(object):
                 raise ValueError("配置文件格式不正确，必须是一个JSON文件")
             if not messagebox.askyesno(
                 "确认导入",
-                f"确定要导入模式配置吗？这将覆盖当前账号的所有模式配置。",
+                "确定要导入模式配置吗？这将覆盖当前账号的所有模式配置。",
                 parent=self.UIObject["root"],
             ):
                 return
@@ -687,7 +676,7 @@ class ConfigUI(object):
                     json.dump(import_data, f, ensure_ascii=False, indent=4)
                 self.init_data_total()
                 messagebox.showinfo("完成", "模式配置导入成功", parent=self.UIObject["root"])
-            except Exception as e:
+            except Exception:
                 # 回滚
                 dictModeCustom[current_hash] = backup
                 for mode_name, mode_data in backup.items():
@@ -814,18 +803,18 @@ class ConfigUI(object):
             }
             field_key = key_map[field_key]
             current_data["seats"][field_key] = default_modes["seats"][field_key]
-        elif field_key in ("props_pool", "props_limit", "props_ban"):
+        elif field_key in ("props_pool", "props_limit", "props_banned"):
             if field_key == "props_pool":
                 current_data["props"]["pool"] = default_modes["props"]["pool"]
             elif field_key == "props_limit":
                 current_data["props"]["limit"] = default_modes["props"]["limit"]
-            elif field_key == "props_ban":
-                current_data["props"]["ban"] = default_modes["props"]["ban"]
-        elif field_key in ("modify_dmg", "modify_flag_ammo_show", "modify_flag_bullet_show"):
+            elif field_key == "props_banned":
+                current_data["props"]["banned"] = default_modes["props"]["banned"]
+        elif field_key in ("modify_dmg", "modify_ammo_visible", "modify_bullet_visible"):
             key_map = {
                 "modify_dmg": "dmg",
-                "modify_flag_ammo_show": "flag_ammo_show",
-                "modify_flag_bullet_show": "flag_bullet_show",
+                "modify_ammo_visible": "ammo_visible",
+                "modify_bullet_visible": "bullet_visible",
             }
             field_key = key_map[field_key]
             current_data["modify"][field_key] = default_modes["modify"][field_key]
@@ -876,8 +865,8 @@ class ConfigUI(object):
             if field_key == "props_pool":
                 lst = props.get("pool", [])
                 current_value = ", ".join(lst) if lst else ""
-            elif field_key == "props_ban":
-                lst = props.get("ban", [])
+            elif field_key == "props_banned":
+                lst = props.get("banned", [])
                 current_value = ", ".join(lst) if lst else ""
             elif field_key == "props_limit":
                 current_value = str(props.get("limit", 0))
@@ -885,10 +874,10 @@ class ConfigUI(object):
             modify = mode_data.get("modify", {})
             if field_key == "modify_dmg":
                 current_value = str(modify.get("dmg", 1))
-            elif field_key == "modify_flag_ammo_show":
-                current_value = bool(modify.get("flag_ammo_show", 1))
-            elif field_key == "modify_flag_bullet_show":
-                current_value = bool(modify.get("flag_bullet_show", 0))
+            elif field_key == "modify_ammo_visible":
+                current_value = bool(modify.get("ammo_visible", 1))
+            elif field_key == "modify_bullet_visible":
+                current_value = bool(modify.get("bullet_visible", 0))
 
         self.edit_mode_UI(
             root_class=self,
@@ -969,8 +958,7 @@ class ConfigUI(object):
 
         def save(self):
             new_value = self.UIObject["text_edit"].get("1.0", tkinter.END)
-            if new_value.endswith("\n"):
-                new_value = new_value[:-1]
+            new_value = new_value.removesuffix("\n")
             self.root_class.save_mode_detail(self.mode_name, self.field_key, new_value)
             self.root_class.init_data_total()
 
@@ -1003,17 +991,17 @@ class ConfigUI(object):
                 elif field_key == "props_pool":
                     lst = [item.strip() for item in new_value.split(",") if item.strip()]
                     props["pool"] = lst
-                elif field_key == "props_ban":
+                elif field_key == "props_banned":
                     lst = [item.strip() for item in new_value.split(",") if item.strip()]
-                    props["ban"] = lst
+                    props["banned"] = lst
             elif field_key.startswith("modify_"):
                 modify = mode_data.setdefault("modify", {})
                 if field_key == "modify_dmg":
                     modify["dmg"] = int(new_value)
-                elif field_key == "modify_flag_ammo_show":
-                    modify["flag_ammo_show"] = bool(int(new_value))
-                elif field_key == "modify_flag_bullet_show":
-                    modify["flag_bullet_show"] = bool(int(new_value))
+                elif field_key == "modify_ammo_visible":
+                    modify["ammo_visible"] = bool(int(new_value))
+                elif field_key == "modify_bullet_visible":
+                    modify["bullet_visible"] = bool(int(new_value))
         except ValueError:
             messagebox.showerror("错误", "请输入正确的数值", parent=self.UIObject["root"])
             return

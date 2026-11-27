@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+# ruff: isort: skip_file
 """
 @File      :    MammonRoulette/Defs/__init__.py
 @Author    :    lianqingyuYuri恋倾雨
@@ -11,5 +12,4 @@
 from . import mode
 from . import prop
 from . import effect
-
-# from . import bot
+from . import bot

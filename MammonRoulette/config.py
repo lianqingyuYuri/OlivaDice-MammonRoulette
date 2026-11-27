@@ -8,63 +8,45 @@
 @Desc      :    None
 """
 
-try:
-    import OlivaDiceNativeGUI
-
-    has_NativeGUI = True
-except ImportError:
-    has_NativeGUI = False
-
 import copy
 import json
 import os
 
-from AmorLib import IniConfig
+from AmorLib import IniConfig, releaseDir
 
-from .msgCustom import dictModeCustom, dictPropCustom, dictEffectCustom
+from .custom import dictEffectCustom, dictModeCustom, dictPropCustom
 
-name = "恶魔轮盘"
+debug = 0
 
+dataDirRoot = "plugin/data/MammonRoulette"
+configPath = "plugin/data/MammonRoulette/config.ini"
 
-dataDirRoot = "plugin/data/MammonRoulette/data"
-configPath = "plugin/data/MammonRoulette/data/config.ini"
-
-default_db_path = "plugin/data/MammonRoulette/Roulette.db"
-DB_PATH = ""
-default_tmp_game_path = "plugin/tmp/MammonRoulette_data.json"
-TMP_GAME_PATH = ""
-
-default_debug_flag = False
-DEBUG_FLAG = 0
-
-default_bot_model_dir = "plugin/data/MammonRoulette/data/bot_model/"
-BOT_MODEL_DIR = ""
-
-
-def releaseDir(dir_path):
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
+dbPath = "plugin/data/MammonRoulette/Roulette.db"
+tmpGameDataPath = "plugin/tmp/MammonRoulette_data.json"
+botModelDir = "plugin/data/MammonRoulette/botModel"
 
 
 def initConfig(Proc):
-    global DB_PATH, TMP_GAME_PATH, DEBUG_FLAG, BOT_MODEL_DIR
+    global dbPath, tmpGameDataPath, botModelDir
+    if not os.path.exists(configPath):
+        # 创建空配置文件
+        with open(configPath, "w", encoding="utf-8") as f:
+            f.write("")
     with IniConfig(configPath) as cfg:
-        DB_PATH = cfg.get("path", "db_path", default_db_path)
-        TMP_GAME_PATH = cfg.get("path", "tmp_game_path", default_tmp_game_path)
-        DEBUG_FLAG = cfg.getboolean("flags", "debug_flag", default_debug_flag)
-        BOT_MODEL_DIR = cfg.get("dir", "bot_model_dir", default_bot_model_dir)
-    releaseDir(BOT_MODEL_DIR)
+        dbPath = cfg.get("path", "dbPath", "plugin/data/MammonRoulette/Roulette.db")
+        tmpGameDataPath = cfg.get("path", "tmpGameDataPath", "plugin/tmp/MammonRoulette_data.json")
+        botModelDir = cfg.get("dir", "botModelDir", "plugin/data/MammonRoulette/botModel")
+    releaseDir(botModelDir)
     for hash_this in Proc.Proc_data["bot_info_dict"]:
         releaseDir(dataDirRoot + "/" + hash_this)
 
 
 def readConfig(Proc):
-    global DB_PATH, TMP_GAME_PATH, DEBUG_FLAG, BOT_MODEL_DIR
+    global dbPath, tmpGameDataPath, botModelDir
     with IniConfig(configPath) as cfg:
-        DB_PATH = cfg.get("path", "db_path", default_db_path)
-        TMP_GAME_PATH = cfg.get("path", "tmp_game_path", default_tmp_game_path)
-        DEBUG_FLAG = cfg.getboolean("flags", "debug_flag", default_debug_flag)
-        BOT_MODEL_DIR = cfg.get("dir", "bot_model_dir", default_bot_model_dir)
+        dbPath = cfg.get("path", "dbPath", "plugin/data/MammonRoulette/Roulette.db")
+        tmpGameDataPath = cfg.get("path", "tmpGameDataPath", "plugin/tmp/MammonRoulette_data.json")
+        botModelDir = cfg.get("dir", "botModelDir", "plugin/data/MammonRoulette/botModel")
     for hash_this in Proc.Proc_data["bot_info_dict"]:
         custom_path = dataDirRoot + "/" + hash_this
         releaseDir(custom_path)
@@ -93,10 +75,9 @@ def readConfig(Proc):
 
 def saveConfig(Proc):
     with IniConfig(configPath) as cfg:
-        cfg.set("path", "db_path", DB_PATH)
-        cfg.set("path", "tmp_game_path", TMP_GAME_PATH)
-        cfg.set("flags", "debug_flag", DEBUG_FLAG)
-        cfg.set("dir", "bot_model_dir", BOT_MODEL_DIR)
+        cfg.set("path", "dbPath", dbPath)
+        cfg.set("path", "tmpGameDataPath", tmpGameDataPath)
+        cfg.set("dir", "botModelDir", botModelDir)
         cfg.save()
     for hash_this in Proc.Proc_data["bot_info_dict"]:
         custom_path = dataDirRoot + "/" + hash_this

@@ -10,9 +10,8 @@
 
 import random
 
-from ..msgCustom import dictModeCustom, dictDefsNote
 from ..Core.base import BaseMode
-from ..Core.comp import ModeComp
+from ..Core.registry import modeDef
 from ..Core.work import GameWork
 
 
@@ -21,8 +20,8 @@ def generate_helpdoc(
     hp_str: str = "",
     props_limit: int | str = 0,
     props_pool: tuple = (),
-    props_allow: tuple = (),
-    props_ban: tuple = (),
+    props_allowed: tuple = (),
+    props_banned: tuple = (),
     mechanisms: tuple = (),
 ) -> str:
     lines = []
@@ -34,25 +33,27 @@ def generate_helpdoc(
         lines.append(f"〈道具池〉(上限{props_limit})")
     if props_pool:
         lines.append(f"  {', '.join(props_pool)}")
-    if props_allow:
-        lines.append(f"-特殊道具-\n  {', '.join(props_allow)}")
-    if props_ban:
-        lines.append(f"-禁用道具-\n  {', '.join(props_ban)}")
+    if props_allowed:
+        lines.append(f"-特殊道具-\n  {', '.join(props_allowed)}")
+    if props_banned:
+        lines.append(f"-禁用道具-\n  {', '.join(props_banned)}")
     if mechanisms:
         lines.append("〔机制〕")
         lines.extend(f"{i}. {m}{'.' if i == len(mechanisms) else ';'}" for i, m in enumerate(mechanisms, 1))
     return "\n".join(lines)
 
 
-class 经典(ModeComp, BaseMode):
-    name = "经典"
-    helpdoc = generate_helpdoc(
+@modeDef(helpDocDefault={
+    "恶赌模式 经典": generate_helpdoc(
         points=50,
-        hp_str="每名玩家4hp.",
+        hp_str="每名玩家 4hp.",
         props_limit=6,
         props_pool=("手铐", "锯子", "花生", "巧克力", "香烟", "红牛", "邀请函", "放大镜"),
         mechanisms=("游戏开始时, 首发玩家抽取 2 个道具, 非首发玩家抽取 1 个道具", "玩家回合开始时抽取 2 个道具"),
     )
+})
+class 经典(BaseMode):
+    name = "经典"
     points = 50
 
     class props(BaseMode.props):
@@ -60,28 +61,27 @@ class 经典(ModeComp, BaseMode):
         limit = 6
 
     @classmethod
-    def start(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def start(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         for pl in game_work.order[1:]:
             game_work.draw_prop(pl, 1)
         game_work.draw_prop(game_work.shooter, 2)
 
     @classmethod
-    def join(cls, msg_manager, user_id):
-        msg_manager.val["game"]["data"]["players"][user_id]["hp"] = 4
+    def join(cls, msg_event, user_id):
+        msg_event.val["game"]["data"]["players"][user_id]["hp"] = 4
 
     # 换人
     @classmethod
-    def switch(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def switch(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         game_work.draw_prop(game_work.shooter, 2)
 
 
-class 道具(ModeComp, BaseMode):
-    name = "道具"
-    helpdoc = generate_helpdoc(
+@modeDef(helpDocDefault={
+    "恶赌模式 道具": generate_helpdoc(
         points=40,
-        hp_str="前3名玩家5hp, 其余玩家6hp.",
+        hp_str="前 3 名玩家 5hp, 其余玩家 6hp.",
         props_limit=16,
         props_pool=(
             "手铐",
@@ -101,6 +101,9 @@ class 道具(ModeComp, BaseMode):
         ),
         mechanisms=("装弹时所有玩家抽取 4 个道具",),
     )
+})
+class 道具(BaseMode):
+    name = "道具"
     points = 40
 
     class props(BaseMode.props):
@@ -123,31 +126,35 @@ class 道具(ModeComp, BaseMode):
         limit = 16
 
     @classmethod
-    def join(cls, msg_manager, user_id):
-        game_work = GameWork.from_manager(msg_manager)
+    def join(cls, msg_event, user_id):
+        game_work = GameWork.from_manager(msg_event)
         game_work.players[user_id]["hp"] = 5 if len(game_work.order) < 4 else 6
 
     # 装弹
     @classmethod
-    def reload(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def reload(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         for pl in game_work.order:
             game_work.draw_prop(pl, 4)
 
 
-class 金币(ModeComp, BaseMode):
+@modeDef(
+    helpDocDefault={
+        "恶赌模式 金币": generate_helpdoc(
+            points=60,
+            hp_str="每名玩家 5hp.",
+            props_limit=12,
+            props_pool=("金币",),
+            mechanisms=("玩家回合开始时获得 1 枚金币", "玩家血量首次低至 2 时, 获得 1 枚金币"),
+        )
+    },
+    strCustomDefault={
+        "strMrModeGold_1": ("金币模式 机制2的回复词", "金光乍現！一枚金幣落入{tGamblerName}手中."),
+        "strMrModeGold_2": ("金币模式 机制2的回复词", "金光乍現！一枚含金量0%的金幣?落入{tGamblerName}手中."),
+    }
+)
+class 金币(BaseMode):
     name = "金币"
-    helpdoc = generate_helpdoc(
-        points=60,
-        hp_str="每名玩家5hp.",
-        props_limit=12,
-        props_pool=("金币",),
-        mechanisms=("玩家回合开始时获得 1 枚金币", "玩家血量首次低至 2 时, 获得 1 枚金币"),
-    )
-    reply = (
-        ("strMrModeGold_1", "金币模式 机制2的回复词", "金光乍現！一枚金幣落入{tGamblerName}手中."),
-        ("strMrModeGold_2", "金币模式 机制2的回复词", "金光乍現！一枚含金量0%的金幣?落入{tGamblerName}手中."),
-    )
     points = 60
 
     class props(BaseMode.props):
@@ -155,50 +162,71 @@ class 金币(ModeComp, BaseMode):
         limit = 12
 
     @classmethod
-    def start(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def start(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         game_work.draw_prop(game_work.shooter, 1)
 
     @classmethod
-    def join(cls, msg_manager, user_id):
-        msg_manager.val["game"]["data"]["players"][user_id]["hp"] = 5
+    def join(cls, msg_event, user_id):
+        msg_event.val["game"]["data"]["players"][user_id]["hp"] = 5
 
     # 换人
     @classmethod
-    def switch(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def switch(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         game_work.draw_prop(game_work.shooter, 1)
 
     # 受伤
     @classmethod
-    def damage(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def damage(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         target, dmg = game_work.tmp["target"], game_work.modify["dmg"]
         comp = game_work.modify.setdefault("金币", [])
         if target not in comp and game_work.players[target]["hp"] - dmg <= 2:
             t_value = {"tGamblerName": game_work.get_name(target)}
             if game_work.get_prop(target, "金币"):
-                msg_reply = msg_manager.msg_format("strMrModeGold_1", t_value)
+                msg_reply = msg_event.msg_format("strMrModeGold_1", t_value)
             else:
-                msg_reply = msg_manager.msg_format("strMrModeGold_2", t_value)
+                msg_reply = msg_event.msg_format("strMrModeGold_2", t_value)
             game_work.upsert_info(msg_reply)
             comp.append(target)
 
 
-class 勇者(ModeComp, BaseMode):
+@modeDef(
+    helpDocDefault={
+        "恶赌模式 勇者": generate_helpdoc(
+            points=40,
+            hp_str="每名玩家 5hp.",
+            props_limit=12,
+            props_pool=(
+                "手铐",
+                "锯子",
+                "邀请函",
+                "花生",
+                "巧克力",
+                "香烟",
+                "红牛",
+                "放大镜",
+                "口红",
+                "扑克",
+                "转盘",
+                "牛奶",
+                "金币",
+            ),
+            mechanisms=(
+                "游戏开始时, 首发玩家抽取 1 个道具, 非首发玩家抽取 2 个道具",
+                "玩家吞枪且为空弹时抽取 2 个道具",
+                "魔弹: 开枪且为实弹时有 1/3 概率使伤害 +1",
+            ),
+        )
+    },
+    strCustomDefault={
+        "strMrModeHero_1": ("勇者模式 魔弹机制回复词", "伴隨七彩光芒，魔彈發射."),
+    }
+)
+class 勇者(BaseMode):
     name = "勇者"
-    helpdoc = generate_helpdoc(
-        points=40,
-        hp_str="每名玩家5hp.",
-        props_limit=12,
-        props_pool=("手铐", "锯子", "邀请函", "花生", "巧克力", "香烟", "红牛", "放大镜", "口红", "扑克", "转盘", "牛奶", "金币"),
-        mechanisms=(
-            "游戏开始时, 首发玩家抽取 1 个道具, 非首发玩家抽取 2 个道具",
-            "玩家吞枪且为空弹时抽取 2 个道具",
-            "魔弹: 开枪且为实弹时有1/3概率使伤害+1",
-        ),
-    )
-    reply = (("strMrModeHero_1", "勇者模式 魔弹机制回复词", "伴隨七彩光芒，魔彈發射."),)
+
     points = 40
 
     class props(BaseMode.props):
@@ -206,47 +234,51 @@ class 勇者(ModeComp, BaseMode):
         limit = 12
 
     @classmethod
-    def start(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def start(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         for pl in game_work.order:
             game_work.draw_prop(pl, 2 if pl != game_work.shooter else 1)
 
     @classmethod
-    def join(cls, msg_manager, user_id):
-        msg_manager.val["game"]["data"]["players"][user_id]["hp"] = 5
+    def join(cls, msg_event, user_id):
+        msg_event.val["game"]["data"]["players"][user_id]["hp"] = 5
 
     # 开枪
     @classmethod
-    def shoot(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def shoot(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         if game_work.bullet and random.randint(1, 3) == 1:  # 魔弹
             game_work.tmp["dmg"] += 1
-            msg_reply = msg_manager.msg_format("strMrModeHero_1")
+            msg_reply = msg_event.msg_format("strMrModeHero_1")
             game_work.upsert_info(msg_reply)
         target, is_shoot_me = game_work.tmp["target"], game_work.tmp["is_shoot_me"]
         if is_shoot_me and not game_work.bullet:
             game_work.draw_prop(target, 2)
 
 
-class 赌徒(ModeComp, BaseMode):
+@modeDef(
+    helpDocDefault={
+        "恶赌模式 赌徒": generate_helpdoc(
+            points=40,
+            hp_str="每名玩家 5hp.",
+            props_limit=12,
+            props_pool=("手铐", "锯子", "邀请函", "红牛", "放大镜", "口红", "牛奶", "金币", "烟花"),
+            mechanisms=(
+                "游戏开始时, 所有玩家抽取 2 个道具",
+                "玩家吞枪且为空弹时抽取 3 个道具",
+                "魔弹: 开枪且为实弹时有 1/3 概率使伤害 +1",
+                "扑克: 开枪有 1/3 概率反转子弹虚实",
+                "隐藏显示弹药数量",
+            ),
+        )
+    },
+    strCustomDefault={
+        "strMrModeGambler_1": ("赌徒模式 扑克机制回复词", "子彈擊穿突然出現的{poker}."),
+        "strMrModeGambler_2": ("赌徒模式 魔弹机制回复词", "伴隨七彩光芒，魔彈發射."),
+    }
+)
+class 赌徒(BaseMode):
     name = "赌徒"
-    helpdoc = generate_helpdoc(
-        points=40,
-        hp_str="每名玩家5hp.",
-        props_limit=12,
-        props_pool=("手铐", "锯子", "邀请函", "红牛", "放大镜", "口红", "牛奶", "金币", "烟花"),
-        mechanisms=(
-            "游戏开始时, 所有玩家抽取 2 个道具",
-            "玩家吞枪且为空弹时抽取 3 个道具",
-            "魔弹: 开枪且为实弹时有1/3概率使伤害+1",
-            "扑克: 开枪有1/3概率反转子弹虚实",
-            "隐藏显示弹药数量",
-        ),
-    )
-    reply = (
-        ("strMrModeGambler_1", "赌徒模式 扑克机制回复词", "子彈擊穿突然出現的{poker}."),
-        ("strMrModeGambler_2", "赌徒模式 魔弹机制回复词", "伴隨七彩光芒，魔彈發射."),
-    )
     points = 40
 
     class props(BaseMode.props):
@@ -254,7 +286,7 @@ class 赌徒(ModeComp, BaseMode):
         limit = 12
 
     class modify(BaseMode.modify):
-        flag_ammo_show = False
+        ammo_visible = False
 
     @staticmethod
     def poker():
@@ -266,19 +298,19 @@ class 赌徒(ModeComp, BaseMode):
             return random.choice(["JOKER", "joker"])
 
     @classmethod
-    def start(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def start(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         for pl in game_work.order:
             game_work.draw_prop(pl, 2)
 
     @classmethod
-    def join(cls, msg_manager, user_id):
-        msg_manager.val["game"]["data"]["players"][user_id]["hp"] = 5
+    def join(cls, msg_event, user_id):
+        msg_event.val["game"]["data"]["players"][user_id]["hp"] = 5
 
     # 开枪
     @classmethod
-    def shoot(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def shoot(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         target, is_shoot_me = game_work.tmp["target"], game_work.tmp["is_shoot_me"]
         if is_shoot_me and not game_work.bullet:
             game_work.draw_prop(target, 3)
@@ -290,38 +322,43 @@ class 赌徒(ModeComp, BaseMode):
                 game_work.data["ammo_blank"] -= 1
                 game_work.data["ammo_live"] += 1
             game_work.bullet = not game_work.bullet
-            msg_reply = msg_manager.msg_format("strMrModeGambler_1", {"poker": cls.poker()})
+            msg_reply = msg_event.msg_format("strMrModeGambler_1", {"poker": cls.poker()})
             game_work.upsert_info(msg_reply)
         if game_work.bullet and random.randint(1, 3) == 1:  # 魔弹
             game_work.tmp["dmg"] += 1
-            msg_reply = msg_manager.msg_format("strMrModeGambler_2")
+            msg_reply = msg_event.msg_format("strMrModeGambler_2")
             game_work.upsert_info(msg_reply)
 
 
-class 大富翁(ModeComp, BaseMode):
+@modeDef(
+    helpDocDefault={
+        "恶赌模式 大富翁": generate_helpdoc(
+            points=20,
+            hp_str="每名玩家 2hp.",
+            props_limit="∞",
+            props_pool=("锯子", "邀请函", "花生", "巧克力", "香烟", "放大镜", "扑克", "转盘", "牛奶"),
+            props_allowed=("和你爆了",),
+            props_banned=("手铐", "口红", "止疼药", "红牛"),
+            mechanisms=(
+                "游戏开始时, 所有玩家抽取 2 个道具",
+                "贷款: 玩家死亡时复活, 并失去半数金币",
+                "老虎机: 玩家复活时摇动老虎机, 有 1/6 概率中奖(1 枚金币), 若未中奖, 则本次奖励叠加到下次奖励中",
+                "掠夺: 击杀其他玩家时, 获得对方半数金币",
+                "每对其他玩家造成 1 点伤害, 获得 1 枚金币",
+                "率先持有 6 枚金币的玩家获胜",
+            ),
+        )
+    },
+    strCustomDefault={
+        "strMrModeMonopoly_1": ("大富翁模式 贷款机制回复词", "{tGamblerName}申請‘無償’救助[hp {tOldHp}->{tNewHp}]."),
+        "strMrModeMonopoly_2": ("大富翁模式 老虎机中奖回复词", "老虎機拉桿落下, [{jackpot}], {tGamblerName}贏得{gold}枚金幣."),
+        "strMrModeMonopoly_3": ("大富翁模式 老虎机未中奖回复词", "老虎機拉桿落下, [{jackpot}]."),
+        "strMrModeMonopoly_4": ("大富翁模式 掠夺机制回复词", "{tTargetName}拾取{tSourceName}的{tNum}枚金幣."),
+    }
+)
+class 大富翁(BaseMode):
     name = "大富翁"
-    helpdoc = generate_helpdoc(
-        points=20,
-        hp_str="每名玩家2hp.",
-        props_limit="∞",
-        props_pool=("锯子", "邀请函", "花生", "巧克力", "香烟", "放大镜", "扑克", "转盘", "牛奶"),
-        props_allow=("和你爆了",),
-        props_ban=("手铐", "口红", "止疼药", "红牛"),
-        mechanisms=(
-            "游戏开始时, 所有玩家抽取 2 个道具",
-            "贷款: 玩家死亡时复活, 并失去半数金币",
-            "老虎机: 玩家复活时摇动老虎机, 有1/6概率中奖(1 枚金币), 若未中奖, 则本次奖励叠加到下次奖励中",
-            "掠夺: 击杀其他玩家时, 获得对方半数金币",
-            "每对其他玩家造成 1 点伤害, 获得 1 枚金币",
-            "率先持有6枚金币的玩家获胜",
-        ),
-    )
-    reply = (
-        ("strMrModeMonopoly_1", "大富翁模式 贷款机制回复词", "{tGamblerName}申請‘無償’救助[hp {tOldHp}->{tNewHp}]."),
-        ("strMrModeMonopoly_2", "大富翁模式 老虎机中奖回复词", "老虎機拉桿落下, [{jackpot}], {tGamblerName}贏得{gold}枚金幣."),
-        ("strMrModeMonopoly_3", "大富翁模式 老虎机未中奖回复词", "老虎機拉桿落下, [{jackpot}]."),
-        ("strMrModeMonopoly_4", "大富翁模式 掠夺机制回复词", "{tTargetName}拾取{tSourceName}的{tNum}枚金幣."),
-    )
+
     points = 20
 
     class seats(BaseMode.seats):
@@ -331,26 +368,26 @@ class 大富翁(ModeComp, BaseMode):
 
     class props(BaseMode.props):
         pool = ("锯子", "邀请函", "花生", "巧克力", "香烟", "放大镜", "扑克", "转盘", "牛奶")
-        allow = ("和你爆了",)
-        ban = ("手铐", "口红", "止疼药", "红牛")
+        allowed = ("和你爆了",)
+        banned = ("手铐", "口红", "止疼药", "红牛")
         limit = 0
 
     @classmethod
-    def start(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def start(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         game_work.modify["order_copy"] = game_work.order.copy()
         game_work.modify["gold"] = 0
         for pl in game_work.order:
             game_work.draw_prop(pl, 2)
 
     @classmethod
-    def join(cls, msg_manager, user_id):
-        game_work = GameWork.from_manager(msg_manager)
+    def join(cls, msg_event, user_id):
+        game_work = GameWork.from_manager(msg_event)
         game_work.players[user_id]["hp"] = 2
 
     @classmethod
-    def try_over(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def try_over(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         wins = []
         for pl in game_work.order:
             gold_count = game_work.players[pl]["props"].count("金币")
@@ -358,20 +395,20 @@ class 大富翁(ModeComp, BaseMode):
             if gold_count >= 6:
                 wins.append(pl)
         if wins:
-            game_work.order = [pl for pl in game_work.order if pl in wins]
+            game_work.order[:] = [pl for pl in game_work.order if pl in wins]
             return True
         return False
 
     @classmethod
-    def damage(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def damage(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         if not game_work.tmp["is_attack_me"]:
             game_work.draw_prop(game_work.tmp["source"], game_work.tmp["dmg"], ("金币",))
             game_work.try_over()
 
     @classmethod
-    def dead(cls, msg_manager):
-        game_work = GameWork.from_manager(msg_manager)
+    def dead(cls, msg_event):
+        game_work = GameWork.from_manager(msg_event)
         target, source = game_work.tmp["target"], game_work.tmp["source"]
         pl_target = game_work.players[target]
         if pl_target["surrender"]:
@@ -389,16 +426,16 @@ class 大富翁(ModeComp, BaseMode):
                     for _ in range(gold_count_half):
                         game_work.get_prop(source, "金币")
                     game_work.upsert_info(
-                        msg_manager.msg_format(
+                        msg_event.msg_format(
                             "strMrModeMonopoly_4", {"tTargetName": target, "tSourceName": source, "tNum": gold_count_half}
                         )
                     )
             # 贷款复活
-            game_work.order = game_work.modify["order_copy"].copy()
+            game_work.order[:] = game_work.modify["order_copy"].copy()
             old_hp = pl_target["hp"]
             pl_target.update({"hp": 2, "kills": 0, "suicide": False})
             game_work.upsert_info(
-                msg_manager.msg_format("strMrModeMonopoly_1", {"tGamblerName": target, "tOldHp": old_hp, "tNewHp": 2})
+                msg_event.msg_format("strMrModeMonopoly_1", {"tGamblerName": target, "tOldHp": old_hp, "tNewHp": 2})
             )
             # 摇动老虎机
             if random.randint(1, 6) == 1:
@@ -407,13 +444,13 @@ class 大富翁(ModeComp, BaseMode):
                     game_work.get_prop(target, "金币")
                 game_work.modify["gold"] = 0
                 jackpot = str(random.randint(0, 9)) * 3
-                msg_reply = msg_manager.msg_format(
+                msg_reply = msg_event.msg_format(
                     "strMrModeMonopoly_2", {"jackpot": jackpot, "tGamblerName": target, "gold": gold}
                 )
             else:
                 game_work.modify["gold"] += 1
                 choices = [f"{i:03d}" for i in range(1000) if i % 111 != 0]
                 jackpot = random.choice(choices)
-                msg_reply = msg_manager.msg_format("strMrModeMonopoly_3", {"jackpot": jackpot})
+                msg_reply = msg_event.msg_format("strMrModeMonopoly_3", {"jackpot": jackpot})
             game_work.upsert_info(msg_reply)
             game_work.try_over()

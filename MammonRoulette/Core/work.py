@@ -8,16 +8,16 @@
 @Desc      :    None
 """
 
-import MammonRoulette as MR
-
-import time
 import random
+import time
 from dataclasses import dataclass
 
-from AmorLib import DataBase, MsgManager
+from AmorLib import DataBase, MsgEvent
 
-from .base import BaseMode
+import MammonRoulette as MR
+
 from .. import config
+from .base import BaseMode, GameState, Moment, PlayerView
 
 
 def data_mirror(key):
@@ -51,8 +51,13 @@ def modify_mirror(key):
 @dataclass
 class GameWork:
     # region index
-    msg_manager: MsgManager
-    mode: BaseMode
+    msg_event: MsgEvent
+    mode: type[BaseMode]
+    props_pool: list
+    props_allowed: list
+    props_banned: list
+    props_limit: int
+
     game: dict
     data: dict
     reply: dict
@@ -63,35 +68,47 @@ class GameWork:
     order: list
     props_event: list
 
-    props_pool: list
-    props_allow: list
-    props_ban: list
-    props_limit: int
+    shooter = data_mirror("shooter")  # 枪手
 
     ammo_live = data_mirror("ammo_live")  # 实弹数
     ammo_blank = data_mirror("ammo_blank")  # 空弹数
+    ammo_visible = modify_mirror("ammo_visible")  # 显示弹药
+
     bullet = data_mirror("bullet")  # 当前子弹
-    shooter = data_mirror("shooter")  # 枪手
+    bullet_visible = modify_mirror("bullet_visible")  # 显示子弹
+
     dmg = modify_mirror("dmg")  # 伤害
-    flag_ammo_show = modify_mirror("flag_ammo_show")  # 显示弹药
-    flag_bullet_show = modify_mirror("flag_bullet_show")  # 显示子弹
 
     @property
-    def flag_bot(self) -> bool:  # 是否为AI玩家
+    def ammo_total(self) -> int:  # 总弹药数
+        return self.ammo_live + self.ammo_blank
+
+    @property
+    def flag_bot(self) -> bool:  # BOT标识
         return self.players[self.shooter]["bot_model"] is not None
 
     @property
-    def flag_over(self) -> bool:
+    def next_id(self) -> int:  # 下一个ID
+        self.game["IdStore"] += 1
+        return self.game["IdStore"]
+
+    @property
+    def flag_over(self) -> bool:  # 游戏结束标识
         return self.game["over"]
 
     @classmethod
-    def from_manager(cls, msg_manager):
-        game = msg_manager.val["game"]
+    def from_manager(cls, msg_event) -> "GameWork":
+        game = msg_event.val["game"]
         data = game["data"]
         props = game["mode"]["props"]
+        mode = MR.Core.registry.modeReg.get(game["mode"]["name"])
         return cls(
-            msg_manager=msg_manager,
-            mode=MR.Core.comp.ModeComp.get(game["mode"]["name"]),
+            msg_event=msg_event,
+            mode=mode,
+            props_pool=props["pool"],
+            props_allowed=props["allowed"],
+            props_banned=props["banned"],
+            props_limit=props["limit"],
             game=game,
             data=data,
             reply=game["reply"],
@@ -100,10 +117,6 @@ class GameWork:
             players=data["players"],
             order=data["order"],
             props_event=data["props_event"],
-            props_pool=props["pool"],
-            props_allow=props["allow"],
-            props_ban=props["ban"],
-            props_limit=props["limit"],
         )
 
     def get_name(self, user_id: str | None = None) -> str:  # 获取玩家昵称
@@ -111,7 +124,7 @@ class GameWork:
             user_id = self.shooter
         return self.players[user_id]["name"]
 
-    def get_target(self, target=None):
+    def get_target(self, target=None):  # 获取目标ID
         if not target:
             target = self.order[(self.order.index(self.shooter) + 1) % len(self.order)]
         elif target not in self.order:
@@ -120,6 +133,47 @@ class GameWork:
                 return
             target = self.order[target - 1]
         return target
+
+    def get_state(self):  # 获取状态切片
+        t_players = []
+        for user_id, pl in self.players.items():
+            pv = PlayerView(
+                id=user_id,
+                name=pl["name"],
+                hp=pl["hp"],
+                actions=pl["actions"],
+                props=tuple(pl["props"]),
+                effects=tuple((name, data["stacks"]) for name, data in pl["effects_event"].items()),
+                is_shooter=(user_id == self.shooter),
+                is_dead=(user_id not in self.order),
+            )
+            t_players.append(pv)
+            if user_id == self.shooter:
+                pl_self = pv
+        bullet_visible = self.bullet_visible or self.ammo_visible and self.ammo_blank == 0
+        return GameState(
+            pl_self=pl_self,
+            # 模式参数
+            mode_name=self.mode.name,
+            props_pool=tuple(self.props_pool),
+            props_allowed=tuple(self.props_allowed),
+            props_banned=tuple(self.props_banned),
+            props_limit=self.props_limit,
+            players=tuple(t_players),
+            props_event=tuple(self.props_event),
+            # 状态参数
+            shooter=self.shooter,
+            order=tuple(self.order),
+            player_count=len(self.players),
+            alive_count=len(self.order),
+            ammo_live=self.ammo_live if self.ammo_visible else -1,
+            ammo_blank=self.ammo_blank if self.ammo_visible else -1,
+            ammo_total=(self.ammo_live + self.ammo_blank) if self.ammo_visible else -1,
+            ammo_visible=self.ammo_visible,
+            bullet=(1 if self.bullet else 0) if bullet_visible else -1,
+            bullet_visible=bullet_visible,
+            dmg=self.dmg,
+        )
 
     # endregion
     # region reply
@@ -134,26 +188,26 @@ class GameWork:
             if not info_flag:
                 self.reply["info"].append({"id": info_id, "data": info})
         else:
-            info_id = max((item["id"] for item in self.reply["info"]), default=0) + 1
+            info_id = self.next_id
             self.reply["info"].append({"id": info_id, "data": info})
         return info_id
 
     def format_reply(self) -> str:  # 格式化回复消息
-        if not self.reply["only"]:
-            info, note = self.reply["info"], self.reply["note"]
+        if not self.reply["override"]:
+            info, below = self.reply["info"], self.reply["below"]
             t_value = {}
             t_value.update({"tInfo": "\n".join([item["data"] for item in info if item["data"]])})
-            if note["flag_ammo"]:
+            if below["show_ammo"]:
                 # 子弹
                 t_value.update(
-                    {"tNowBulletType": self.msg_manager.msg_format("strMrAmmoLive" if self.bullet else "strMrAmmoBlank")}
+                    {"tNowBulletType": self.msg_event.msg_format("strMrAmmoLive" if self.bullet else "strMrAmmoBlank")}
                 )
                 t_value.update(
                     {
                         "tGameNowBullet": (
-                            self.msg_manager.msg_format("strMrGameNowBulletShow", t_value)
-                            if self.flag_bullet_show
-                            else self.msg_manager.msg_format("strMrGameNowBulletHide", t_value)
+                            self.msg_event.msg_format("strMrGameNowBulletShow", t_value)
+                            if self.bullet_visible
+                            else self.msg_event.msg_format("strMrGameNowBulletHide", t_value)
                         )
                     }
                 )
@@ -168,17 +222,17 @@ class GameWork:
                 t_value.update(
                     {
                         "tGameAmmo": (
-                            self.msg_manager.msg_format("strMrGameAmmoShow", t_value)
-                            if self.flag_ammo_show
-                            else self.msg_manager.msg_format("strMrGameAmmoHide", t_value)
+                            self.msg_event.msg_format("strMrGameAmmoShow", t_value)
+                            if self.ammo_visible
+                            else self.msg_event.msg_format("strMrGameAmmoHide", t_value)
                         )
                     }
                 )
-            if note["flag_shooter"]:
+            if below["show_shooter"]:
                 # 枪手
                 t_value.update(
                     {
-                        "tShooter": self.msg_manager.msg_format(
+                        "tShooter": self.msg_event.msg_format(
                             "strMrGameShooter",
                             {
                                 "tGamblerIdx": self.order.index(self.shooter) + 1,
@@ -187,13 +241,13 @@ class GameWork:
                         )
                     }
                 )
-            msg_reply = self.msg_manager.msg_format("strGameReplyInfo", t_value)
-            if not self.flag_over and (note["flag_ammo"] or note["flag_shooter"]):
-                msg_reply += "\n" + self.msg_manager.msg_format("strGameReplyNote", t_value)
+            msg_reply = self.msg_event.msg_format("strGameReplyInfo", t_value) if info else ""
+            if not self.flag_over and (below["show_ammo"] or below["show_shooter"]):
+                msg_reply += "\n" + self.msg_event.msg_format("strGameReplyBelow", t_value)
         else:
-            msg_reply = self.reply["only"]
+            msg_reply = self.reply["override"]
         self.reply.update(
-            {"info": [], "note": {"flag_ammo": self.flag_ammo_show or self.flag_bullet_show, "flag_shooter": False}, "only": ""}
+            {"info": [], "below": {"show_ammo": self.ammo_visible or self.bullet_visible, "show_shooter": False}, "override": ""}
         )
         self.tmp.clear()
         return msg_reply
@@ -215,16 +269,19 @@ class GameWork:
     def get_effect_data(self, target: str, effect_name: str):
         return self.players[target]["effects_event"].get(effect_name)
 
-    def create_props_event(self, prop_data):
-        prop_data["id"] = id(prop_data)
+    def register_prop_event(self, prop_data: dict):
+        prop_id = self.next_id
+        prop_data["id"] = prop_id
+        prop_data.setdefault("expired", False)
         self.props_event.append(prop_data)
         return
 
-    def create_effects_event(self, target: str, effect_name: str, effect_data: dict):
+    def register_effect_event(self, target: str, effect_name: str, effect_data: dict):
+        effect_data.setdefault("expired", False)
         self.players[target]["effects_event"][effect_name] = effect_data
         return
 
-    def remove_props_event(self, prop_id: int | None = None, prop_name: str | None = None):
+    def unregister_prop_event(self, prop_id: int | None = None, prop_name: str | None = None):
         if not prop_id and not prop_name:
             return
         if prop_id:
@@ -235,33 +292,38 @@ class GameWork:
             search_key = "name"
         for prop_data in reversed(self.props_event):
             if prop_data[search_key] == search:
-                MR.Core.comp.PropComp.uninstall(self.msg_manager, prop_data["name"], prop_data)
+                MR.Core.registry.propReg.get(prop_data["name"]).on_unregister(self.msg_event, prop_data)
                 self.props_event.remove(prop_data)
         return
 
-    def remove_effects_event(self, effect_name, target, stacks: int = 0):
+    def unregister_effect_event(self, effect_name, target, stacks: int = 0):
         effects_event = self.players[target]["effects_event"]
         if effect_name in effects_event:
             effect_data = effects_event[effect_name]
             effect_data["stacks"] -= stacks
             if effect_data["stacks"] <= 0 or stacks == 0:
-                MR.Core.comp.EffectComp.uninstall(self.msg_manager, effect_name)
+                MR.Core.registry.effectReg.get(effect_name).on_unregister(self.msg_event)
                 del effects_event[effect_name]
         return
 
-    def handle_event(self, moment, **kwargs):
+    def handle_event(self, moment: Moment, **kwargs):
         self.tmp.update(kwargs)
-        for prop_data in reversed(self.props_event):
-            if MR.Core.comp.PropComp.trigger(self.msg_manager, prop_data["name"], moment, prop_data):
-                self.remove_props_event(prop_data["id"])
         for prop_data in self.props_event:
-            MR.Core.comp.PropComp.sustain(self.msg_manager, prop_data["name"], prop_data)
+            MR.Core.registry.propReg.get(prop_data["name"]).on_moment(self.msg_event, moment, prop_data)
+        for prop_data in self.props_event:
+            MR.Core.registry.propReg.get(prop_data["name"]).sustain(self.msg_event, prop_data)
+        for prop_data in list(self.props_event):
+            if prop_data.get("expired", False):
+                self.unregister_prop_event(prop_data["id"])
         for target in self.players:
             effects_event = self.players[target]["effects_event"]
-            for effect in list(effects_event.keys()):
-                if MR.Core.comp.EffectComp.trigger(self.msg_manager, effect, moment, target, effects_event[effect]):
-                    self.remove_effects_event(effect, target, 0)
-        MR.Core.comp.ModeComp.trigger(self.msg_manager, moment)
+            effects_event_list = list(effects_event.keys())
+            for effect_name in effects_event_list:
+                MR.Core.registry.effectReg.get(effect_name).on_moment(self.msg_event, moment, target, effects_event[effect_name])
+            for effect_name in effects_event_list:
+                if effects_event[effect_name].get("expired", False):
+                    self.unregister_effect_event(effect_name, target, 0)
+        MR.Core.registry.modeReg.trigger(self.msg_event, moment)
         return
 
     # endregion
@@ -270,9 +332,7 @@ class GameWork:
         pl_props = self.players[user_id]["props"]
         if self.props_limit > 0 and len(pl_props) >= self.props_limit:
             return None
-        elif prop in self.props_ban:
-            prop = random.choice(self.props_pool)
-        elif not MR.Core.comp.PropComp.get(prop).allow_flag and prop not in self.props_allow:
+        elif prop in self.props_banned or not MR.Core.registry.propReg.get(prop).allowed and prop not in self.props_allowed:
             prop = random.choice(self.props_pool)
         pl_props.append(prop)
         return prop
@@ -294,9 +354,9 @@ class GameWork:
                 break
             t_draw_props.append(actual_prop)
         if t_draw_props:
-            link = self.msg_manager.msg_format("strMrLink")
+            link = self.msg_event.msg_format("strMrLink")
             self.upsert_info(
-                self.msg_manager.msg_format(
+                self.msg_event.msg_format(
                     "strMrGamblerPropsDraw",
                     {
                         "tGamblerName": self.get_name(user_id),
@@ -310,10 +370,10 @@ class GameWork:
     # region action
     def join(self, user_id, bot_model=None):
         if bot_model is None:
-            with DataBase(config.DB_PATH) as db:
+            with DataBase(config.dbPath) as db:
                 name = db.select("gambler", "name", "user_id = ?", user_id)[0][0]
         else:
-            name = bot_model
+            name = bot_model + str(random.randint(0, 9999))
         self.order.append(user_id)
         self.players[user_id] = {
             "name": name,
@@ -327,20 +387,23 @@ class GameWork:
             "effects_event": {},
             "bot_model": bot_model,
         }
-        self.mode.join(self.msg_manager, user_id)
+        self.mode.join(self.msg_event, user_id)
         return
 
-    def start(self):
+    def start(self, plugin_event):
         self.game["start"] = True
         self.game["expireTime"] = int(time.time()) // 60 + 120
         self.chamber()
         random.shuffle(self.order)
         self.shooter = self.order[0]
         self.players[self.shooter]["actions"] = 1
-        self.mode.start(self.msg_manager)
-        self.reply.update({"info": [], "note": {"flag_ammo": False, "flag_shooter": False}, "only": ""})
+        self.mode.start(self.msg_event)
+        # 清空初始信息 构建对局时发送局势信息, 初始信息不需要
+        self.reply.update({"info": [], "below": {"show_ammo": False, "show_shooter": False}, "override": ""})
         if self.flag_bot:
-            MR.Core.comp.BotComp.action(self.msg_manager)
+            MR.Core.registry.botReg.action(self.msg_event)
+            msg_reply = self.format_reply()
+            plugin_event.reply(msg_reply)
         return
 
     def chamber(self):
@@ -351,7 +414,7 @@ class GameWork:
         else:
             ammo_live, ammo_blank = self.ammo_live, self.ammo_blank
         self.bullet = random.randint(1, ammo_live + ammo_blank) > ammo_blank
-        self.reply["note"]["flag_ammo"] = True
+        self.reply["below"]["show_ammo"] = True
         return
 
     def reload(self):
@@ -359,15 +422,15 @@ class GameWork:
             return 0, 0
         ammo_live, ammo_blank = random.randint(1, 4), random.randint(1, 4)
         self.data["ammo_live"], self.data["ammo_blank"] = ammo_live, ammo_blank
-        self.upsert_info(self.msg_manager.msg_format("strMrGameAmmoRanOut"))
-        self.handle_event("reload")
-        self.reply["note"]["flag_ammo"] = True
+        self.upsert_info(self.msg_event.msg_format("strMrGameAmmoRanOut"))
+        self.handle_event(Moment.RELOAD)
+        self.reply["below"]["show_ammo"] = True
         return ammo_live, ammo_blank
 
     def shoot(self, target):
         source = self.shooter
         self.handle_event(
-            "shoot",
+            Moment.SHOOT,
             target=target,
             source=self.tmp.get("source", source),
             is_shoot_me=self.tmp.get("is_shoot_me", target == source),
@@ -392,7 +455,7 @@ class GameWork:
             self.damage(target, dmg, source)
             if self.tmp["new_hp"] > 0:
                 self.upsert_info(
-                    self.msg_manager.msg_format(
+                    self.msg_event.msg_format(
                         "strMrGamblerWasShotWithLiveAmmo",
                         {
                             "tTargetName": pl_target["name"],
@@ -408,7 +471,7 @@ class GameWork:
             if consume_action is None:
                 consume_action = 0 if is_shoot_me else 1
             self.upsert_info(
-                self.msg_manager.msg_format(
+                self.msg_event.msg_format(
                     "strMrGamblerWasShotWithBlankAmmo",
                     {
                         "tTargetName": pl_target["name"],
@@ -428,7 +491,7 @@ class GameWork:
         if self.flag_over:
             return
         self.handle_event(
-            "damage",
+            Moment.DAMAGE,
             target=target,
             source=source,
             is_attack_me=self.tmp.get("is_attack_me", target == source),
@@ -463,15 +526,15 @@ class GameWork:
 
         pl_target, pl_source = self.players[target], self.players[source]
         if pl_target["surrender"]:  # 投降
-            self.upsert_info(self.msg_manager.msg_format("strMrGamblerSurrender", {"tGamblerName": pl_target["name"]}))
+            self.upsert_info(self.msg_event.msg_format("strMrGamblerSurrender", {"tGamblerName": pl_target["name"]}))
         elif is_attack_me:  # 自杀
             pl_target["suicide"] = True
-            self.upsert_info(self.msg_manager.msg_format("strMrGamblerSuicide", {"tGamblerName": pl_target["name"]}))
+            self.upsert_info(self.msg_event.msg_format("strMrGamblerSuicide", {"tGamblerName": pl_target["name"]}))
         else:  # 被杀
             pl_source["kills"] += 1
             pl_target["suicide"] = False
             self.upsert_info(
-                self.msg_manager.msg_format(
+                self.msg_event.msg_format(
                     "strMrGamblerKilled",
                     {"tTargetName": pl_target["name"], "tSourceName": pl_source["name"]},
                 ),
@@ -480,7 +543,11 @@ class GameWork:
             self.switch()
         self.order.remove(target)
         self.handle_event(
-            "dead", target=target, source=source, is_attack_me=is_attack_me, is_check_over=self.tmp.get("is_check_over", True)
+            Moment.DEAD,
+            target=target,
+            source=source,
+            is_attack_me=is_attack_me,
+            is_check_over=self.tmp.get("is_check_over", True),
         )
         is_check_over = self.tmp["is_check_over"]
         if is_check_over:
@@ -490,14 +557,12 @@ class GameWork:
     def done(self):
         if self.flag_over:
             return
-        self.handle_event("done", consume_action=self.tmp.get("consume_action", 0))
+        self.handle_event(Moment.DONE, consume_action=self.tmp.get("consume_action", 0))
         consume_action = self.tmp["consume_action"]
         pl_shooter = self.players[self.shooter]
         pl_shooter["actions"] -= consume_action
         if pl_shooter["actions"] < 1:
             self.switch()
-        if self.flag_bot:
-            MR.Core.comp.BotComp.action(self.msg_manager)
         return
 
     def switch(self):
@@ -510,20 +575,20 @@ class GameWork:
                 break
         if self.shooter != shooter:
             self.shooter = shooter
-            self.reply["note"]["flag_shooter"] = True
-            self.handle_event("switch", shooter=shooter)
+            self.reply["below"]["show_shooter"] = True
+            self.handle_event(Moment.SWITCH, shooter=shooter)
         return
 
     def try_over(self):
         if self.flag_over:
             return True
         self.tmp["is_check_over"] = True
-        flag_over = self.mode.try_over(self.msg_manager)
+        flag_over = self.mode.try_over(self.msg_event)
         if len(self.order) == 1:
-            self.upsert_info(self.msg_manager.msg_format("strMrGameOver", {"tWinnerName": self.get_name(self.order[0])}))
+            self.upsert_info(self.msg_event.msg_format("strMrGameOver", {"tWinnerName": self.get_name(self.order[0])}))
             flag_over = True
         elif len(self.order) < 1:
-            self.upsert_info(self.msg_manager.msg_format("strMrGameTied"))
+            self.upsert_info(self.msg_event.msg_format("strMrGameTied"))
             flag_over = True
         if flag_over:
             self.over()
@@ -531,10 +596,8 @@ class GameWork:
 
     def over(self):
         self.game["over"] = True
-        with DataBase(config.DB_PATH) as db:
-            for pl in self.players.keys():
-                if self.players[pl]["bot_model"] is None:
-                    continue
+        with DataBase(config.dbPath) as db:
+            for pl in self.players:
                 pl_target = self.players[pl]
                 mult = pl_target["points_mult"] + pl_target["kills"]
                 if pl not in self.order:
@@ -543,19 +606,34 @@ class GameWork:
                 else:
                     mult += 1
                     wl = "wins"
-                db.update(
-                    "gambler",
-                    {
-                        "points": self.game["mode"]["points"] * mult,
-                        "kills": pl_target["kills"],
-                        "suicide": 1 if pl_target["suicide"] else 0,
-                        "surrender": 1 if pl_target["surrender"] else 0,
-                        wl: 1,
-                    },
-                    "user_id = ?",
-                    pl,
-                    increment=("points", "kills", "suicide", "surrender", wl),
-                )
+                if pl_target["bot_model"] is None:
+                    db.update(
+                        "gambler",
+                        {
+                            "points": self.game["mode"]["points"] * mult,
+                            "kills": pl_target["kills"],
+                            "suicide": 1 if pl_target["suicide"] else 0,
+                            "surrender": 1 if pl_target["surrender"] else 0,
+                            wl: 1,
+                        },
+                        "user_id = ?",
+                        pl,
+                        increment=("points", "kills", "suicide", "surrender", wl),
+                    )
+                else:
+                    db.update(
+                        "bot",
+                        {
+                            "points": self.game["mode"]["points"] * mult,
+                            "kills": pl_target["kills"],
+                            "suicide": 1 if pl_target["suicide"] else 0,
+                            "surrender": 1 if pl_target["surrender"] else 0,
+                            wl: 1,
+                        },
+                        "bot_model = ?",
+                        pl_target["bot_model"],
+                        increment=("points", "kills", "suicide", "surrender", wl),
+                    )
         return
 
     # endregion
