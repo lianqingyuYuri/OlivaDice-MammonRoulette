@@ -241,9 +241,9 @@ class GameWork:
                         )
                     }
                 )
-            msg_reply = self.msg_event.msg_format("strGameReplyInfo", t_value) if info else ""
+            msg_reply = self.msg_event.msg_format("strMrGameReplyInfo", t_value) if info else ""
             if not self.flag_over and (below["show_ammo"] or below["show_shooter"]):
-                msg_reply += "\n" + self.msg_event.msg_format("strGameReplyBelow", t_value)
+                msg_reply += "\n" + self.msg_event.msg_format("strMrGameReplyBelow", t_value)
         else:
             msg_reply = self.reply["override"]
         self.reply.update(
