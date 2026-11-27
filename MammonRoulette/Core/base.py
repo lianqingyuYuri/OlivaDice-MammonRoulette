@@ -240,17 +240,12 @@ class BotAction:
     prop: str = ""
     memory: dict = field(default_factory=dict)
 
-    SHOOT_SELF = "shoot_self"
-    SHOOT_OTHER = "shoot_other"
+    SHOOT = "shoot"
     USE_PROP = "use_prop"
 
     @classmethod
-    def shoot_self(cls, memory: dict | None = None):
-        return cls(type=cls.SHOOT_SELF, memory=memory or {})
-
-    @classmethod
-    def shoot_other(cls, target: str | int = "", memory: dict | None = None):
-        return cls(type=cls.SHOOT_OTHER, target=str(target), memory=memory or {})
+    def shoot(cls, target: str | int = "", memory: dict | None = None):
+        return cls(type=cls.SHOOT, target=str(target), memory=memory or {})
 
     @classmethod
     def use_prop(cls, prop: str, target: str | int = "", memory: dict | None = None):

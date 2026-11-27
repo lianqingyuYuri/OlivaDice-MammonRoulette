@@ -359,16 +359,16 @@ class BotRegistry(Registry[str]):
                             )
                         )
                     MR.Core.registry.propReg.apply(msg_event, action.prop, shooter, target)
-                elif action.type == action.SHOOT_SELF:
-                    game_work.upsert_info(msg_event.msg_format("strMrBotShootSelf", {"tBotMark": bot_mark, "tBotName": bot_name}))
-                    game_work.shoot(shooter)
-                else:
-                    game_work.upsert_info(
-                        msg_event.msg_format(
-                            "strMrBotShootOther",
-                            {"tBotMark": bot_mark, "tBotName": bot_name, "tTargetName": game_work.get_name(target)},
+                elif action.type == action.SHOOT:
+                    if target == shooter:
+                        game_work.upsert_info(msg_event.msg_format("strMrBotShootSelf", {"tBotMark": bot_mark, "tBotName": bot_name}))
+                    else:
+                        game_work.upsert_info(
+                            msg_event.msg_format(
+                                "strMrBotShootOther",
+                                {"tBotMark": bot_mark, "tBotName": bot_name, "tTargetName": game_work.get_name(target)},
+                            )
                         )
-                    )
                     game_work.shoot(target)
                 state = game_work.get_state()
                 for f, v in memory.items():

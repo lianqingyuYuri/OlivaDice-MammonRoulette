@@ -55,7 +55,7 @@ class 达尔文(BaseBot):
                 for prop in ("巧克力", "花生", "香烟", "转盘"):
                     if prop in me.props and prop_can_use(msg_event, prop):
                         return BotAction.use_prop(prop, me.id)
-                return BotAction.shoot_self()
+                return BotAction.shoot()
         else:  # 子弹不可见
             if "放大镜" in me.props and prop_can_use(msg_event, "放大镜"):
                 return BotAction.use_prop("放大镜", me.id)
@@ -69,4 +69,4 @@ class 达尔文(BaseBot):
                 if prop in me.props and prop_can_use(msg_event, prop):
                     return BotAction.use_prop(prop, me.id)
 
-        return BotAction.shoot_other(pv_target.id)
+        return BotAction.shoot(pv_target.id)
