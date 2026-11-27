@@ -54,7 +54,7 @@ def test_generate_helpdoc_empty():
 
 def test_classic_start_join_switch(monkeypatch):
     monkeypatch.setattr(random, "choice", lambda seq: seq[0])
-    game, msg_event, work = work_for("经典", [("u1", 4), ("u2", 4)], shooter="u1")
+    game, msg_event, _work = work_for("经典", [("u1", 4), ("u2", 4)], shooter="u1")
     MR.Core.registry.modeReg.get("经典").start(msg_event)
     assert len(game["data"]["players"]["u1"]["props"]) == 2
     assert len(game["data"]["players"]["u2"]["props"]) == 1
@@ -68,7 +68,7 @@ def test_classic_start_join_switch(monkeypatch):
 
 def test_item_mode_join_and_reload(monkeypatch):
     monkeypatch.setattr(random, "choice", lambda seq: seq[0])
-    game, msg_event, work = work_for("道具", [("u1", 4), ("u2", 4), ("u3", 4)], shooter="u1")
+    game, msg_event, _work = work_for("道具", [("u1", 4), ("u2", 4), ("u3", 4)], shooter="u1")
     MR.Core.registry.modeReg.get("道具").join(msg_event, "u3")
     assert game["data"]["players"]["u3"]["hp"] == 5
     add_player(game, "u4", hp=4)

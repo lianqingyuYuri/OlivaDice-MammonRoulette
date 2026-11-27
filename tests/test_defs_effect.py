@@ -17,13 +17,13 @@ def work_for(players, shooter="u1", hp=4):
 
 
 def test_bind_apply():
-    game, msg_event, work = work_for(["u1", "u2"])
+    game, msg_event, _work = work_for(["u1", "u2"])
     assert effectReg.get("束缚").apply(msg_event, "u2", 1) is True
     assert game["data"]["players"]["u2"]["effects_event"]["束缚"]["stacks"] == 1
 
 
 def test_bind_on_moment():
-    game, msg_event, work = work_for(["u1", "u2"], shooter="u1")
+    _game, msg_event, _work = work_for(["u1", "u2"], shooter="u1")
     effect_data = {"stacks": 1, "expired": False}
     effectReg.get("束缚").on_moment(msg_event, "shoot", "u1", effect_data)
     assert effect_data["expired"] is False

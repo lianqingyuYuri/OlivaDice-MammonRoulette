@@ -438,7 +438,7 @@ class GameWork:
             dmg_type=self.tmp.get("dmg_type", ""),
             consume_action=self.tmp.get("consume_action", None),
         )
-        target, source, is_shoot_me, dmg, dmg_type, consume_action = (
+        target, source, is_shoot_me, dmg, _dmg_type, consume_action = (
             self.tmp["target"],
             self.tmp["source"],
             self.tmp["is_shoot_me"],
@@ -499,7 +499,7 @@ class GameWork:
             dmg_type=self.tmp.get("dmg_type", ""),
             is_check_dead=self.tmp.get("is_check_dead", True),
         )
-        target, source, is_attack_me, dmg, dmg_type, is_check_dead = (
+        target, source, _is_attack_me, dmg, _dmg_type, is_check_dead = (
             self.tmp["target"],
             self.tmp["source"],
             self.tmp["is_attack_me"],

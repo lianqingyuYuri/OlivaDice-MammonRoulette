@@ -31,12 +31,12 @@ def bot_game(props, enemy_hp=4, bullet=1, bullet_visible=True, props_limit=12, w
 
 
 def test_prop_can_use():
-    game, msg_event, work = bot_game(["手铐"], with_enemy=True)
+    _game, msg_event, _work = bot_game(["手铐"], with_enemy=True)
     assert prop_can_use(msg_event, "手铐", None) is True
     effectReg.get("束缚").apply(msg_event, "u2", 1)
     assert prop_can_use(msg_event, "手铐", "u2") is False
 def test_decide_uses_handcuffs():
-    game, msg_event, work = bot_game(["手铐"], enemy_hp=2)
+    _game, msg_event, work = bot_game(["手铐"], enemy_hp=2)
     action = botReg.get("达尔文").decide(msg_event, work.get_state(), {})
     assert action.type == "use_prop"
     assert action.prop == "手铐"
@@ -44,7 +44,7 @@ def test_decide_uses_handcuffs():
 
 
 def test_decide_uses_red_cow_on_self():
-    game, msg_event, work = bot_game(["红牛"], enemy_hp=2)
+    _game, msg_event, work = bot_game(["红牛"], enemy_hp=2)
     action = botReg.get("达尔文").decide(msg_event, work.get_state(), {})
     assert action.type == "use_prop"
     assert action.prop == "红牛"
@@ -52,14 +52,14 @@ def test_decide_uses_red_cow_on_self():
 
 
 def test_decide_saw_when_bullet_visible_live():
-    game, msg_event, work = bot_game(["锯子"], enemy_hp=2, bullet=1, bullet_visible=True)
+    _game, msg_event, work = bot_game(["锯子"], enemy_hp=2, bullet=1, bullet_visible=True)
     action = botReg.get("达尔文").decide(msg_event, work.get_state(), {})
     assert action.type == "use_prop"
     assert action.prop == "锯子"
 
 
 def test_decide_poker_when_bullet_visible_blank():
-    game, msg_event, work = bot_game(["扑克"], enemy_hp=2, bullet=0, bullet_visible=True)
+    _game, msg_event, work = bot_game(["扑克"], enemy_hp=2, bullet=0, bullet_visible=True)
     action = botReg.get("达尔文").decide(msg_event, work.get_state(), {})
     assert action.type == "use_prop"
     assert action.prop == "扑克"
@@ -67,21 +67,21 @@ def test_decide_poker_when_bullet_visible_blank():
 
 
 def test_decide_shoot_self_on_blank_without_props():
-    game, msg_event, work = bot_game([], enemy_hp=2, bullet=0, bullet_visible=True)
+    _game, msg_event, work = bot_game([], enemy_hp=2, bullet=0, bullet_visible=True)
     action = botReg.get("达尔文").decide(msg_event, work.get_state(), {})
     assert action.type == "shoot"
     assert action.target == ""
 
 
 def test_decide_magnifier_when_bullet_hidden():
-    game, msg_event, work = bot_game(["放大镜"], enemy_hp=2, bullet=1, bullet_visible=False)
+    _game, msg_event, work = bot_game(["放大镜"], enemy_hp=2, bullet=1, bullet_visible=False)
     action = botReg.get("达尔文").decide(msg_event, work.get_state(), {})
     assert action.type == "use_prop"
     assert action.prop == "放大镜"
 
 
 def test_decide_shoot_other_by_default():
-    game, msg_event, work = bot_game([], enemy_hp=2, bullet=1, bullet_visible=True, props_limit=0)
+    _game, msg_event, work = bot_game([], enemy_hp=2, bullet=1, bullet_visible=True, props_limit=0)
     action = botReg.get("达尔文").decide(msg_event, work.get_state(), {})
     assert action.type == "shoot"
     assert action.target == "u2"
@@ -97,7 +97,7 @@ def test_decide_lipstick_steals_from_enemy_with_props():
 
 
 def test_decide_firework():
-    game, msg_event, work = bot_game(["烟花"], enemy_hp=2, bullet=1, bullet_visible=True)
+    _game, msg_event, work = bot_game(["烟花"], enemy_hp=2, bullet=1, bullet_visible=True)
     action = botReg.get("达尔文").decide(msg_event, work.get_state(), {})
     assert action.type == "use_prop"
     assert action.prop == "烟花"
@@ -105,28 +105,28 @@ def test_decide_firework():
 
 
 def test_decide_chocolate_on_blank():
-    game, msg_event, work = bot_game(["巧克力"], enemy_hp=2, bullet=0, bullet_visible=True)
+    _game, msg_event, work = bot_game(["巧克力"], enemy_hp=2, bullet=0, bullet_visible=True)
     action = botReg.get("达尔文").decide(msg_event, work.get_state(), {})
     assert action.type == "use_prop"
     assert action.prop == "巧克力"
 
 
 def test_decide_invite_when_bullet_hidden():
-    game, msg_event, work = bot_game(["邀请函"], enemy_hp=2, bullet=1, bullet_visible=False, props_limit=12)
+    _game, msg_event, work = bot_game(["邀请函"], enemy_hp=2, bullet=1, bullet_visible=False, props_limit=12)
     action = botReg.get("达尔文").decide(msg_event, work.get_state(), {})
     assert action.type == "use_prop"
     assert action.prop == "邀请函"
 
 
 def test_decide_near_full_inventory():
-    game, msg_event, work = bot_game(["巧克力"], enemy_hp=2, bullet=1, bullet_visible=True, props_limit=2)
+    _game, msg_event, work = bot_game(["巧克力"], enemy_hp=2, bullet=1, bullet_visible=True, props_limit=2)
     action = botReg.get("达尔文").decide(msg_event, work.get_state(), {})
     assert action.type == "use_prop"
     assert action.prop == "巧克力"
 
 
 def test_bot_action_shoot_other():
-    game, msg_event, work = bot_game([], enemy_hp=4, bullet=1, bullet_visible=True, props_limit=6)
+    game, msg_event, _work = bot_game([], enemy_hp=4, bullet=1, bullet_visible=True, props_limit=6)
     botReg.action(msg_event)
     assert game["data"]["shooter"] == "u2"
     assert game["data"]["players"]["u2"]["hp"] == 3

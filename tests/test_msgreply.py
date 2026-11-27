@@ -2,7 +2,6 @@
 """msgReply.py 指令处理器的单元测试。"""
 
 import random
-import time
 
 from AmorLib import DataBase
 from MammonRoulette import msgReply

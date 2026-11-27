@@ -415,7 +415,7 @@ class 扑克(BaseProp):
 )
 class 转盘(BaseProp):
     name = "转盘"
-    clear_prop = ["扑克"]
+    clear_prop = ("扑克",)
 
     @staticmethod
     def garbled():
@@ -490,7 +490,7 @@ class 牛奶(BaseProp):
 )
 class 金币(BaseProp):
     name = "金币"
-    direct_use = ["锯子", "花生", "巧克力", "香烟", "放大镜", "扑克", "转盘", "牛奶"]
+    direct_use = ("锯子", "花生", "巧克力", "香烟", "放大镜", "扑克", "转盘", "牛奶")
 
     @classmethod
     def init_after(cls):
@@ -553,9 +553,7 @@ class 止疼药(BaseProp):
     @classmethod
     def can_use(cls, msg_event, target):
         game_work = GameWork.from_manager(msg_event)
-        if game_work.get_effect_data(target, "神经麻痹"):
-            return False
-        return True
+        return not game_work.get_effect_data(target, "神经麻痹")
 
     @classmethod
     def apply(cls, msg_event, target):

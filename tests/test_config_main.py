@@ -6,7 +6,7 @@ import os
 from types import SimpleNamespace
 
 import MammonRoulette
-import MammonRoulette.main as main
+from MammonRoulette import main
 from MammonRoulette import config
 
 from fakes import FakeMsgEvent, FakePluginEvent, add_player, build_game
@@ -455,7 +455,7 @@ def test_event_menu_manage(monkeypatch):
     monkeypatch.setattr(main, "is_windows", True)
 
     class FakeConfigUI:
-        started = []
+        started = []  # noqa: RUF012
 
         def __init__(self, Model_name=None, logger_proc=None):
             self.Model_name = Model_name
