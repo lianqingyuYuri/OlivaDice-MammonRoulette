@@ -10,7 +10,7 @@
 """
 
 MammonRoulette_name = "恶魔轮盘"
-MammonRoulette_ver = "2.19.0-alpha"
+MammonRoulette_ver = "2.19.0"
 MammonRoulette_svn = 61
 MammonRoulette_ver_short = f"{str(MammonRoulette_ver)}({str(MammonRoulette_svn)})"
 

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "olivos-plugin-MammonRoulette"
-version = "2.19.0-alpha"
+version = "2.19.0"
 description = "權衡風險與收益：是孤注一擲，還是步步爲營? 生死之間唯有膽識與策略並存的惡鬼得以幸存."
 readme = "README.md"
 requires-python = ">=3.10"

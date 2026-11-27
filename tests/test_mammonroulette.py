@@ -26,7 +26,7 @@ def _load_manifest():
 def test_manifest_exposes_namespace_version_and_priority():
     manifest = _load_manifest()
     assert manifest["namespace"] == NAMESPACE
-    assert manifest["version"] == "2.19.0-alpha"
+    assert manifest["version"] == "2.19.0"
     assert manifest["priority"] == 50000
     assert manifest["message_mode"] == "old_string"
     assert manifest["support"]
@@ -49,7 +49,7 @@ def test_manifest_declares_menu_config_without_webui():
 
 def test_package_metadata_is_exposed():
     assert MammonRoulette.MammonRoulette_name == "恶魔轮盘"
-    assert MammonRoulette.MammonRoulette_ver == "2.19.0-alpha"
+    assert MammonRoulette.MammonRoulette_ver == "2.19.0"
     assert MammonRoulette.MammonRoulette_svn == 61
 
 
