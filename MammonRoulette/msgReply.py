@@ -379,8 +379,6 @@ def surrender(plugin_event, Proc, msg_event, groups):
     game_work = GameWork.from_manager(msg_event)
     game_work.players[user_id]["surrender"] = True
     game_work.dead(user_id, user_id)
-    if not game_work.flag_over and game_work.flag_bot:
-        botReg.action(msg_event)
     msg_reply = game_work.format_reply()
     plugin_event.reply(msg_reply)
     return
