@@ -28,7 +28,7 @@ class 达尔文(BaseBot):
     @classmethod
     def decide(cls, msg_event, state: GameState, memory):
         me: PlayerView = state.pl_self
-        enemies = [pl for pl in state.players if not pl.is_self and not pl.is_dead]
+        enemies = [pl for pl in state.players if pl.id != state.shooter and not pl.is_dead]
         if not enemies:
             return BotAction.skip()
         pv_target = min(enemies, key=lambda p: p.hp)
