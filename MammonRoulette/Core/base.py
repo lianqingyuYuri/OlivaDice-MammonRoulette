@@ -220,7 +220,6 @@ class GameState:
                     pl.actions,
                     len(pl.props),
                     len(pl.effects),
-                    int(pl.is_self),
                     int(pl.is_shooter),
                     int(pl.is_dead),
                 ]

@@ -395,7 +395,7 @@ class 大富翁(BaseMode):
             if gold_count >= 6:
                 wins.append(pl)
         if wins:
-            game_work.order = [pl for pl in game_work.order if pl in wins]
+            game_work.order[:] = [pl for pl in game_work.order if pl in wins]
             return True
         return False
 
@@ -431,7 +431,7 @@ class 大富翁(BaseMode):
                         )
                     )
             # 贷款复活
-            game_work.order = game_work.modify["order_copy"].copy()
+            game_work.order[:] = game_work.modify["order_copy"].copy()
             old_hp = pl_target["hp"]
             pl_target.update({"hp": 2, "kills": 0, "suicide": False})
             game_work.upsert_info(
