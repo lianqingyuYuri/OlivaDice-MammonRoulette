@@ -231,6 +231,7 @@ def match_game(plugin_event, Proc, msg_event, groups):
                     "override": "",
                 },
                 "tmp": {},
+                "IdStore": 0,
             }
         )
     elif game_start:
@@ -273,10 +274,7 @@ def join_bot(plugin_event, Proc, msg_event, groups):
     mode_name = game["mode"]["name"]
     bot_name = groups[0]
     # region 添加AI
-    while True:
-        bot_id = f"bot_{random.randint(0, 999999)}"
-        if bot_id not in game_work.players:
-            break
+    bot_id = f"bot_{game_work.next_id}"
     game_work.join(bot_id, bot_model=bot_name)
     # endregion
     # region 检查人数

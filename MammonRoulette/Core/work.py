@@ -88,6 +88,11 @@ class GameWork:
         return self.players[self.shooter]["bot_model"] is not None
 
     @property
+    def next_id(self) -> int:  # 下一个ID
+        self.game["IdStore"] += 1
+        return self.game["IdStore"]
+
+    @property
     def flag_over(self) -> bool:  # 游戏结束标识
         return self.game["over"]
 
@@ -183,7 +188,7 @@ class GameWork:
             if not info_flag:
                 self.reply["info"].append({"id": info_id, "data": info})
         else:
-            info_id = max((item["id"] for item in self.reply["info"]), default=0) + 1
+            info_id = self.next_id
             self.reply["info"].append({"id": info_id, "data": info})
         return info_id
 
@@ -265,10 +270,7 @@ class GameWork:
         return self.players[target]["effects_event"].get(effect_name)
 
     def register_prop_event(self, prop_data: dict):
-        if self.props_event:
-            prop_id = max(item["id"] for item in self.props_event) + 1
-        else:
-            prop_id = 1
+        prop_id = self.next_id
         prop_data["id"] = prop_id
         prop_data.setdefault("expired", False)
         self.props_event.append(prop_data)

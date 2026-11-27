@@ -63,6 +63,7 @@ game = {
         "is_check_dead": bool,  # 是否检查死亡
         "is_check_over": bool,  # 是否检查游戏结束
     },
+    "IdStore": int,  # ID存储
 }
 
 moment = [
@@ -78,7 +79,7 @@ remove_props_event = "remove"
 remove_effects_event = "remove"
 
 prop_data = {
-    "id": str,  # 道具id
+    "id": int,  # 道具id
     "name": str,  # 道具名称
     "expired": bool,  # 过期
     "data": {},  # 道具数据
